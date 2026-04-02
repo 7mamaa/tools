@@ -1,0 +1,74 @@
+[
+  {
+    "url": "prompt_manager.html",
+    "title": "مدير البرومبت",
+    "description": "نظام ذكي لإدارة وحفظ وتصنيف النصوص والبرومبتات الخاصة بالذكاء الاصطناعي مع إمكانيات البحث والتصدير.",
+    "icon": "fa-solid fa-shapes",
+    "badge": "الأدوات",
+    "iconBg": "#1e3a5f",
+    "iconColor": "#3b82f6"
+  },
+  {
+    "url": "telegram_bot_mobile.html",
+    "title": "تليجرام بوت (موبايل)",
+    "description": "واجهة مخصصة للهواتف لإدارة بوت التليجرام، إرسال الرسائل وتعديل الأزرار بسهولة.",
+    "icon": "fa-solid fa-mobile-screen-button",
+    "badge": "بوتات",
+    "iconBg": "#064e3b",
+    "iconColor": "#10b981"
+  },
+  {
+    "url": "telegram_bot_desktop.html",
+    "title": "تليجرام بوت (سطح المكتب)",
+    "description": "لوحة تحكم كاملة لإدارة البوت مع محاكي للمعاينة المباشرة وأدوات تحرير متقدمة.",
+    "icon": "fa-solid fa-desktop",
+    "badge": "بوتات",
+    "iconBg": "#2e1065",
+    "iconColor": "#8b5cf6"
+  },
+  {
+    "url": "Pomodoro.html",
+    "title": "Pomodoro ToDo",
+    "description": "تطبيق لإدارة المهام مع تقنية بومودورو للتركيز وزيادة الإنتاجية.",
+    "icon": "fa-solid fa-list-check",
+    "badge": "انتاجية",
+    "iconBg": "#451a03",
+    "iconColor": "#f59e0b"
+  },
+  {
+    "url": "منسق التفريغات.html",
+    "title": "منسق الملاحظات",
+    "description": "أداة ذكية لتنسيق التفريغات الطبية وتحويلها من Markdown إلى تقارير احترافية.",
+    "icon": "fa-solid fa-file-medical",
+    "badge": "أدوات طبية",
+    "iconBg": "#4c0519",
+    "iconColor": "#f43f5e"
+  },
+  {
+    "url": "FILE_marger.html",
+    "title": "دمج الملفات",
+    "description": "أداة سريعة لدمج ملفات TXT المتعددة معاً وتحميلها في ملف واحد في ثوانٍ.",
+    "icon": "fa-solid fa-layer-group",
+    "badge": "أدوات",
+    "iconBg": "#312e81",
+    "iconColor": "#818cf8"
+  },
+  {
+    "url": "csv-html-txt.html",
+    "title": "محول النصوص",
+    "description": "أداة سريعة تحول النصوص العادية إلى صيغ متعددة مثل CSV و HTML.",
+    "icon": "fa-solid fa-file-export",
+    "badge": "أدوات",
+    "iconBg": "#0f766e",
+    "iconColor": "#2dd4bf"
+  },
+  {
+    "url": "MARKDAWIN/index.html",
+    "title": "محرر ومصمم ماركداون",
+    "description": "أداة لعرض وتحرير نصوص Markdown بسهولة وشكل متناسق.",
+    "icon": "fa-brands fa-markdown",
+    "badge": "أدوات",
+    "iconBg": "#374151",
+    "iconColor": "#d1d5db"
+  }
+]

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مدير البرومبت الشخصي - المطور</title>
+    <style>
+        :root {
+            --bg-color: #1e1e2e;
+            --card-bg: #2b2b3f;
+            --text-color: #cdd6f4;
+            --accent: #89b4fa;
+            --danger: #f38ba8;
+            --success: #a6e3a1;
+            --warning: #fab387;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+        }
+
+        h1 { text-align: center; color: var(--accent); margin-bottom: 30px; }
+
+        .input-group {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        input, textarea {
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #45475a;
+            background: #181825;
+            color: white;
+            font-size: 16px;
+            font-family: inherit;
+        }
+        
+        textarea { resize: vertical; min-height: 80px; }
+
+        .btn-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            flex: 1;
+            cursor: pointer;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        #addBtn { background-color: var(--accent); color: #1e1e2e; }
+        #exportBtn { background-color: var(--success); color: #1e1e2e; }
+        #importBtn { background-color: var(--warning); color: #1e1e2e; }
+
+        button:hover { opacity: 0.8; }
+
+        #searchBar {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border: 1px solid #45475a;
+            background: #181825;
+            color: white;
+            box-sizing: border-box;
+        }
+
+        .prompt-list { display: grid; gap: 15px; }
+
+        .prompt-card {
+            background: var(--card-bg);
+            padding: 15px 20px;
+            border-radius: 10px;
+            border-left: 5px solid var(--accent);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: 0.2s;
+        }
+
+        .prompt-card:hover { background: #313244; }
+
+        .prompt-info { flex-grow: 1; }
+        .prompt-title { font-weight: bold; font-size: 1.1em; margin-bottom: 5px; }
+        .prompt-preview { font-size: 0.85em; color: #a6adc8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 400px; }
+
+        .delete-btn { background: none; color: var(--danger); font-size: 20px; border: none; cursor: pointer; flex: 0; }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--success);
+            color: #1e1e2e;
+            padding: 10px 20px;
+            border-radius: 20px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        .toast.show { opacity: 1; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>مخزن البرومبت الذكي 🧠</h1>
+
+    <div class="input-group">
+        <input type="text" id="titleInput" placeholder="عنوان البرومبت...">
+        <textarea id="promptInput" placeholder="ضع نص البرومبت هنا..."></textarea>
+        
+        <div class="btn-row">
+            <button id="addBtn" onclick="addPrompt()">حفظ جديد</button>
+            <button id="exportBtn" onclick="exportData()">تصدير (Backup)</button>
+            <button id="importBtn" onclick="document.getElementById('fileInput').click()">استيراد (Restore)</button>
+        </div>
+        <input type="file" id="fileInput" style="display:none" onchange="importData(event)">
+    </div>
+
+    <input type="text" id="searchBar" onkeyup="filterPrompts()" placeholder="بحث في العناوين...">
+
+    <div id="promptList" class="prompt-list"></div>
+</div>
+
+<div id="toast" class="toast">تمت العملية بنجاح! ✅</div>
+
+<script>
+    let prompts = JSON.parse(localStorage.getItem('myPrompts')) || [];
+
+    function saveToLocal() {
+        localStorage.setItem('myPrompts', JSON.stringify(prompts));
+    }
+
+    function renderPrompts(filterText = '') {
+        const list = document.getElementById('promptList');
+        list.innerHTML = '';
+        prompts.forEach((item, index) => {
+            if (item.title.toLowerCase().includes(filterText.toLowerCase())) {
+                const div = document.createElement('div');
+                div.className = 'prompt-card';
+                div.onclick = (e) => copyToClipboard(item.content);
+                div.innerHTML = `
+                    <div class="prompt-info">
+                        <div class="prompt-title">${item.title}</div>
+                        <div class="prompt-preview">${item.content.substring(0, 60)}...</div>
+                    </div>
+                    <button class="delete-btn" onclick="deletePrompt(${index}, event)">×</button>
+                `;
+                list.appendChild(div);
+            }
+        });
+    }
+
+    function addPrompt() {
+        const title = document.getElementById('titleInput').value;
+        const content = document.getElementById('promptInput').value;
+        if (title && content) {
+            prompts.unshift({ title, content });
+            saveAndRefresh();
+            document.getElementById('titleInput').value = '';
+            document.getElementById('promptInput').value = '';
+        }
+    }
+
+    function deletePrompt(index, event) {
+        event.stopPropagation();
+        if(confirm('حذف هذا البرومبت؟')) {
+            prompts.splice(index, 1);
+            saveAndRefresh();
+        }
+    }
+
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(() => showToast("تم النسخ!"));
+    }
+
+    // --- وظائف التصدير والاستيراد الجديدة ---
+
+    function exportData() {
+        if (prompts.length === 0) return alert("لا توجد بيانات لتصديرها");
+        const dataStr = JSON.stringify(prompts, null, 2);
+        const blob = new Blob([dataStr], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `prompts_backup_${new Date().toLocaleDateString()}.json`;
+        link.click();
+        showToast("تم تحميل ملف النسخة الاحتياطية");
+    }
+
+    function importData(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const imported = JSON.parse(e.target.result);
+                if (Array.isArray(imported)) {
+                    prompts = imported.concat(prompts); // دمج القديم والجديد
+                    saveAndRefresh();
+                    showToast("تم استيراد البيانات بنجاح!");
+                }
+            } catch (err) {
+                alert("خطأ في قراءة الملف!");
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    function saveAndRefresh() {
+        saveToLocal();
+        renderPrompts();
+    }
+
+    function showToast(msg) {
+        const toast = document.getElementById('toast');
+        toast.innerText = msg + " ✅";
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+
+    function filterPrompts() {
+        renderPrompts(document.getElementById('searchBar').value);
+    }
+
+    renderPrompts();
+</script>
+
+</body>
+</html>

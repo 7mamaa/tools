@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أداة دمج الملفات النصية المتقدمة جداً</title>
+    <!-- استدعاء Tailwind CSS لتوفير عناء كتابة CSS يدوي -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* تخصيص شريط التمرير ليبدو أكثر احترافية */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap');
+        body {
+            font-family: 'Tajawal', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 min-h-screen flex items-center justify-center p-4">
+
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden border border-slate-200">
+        <!-- ترويسة الأداة -->
+        <div class="bg-indigo-600 p-6 text-white text-center">
+            <h1 class="text-2xl font-bold mb-2">دمج الملفات النصية 📝</h1>
+            <p class="text-indigo-200 text-sm">ارفع ملفاتك، اختر اسماً، وسنقوم بالباقي في جزء من الثانية.</p>
+        </div>
+
+        <div class="p-8 space-y-6">
+            
+            <!-- منطقة رفع الملفات -->
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-2">اختر الملفات النصية (.txt)</label>
+                <div class="flex items-center justify-center w-full">
+                    <label for="file-upload" class="flex flex-col items-center justify-center w-full h-32 border-2 border-slate-300 border-dashed rounded-lg cursor-pointer bg-slate-50 hover:bg-slate-100 transition duration-200">
+                        <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                            <svg class="w-8 h-8 mb-4 text-slate-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
+                            </svg>
+                            <p class="mb-2 text-sm text-slate-500"><span class="font-semibold">اضغط لاختيار الملفات</span> أو اسحبها هنا</p>
+                            <p class="text-xs text-slate-500">يدعم ملفات TXT فقط</p>
+                        </div>
+                        <input id="file-upload" type="file" class="hidden" multiple accept=".txt" />
+                    </label>
+                </div>
+            </div>
+
+            <!-- عرض الملفات المختارة -->
+            <div id="file-list-container" class="hidden">
+                <h3 class="text-sm font-medium text-slate-700 mb-2">الملفات المحددة:</h3>
+                <ul id="file-list" class="bg-slate-50 rounded-lg p-3 max-h-40 overflow-y-auto text-sm text-slate-600 border border-slate-200 space-y-1">
+                    <!-- سيتم إضافة أسماء الملفات هنا عبر جافا سكريبت -->
+                </ul>
+            </div>
+
+            <!-- إعدادات الملف الناتج -->
+            <div>
+                <label for="output-filename" class="block text-sm font-medium text-slate-700 mb-2">اسم الملف الناتج (اختياري)</label>
+                <input type="text" id="output-filename" placeholder="مثال: AR_Merged_Document" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition text-left" dir="ltr">
+                <p class="text-xs text-slate-500 mt-1">سيتم استخدام "Merged_Files" كاسم افتراضي إذا تركته فارغاً.</p>
+            </div>
+
+            <!-- صندوق الرسائل (بديل عن alert المزعج) -->
+            <div id="message-box" class="hidden p-4 rounded-lg text-sm font-medium"></div>
+
+            <!-- زر الدمج -->
+            <button id="merge-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200 flex justify-center items-center shadow-md">
+                <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
+                دمج وتحميل
+            </button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const fileUpload = document.getElementById('file-upload');
+            const fileListContainer = document.getElementById('file-list-container');
+            const fileList = document.getElementById('file-list');
+            const outputFilename = document.getElementById('output-filename');
+            const mergeBtn = document.getElementById('merge-btn');
+            const messageBox = document.getElementById('message-box');
+
+            let selectedFiles = [];
+
+            // دالة لإظهار الرسائل بدلاً من استخدام alert
+            const showMessage = (msg, type = 'error') => {
+                messageBox.textContent = msg;
+                messageBox.className = `p-4 rounded-lg text-sm font-medium mb-4 block ${
+                    type === 'error' ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-green-50 text-green-700 border border-green-200'
+                }`;
+                // إخفاء الرسالة بعد 4 ثواني
+                setTimeout(() => {
+                    messageBox.classList.add('hidden');
+                }, 4000);
+            };
+
+            // تحديث واجهة عرض الملفات عند اختيارها
+            fileUpload.addEventListener('change', (e) => {
+                selectedFiles = Array.from(e.target.files);
+                
+                if (selectedFiles.length > 0) {
+                    fileList.innerHTML = '';
+                    selectedFiles.forEach((file, index) => {
+                        const li = document.createElement('li');
+                        li.className = 'flex items-center before:content-["📄"] before:ml-2';
+                        li.textContent = `${index + 1}. ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+                        fileList.appendChild(li);
+                    });
+                    fileListContainer.classList.remove('hidden');
+                    messageBox.classList.add('hidden'); // إخفاء أي رسائل خطأ سابقة
+                } else {
+                    fileListContainer.classList.add('hidden');
+                }
+            });
+
+            // عملية الدمج الرئيسية
+            mergeBtn.addEventListener('click', async () => {
+                if (selectedFiles.length === 0) {
+                    showMessage('أيها المحترف، يجب عليك اختيار ملف واحد على الأقل قبل محاولة الدمج.', 'error');
+                    return;
+                }
+
+                // تعطيل الزر أثناء المعالجة (رغم أنها ستكون سريعة جداً)
+                mergeBtn.disabled = true;
+                mergeBtn.classList.add('opacity-75', 'cursor-not-allowed');
+                mergeBtn.innerHTML = '<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> جاري الدمج...';
+
+                try {
+                    let mergedText = '';
+                    const separator = '\n\n' + '='.repeat(50) + '\n\n';
+
+                    // قراءة محتوى كل ملف ودمجه
+                    for (let i = 0; i < selectedFiles.length; i++) {
+                        const file = selectedFiles[i];
+                        const text = await file.text(); // هذه دالة قياسية مدعومة في كل المتصفحات الحديثة
+                        
+                        // إضافة ترويسة بسيطة لكل ملف مدمج لتسهيل القراءة
+                        mergedText += `--- بداية الملف: ${file.name} ---\n\n`;
+                        mergedText += text;
+                        mergedText += (i < selectedFiles.length - 1) ? separator : '\n\n--- نهاية الدمج ---';
+                    }
+
+                    // تحديد اسم الملف النهائي
+                    let finalName = outputFilename.value.trim();
+                    if (!finalName) {
+                        finalName = 'Merged_Files'; // الاسم الافتراضي
+                    }
+                    if (!finalName.toLowerCase().endsWith('.txt')) {
+                        finalName += '.txt';
+                    }
+
+                    // إنشاء Blob وهو كائن يمثل بيانات ملف خام غير قابلة للتغيير
+                    const blob = new Blob([mergedText], { type: 'text/plain;charset=utf-8' });
+                    
+                    // إنشاء رابط وهمي لتحميل الملف
+                    const downloadUrl = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = downloadUrl;
+                    a.download = finalName;
+                    
+                    // إخفاء الرابط والضغط عليه برمجياً
+                    document.body.appendChild(a);
+                    a.click();
+                    
+                    // تنظيف الذاكرة
+                    setTimeout(() => {
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(downloadUrl);
+                    }, 100);
+
+                    showMessage('تم دمج الملفات وتحميلها بنجاح!', 'success');
+
+                } catch (error) {
+                    console.error("خطأ أثناء دمج الملفات:", error);
+                    showMessage('حدث خطأ غير متوقع أثناء قراءة الملفات.', 'error');
+                } finally {
+                    // إعادة الزر لحالته الأصلية
+                    mergeBtn.disabled = false;
+                    mergeBtn.classList.remove('opacity-75', 'cursor-not-allowed');
+                    mergeBtn.innerHTML = '<svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg> دمج وتحميل';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1421 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PomoDoro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        body {
+            font-family: system-ui, sans-serif;
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #1a1a2e;
+            color: #eee;
+            padding: 16px;
+        }
+
+        body.audio-active {
+            padding-bottom: 110px;
+        }
+
+        .container {
+            width: auto;
+            height: auto;
+            max-width: 92vw;
+            padding: 36px 28px;
+            border-radius: 16px;
+            background: #16213e;
+            text-align: center;
+            position: relative
+        }
+
+        .menu-btn {
+            background: #1a1a2e;
+            border: none;
+            color: #aaa;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center
+        }
+
+        .butto--container {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 8px
+        }
+
+        .butto--container:last-of-type {
+            margin-top: 8px;
+            margin-bottom: 0
+        }
+
+        .butto {
+            border: none;
+            border-radius: 10px;
+            font-family: inherit;
+            font-weight: 600;
+            cursor: pointer
+        }
+
+        .butto--comand {
+            padding: 8px 16px;
+            font-size: .82rem;
+            background: #1a1a2e;
+            color: #888
+        }
+
+        .butto--comand.active-mode {
+            background: #0f3460;
+            color: #fff
+        }
+
+        .clock {
+            font-size: clamp(3rem, 12vw, 5.5rem);
+            font-weight: 800;
+            color: #eee;
+            padding: clamp(12px, 3vh, 24px) 0;
+            letter-spacing: -2px;
+            line-height: 1
+        }
+
+        .butto--timer {
+            padding: clamp(8px, 2vw, 12px) clamp(14px, 4vw, 26px);
+            font-size: clamp(.75rem, 2.5vw, .9rem);
+            color: #fff;
+            background: #e94560
+        }
+
+        [data-mode="short"] .butto--timer {
+            background: #1abc9c
+        }
+
+        [data-mode="infinity"] .butto--timer {
+            background: #9b59b6
+        }
+
+        [data-mode="infinity"] .clock {
+            color: #c39bd3
+        }
+
+        .timer-notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #27ae60;
+            color: #fff;
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1rem;
+            z-index: 10000;
+            display: none
+        }
+
+        .timer-notification.show {
+            display: block
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -360px;
+            width: 340px;
+            max-width: 85vw;
+            height: 100vh;
+            background: #0f0f23;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column
+        }
+
+        .sidebar.open {
+            left: 0
+        }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #222
+        }
+
+        .sidebar-header h2 {
+            color: #ddd;
+            font-size: 1.2rem
+        }
+
+        .close-btn {
+            background: #1a1a2e;
+            border: none;
+            color: #aaa;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center
+        }
+
+        .todo-input-container {
+            display: flex;
+            gap: 6px;
+            padding: 14px 20px
+        }
+
+        .todo-input-container input {
+            flex: 1;
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1px solid #333;
+            background: #1a1a2e;
+            color: #fff;
+            font-family: inherit;
+            font-size: .88rem;
+            outline: none
+        }
+
+        .todo-input-container button {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            border: none;
+            background: #27ae60;
+            color: #fff;
+            font-size: 1.3rem;
+            font-weight: 700;
+            cursor: pointer
+        }
+
+        .todo-list {
+            list-style: none;
+            padding: 6px 20px 20px;
+            overflow-y: auto;
+            flex: 1
+        }
+
+        .todo-list li {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            margin-bottom: 4px;
+            border-radius: 8px;
+            background: #1a1a2e;
+            color: #ccc;
+            font-size: .88rem
+        }
+
+        .todo-list li.completed span {
+            text-decoration: line-through;
+            color: #555
+        }
+
+        .delete-task-btn {
+            background: none;
+            border: none;
+            color: #555;
+            font-size: 1.2rem;
+            cursor: pointer
+        }
+
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .6);
+            z-index: 999;
+            display: none
+        }
+
+        .overlay.active {
+            display: block
+        }
+
+        .modal {
+            position: fixed;
+            inset: 0;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            background: rgba(0, 0, 0, .7)
+        }
+
+        .modal.visible {
+            display: flex
+        }
+
+        .modal-content {
+            width: 360px;
+            max-width: 88vw;
+            background: #16213e;
+            border-radius: 16px;
+            padding: 28px;
+            position: relative
+        }
+
+        .modal-content h2 {
+            color: #ddd;
+            font-size: 1.2rem;
+            margin-bottom: 20px
+        }
+
+        .close {
+            position: absolute;
+            top: 14px;
+            right: 16px;
+            background: #1a1a2e;
+            border: none;
+            border-radius: 8px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #aaa;
+            font-size: 1.2rem;
+            cursor: pointer
+        }
+
+        .setting-group {
+            margin-bottom: 14px
+        }
+
+        .setting-group label {
+            display: block;
+            color: #888;
+            font-size: .82rem;
+            margin-bottom: 6px
+        }
+
+        .setting-group input {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1px solid #333;
+            background: #1a1a2e;
+            color: #fff;
+            font-family: inherit;
+            font-size: .95rem;
+            outline: none
+        }
+
+        .modal .butto--timer {
+            background: #27ae60
+        }
+
+        @media(max-width:400px) {
+            .container {
+                padding: 20px 12px
+            }
+
+            .butto--comand {
+                padding: 6px 10px;
+                font-size: .75rem
+            }
+        }
+
+        @media(max-height:500px) {
+            .clock {
+                padding: 8px 0
+            }
+
+            .butto--container {
+                margin-bottom: 4px
+            }
+        }
+
+        #audioBar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #0f0f23;
+            border-top: 1px solid #333;
+            padding: 8px 12px;
+            z-index: 900;
+            font-size: .82rem
+        }
+
+        #audioBar .ab-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 4px
+        }
+
+        #audioBar .ab-row:last-child {
+            margin-bottom: 0
+        }
+
+        #audioBar button {
+            background: #1a1a2e;
+            border: none;
+            color: #aaa;
+            padding: 5px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: .78rem;
+            font-family: inherit
+        }
+
+
+
+        #audioSeek {
+            flex: 1;
+            height: 4px;
+            cursor: pointer;
+            accent-color: #e94560
+        }
+
+        #audioTrackName {
+            flex: 1;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            color: #888;
+            font-size: .76rem
+        }
+
+        #audioVolume {
+            width: 60px;
+            height: 4px;
+            cursor: pointer;
+            accent-color: #27ae60
+        }
+
+        #audioSpeed {
+            width: 80px;
+            height: 4px;
+            cursor: pointer;
+            accent-color: #e94560
+        }
+
+        #audioToggleBtn.ab-playing {
+            background: #0f3460;
+            color: #fff
+        }
+
+        /* --- Drag & Drop Overlay --- */
+        #dropOverlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 15, 35, .88);
+            z-index: 9999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 12px;
+            pointer-events: none
+        }
+
+        #dropOverlay.active {
+            display: flex
+        }
+
+        #dropOverlay .drop-icon {
+            font-size: 4rem;
+            line-height: 1
+        }
+
+        #dropOverlay .drop-border {
+            border: 3px dashed #e94560;
+            border-radius: 24px;
+            padding: 48px 64px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px
+        }
+
+        #dropOverlay .drop-text {
+            color: #ccc;
+            font-size: 1.1rem;
+            font-weight: 600
+        }
+
+        #dropOverlay .drop-hint {
+            color: #666;
+            font-size: .8rem
+        }
+
+        /* --- Fullscreen Video Player --- */
+        .video-player {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #000;
+            z-index: 10;
+            display: none;
+        }
+
+        .video-player.active {
+            display: block;
+        }
+
+        body.video-mode {
+            padding: 0;
+            background: #000;
+        }
+
+        body.video-mode .container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            max-width: 100%;
+            border-radius: 0;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            gap: clamp(10px, 2vw, 24px);
+            padding: 10px 24px;
+            z-index: 20;
+            background: rgba(15, 15, 35, 0.9);
+            border-bottom: 1px solid #333;
+            transform: translateY(-100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body.video-mode .container.show-bar {
+            transform: translateY(0);
+        }
+
+        body.video-mode .container .clock {
+            font-size: clamp(2rem, 3vw, 3rem);
+            padding: 0;
+            margin: 0;
+        }
+
+        body.video-mode .container .butto--container {
+            margin: 0;
+            align-items: center;
+        }
+
+        @media(max-width: 800px) {
+            body.video-mode .container {
+                flex-wrap: wrap;
+                padding: 10px;
+                justify-content: space-around;
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Drag & Drop Overlay -->
+    <div id="dropOverlay">
+        <div class="drop-border">
+            <span class="drop-icon">🎵🎬</span>
+            <span class="drop-text">Drop media files here</span>
+            <span class="drop-hint">Audio & Video supported</span>
+        </div>
+    </div>
+    <div id="timerNotification" class="timer-notification">⏰ Time's up!</div>
+    <div id="Container" class="container" data-mode="pomodoro">
+        <div class="butto--container">
+            <button id="menuBtn" class="menu-btn" aria-label="Open todo list">
+                <svg width="20" height="20" viewBox="0 0 448 512" fill="currentColor">
+                    <path
+                        d="M0 96C0 78.3 14.3 64 32 64h384c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zm0 160c0-17.7 14.3-32 32-32h384c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zm448 160c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32h384c17.7 0 32 14.3 32 32z" />
+                </svg>
+            </button>
+            <button id="pomodoro" class="butto butto--comand active-mode">Pomodoro</button>
+            <button id="break" class="butto butto--comand">Break</button>
+            <button id="infinity-mode" class="butto butto--comand">∞ Infinity</button>
+        </div>
+        <div id="counterElement" class="clock">25:00</div>
+        <div class="butto--container">
+            <button id="startStop" class="butto butto--timer">Start</button>
+            <button id="reset" class="butto butto--timer">Reset</button>
+            <button id="settingsBtn" class="butto butto--timer">Settings</button>
+        </div>
+        <div class="butto--container">
+            <button id="videoOpenBtn" class="butto butto--timer" title="Video Player">🎬</button>
+            <button id="audioOpenBtn" class="butto butto--timer" title="Music Player">🎵</button>
+            <button id="audioToggleBtn" class="butto butto--timer" title="Show/Hide Player" hidden>🔊</button>
+            <button id="prayerBtn" class="butto butto--timer" title="مواقيت الصلاة">🕌</button>
+            <button id="fullscreenBtn" class="butto butto--timer" title="ملء الشاشة">⛶</button>
+            <button id="exitVideoBtn" class="butto butto--timer" title="إغلاق الفيديو" hidden
+                style="background:#e94560">❌</button>
+        </div>
+        <input type="file" id="audioFileInput" accept="audio/*,video/*" multiple hidden>
+    </div>
+    <div id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <h2>📝 To-Do List</h2>
+            <button id="closeSidebar" class="close-btn">&times;</button>
+        </div>
+        <div class="todo-input-container">
+            <input type="text" id="todoInput" placeholder="Add a new task...">
+            <button id="addTodoBtn">+</button>
+        </div>
+        <ul id="todoList" class="todo-list"></ul>
+    </div>
+    <div id="overlay" class="overlay"></div>
+    <video id="videoPlayer" class="video-player" controls hidden></video>
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <span id="closeSettings" class="close">&times;</span>
+            <h2>⚙️ Timer Settings</h2>
+            <div class="setting-group">
+                <label for="pomodoroTime">Pomodoro (minutes)</label>
+                <input type="number" id="pomodoroTime" value="25" min="1">
+            </div>
+            <div class="setting-group">
+                <label for="shortBreakTime">Short Break (minutes)</label>
+                <input type="number" id="shortBreakTime" value="5" min="1">
+            </div>
+
+            <button id="saveSettings" class="butto butto--timer" style="width:100%;margin-top:16px">Save</button>
+        </div>
+    </div>
+
+    <!-- Prayer Times Modal -->
+    <div id="prayerModal" class="modal">
+        <div class="modal-content" style="padding:14px;width:390px;max-height:85vh;overflow-y:auto">
+            <span id="closePrayer" class="close">&times;</span>
+            <h2>🕌 مواقيت الصلاة</h2>
+            <div style="display:flex;justify-content:center">
+                <iframe title="prayerWidget"
+                    style="width:100%;max-width:350px;height:358px;border:1px solid #333;border-radius:12px"
+                    scrolling="no" src="https://www.islamicfinder.org/prayer-widget/42626924/shafi/2/0/19.5/17.5"
+                    frameborder="0">
+                </iframe>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audio Player Bottom Bar -->
+    <div id="audioBar" hidden>
+        <div class="ab-row">
+            <span id="audioTrackName">—</span>
+            <span id="audioTimeDisplay" style="color:#aaa;font-size:.76rem">0:00 / 0:00</span>
+            <button id="audioMuteBtn" title="Mute">🔊</button>
+            <input type="range" id="audioVolume" min="0" max="100" value="100" step="1">
+            <button id="audioMinBtn" title="Minimize">▼</button>
+            <button id="audioCloseBtn" title="Close">✕</button>
+        </div>
+        <div class="ab-row">
+            <button id="audioPrevBtn" title="Previous">⏮</button>
+            <button id="audioRewBtn" title="-10s">⏪</button>
+            <button id="audioPlayBtn" title="Play/Pause">▶</button>
+            <button id="audioFwdBtn" title="+10s">⏩</button>
+            <button id="audioNextBtn" title="Next">⏭</button>
+            <input type="range" id="audioSeek" min="0" max="100" value="0" step="0.1">
+        </div>
+        <div class="ab-row">
+            <span style="color:#666;font-size:.72rem">Speed:</span>
+            <input type="range" id="audioSpeed" min="1" max="3" value="1" step="0.1">
+            <span id="audioSpeedVal" style="color:#aaa;font-size:.72rem;min-width:28px">1x</span>
+            <span style="flex:1"></span>
+            <button id="audioAddMore" title="Add more files">+ Files</button>
+            <span id="audioPlaylistInfo" style="color:#666;font-size:.72rem"></span>
+        </div>
+    </div>
+
+    <!-- ============================================================= -->
+    <!-- ALL JAVASCRIPT MERGED INLINE (constants.js + index.js + inline scripts) -->
+    <!-- ============================================================= -->
+    <script>
+        // =============================================================
+        // constants.js — Status Labels & Types
+        // =============================================================
+
+        // Status Labels for buttons
+        const Button_Labels = {
+            Start: "Start",
+            Stop: "Stop",
+            Reset: "Reset",
+            break: "break"
+        }
+
+        // Define variables to hold stopwatch status
+        const Status_Types = {
+            STOPPED: 0,
+            STARTED: 1
+        }
+
+        // =============================================================
+        // index.js — PomodoroToDo Optimized JavaScript (Extreme Minimalism)
+        //
+        // OPTIMIZATIONS APPLIED:
+        // 1. Event delegation — O(1) listeners instead of O(n) per todo/history item
+        // 2. DocumentFragment — batch DOM writes (single reflow per render)
+        // 3. Single-pass counters — one loop instead of 3x .filter() calls
+        // 4. Set-based streak lookup — O(1) instead of O(n) includes()
+        // 5. Memory leak cleanup — beforeunload clears interval
+        // 6. Non-blocking notification — replaces thread-blocking alert()
+        // 7. data-mode attribute — 1 DOM write replaces 14 classList calls
+        // 8. Cached date strings — no redundant Date objects in loops
+        // =============================================================
+
+        // --- Constants & Config (names preserved exactly) ---
+        const starTimerBtn = document.getElementById("startStop");
+        const resetTimerBtn = document.getElementById("reset");
+        const counterElement = document.getElementById("counterElement");
+        const pomodoroBtn = document.getElementById("pomodoro");
+        const breakBtn = document.getElementById("break");
+        const infinityBtn = document.getElementById("infinity-mode");
+        const container = document.getElementById("Container");
+
+        // Settings Elements
+        const settingsBtn = document.getElementById("settingsBtn");
+        const settingsModal = document.getElementById("settingsModal");
+        const closeSettings = document.getElementById("closeSettings");
+        const saveSettingsBtn = document.getElementById("saveSettings");
+        const pomodoroInput = document.getElementById("pomodoroTime");
+        const shortBreakInput = document.getElementById("shortBreakTime");
+
+        // Sidebar Elements
+        const menuBtn = document.getElementById("menuBtn");
+        const sidebar = document.getElementById("sidebar");
+        const closeSidebar = document.getElementById("closeSidebar");
+        const overlay = document.getElementById("overlay");
+        const todoInput = document.getElementById("todoInput");
+        const addTodoBtn = document.getElementById("addTodoBtn");
+        const todoList = document.getElementById("todoList");
+
+
+
+        // Non-blocking notification element (replaces alert)
+        const timerNotification = document.getElementById("timerNotification");
+
+        // Default Times (in minutes) - Load from LocalStorage or default
+        let defaultPomo = parseInt(localStorage.getItem('pomoTime')) || 25;
+        let defaultShort = parseInt(localStorage.getItem('shortTime')) || 5;
+
+        // Current Timer State
+        let minutes = defaultPomo;
+        let seconds = 0;
+        let hours = 0; // Used only in infinity mode
+        let interval = null;
+        let status = Status_Types.STOPPED;
+        let currentMode = 'pomodoro'; // 'pomodoro', 'short', 'infinity'
+
+        // Real-time tracking variables — prevents timer drift
+        let timerStartTime = null;
+        let timerBaseSeconds = 0;
+
+        // Initialize Inputs
+        pomodoroInput.value = defaultPomo;
+        shortBreakInput.value = defaultShort;
+
+        // --- Timer Logic ---
+        const getFormattedNumber = (number) => (number > 9 ? number : `0${number}`);
+
+        const updateDisplay = () => {
+            if (currentMode === 'infinity') {
+                counterElement.textContent = `${getFormattedNumber(hours)}:${getFormattedNumber(minutes)}:${getFormattedNumber(seconds)}`;
+            } else {
+                counterElement.textContent = `${getFormattedNumber(minutes)}:${getFormattedNumber(seconds)}`;
+            }
+        };
+
+        // Count-DOWN timer using real elapsed time
+        const StopWatch = () => {
+            const elapsedMs = Date.now() - timerStartTime;
+            const elapsedSec = Math.floor(elapsedMs / 1000) + timerBaseSeconds;
+            const remaining = timerTotalSeconds - elapsedSec;
+
+            if (remaining <= 0) {
+                window.clearInterval(interval);
+                interval = null;
+                minutes = 0;
+                seconds = 0;
+                status = Status_Types.STOPPED;
+                starTimerBtn.textContent = Button_Labels.Start;
+                timerStartTime = null;
+                timerBaseSeconds = 0;
+                showTimerNotification();
+            } else {
+                minutes = Math.floor(remaining / 60);
+                seconds = remaining % 60;
+            }
+            updateDisplay();
+        };
+
+        // Count-UP stopwatch for infinity mode using real elapsed time
+        const StopWatchUp = () => {
+            const elapsedMs = Date.now() - timerStartTime;
+            const totalSec = Math.floor(elapsedMs / 1000) + timerBaseSeconds;
+
+            hours = Math.floor(totalSec / 3600);
+            minutes = Math.floor((totalSec % 3600) / 60);
+            seconds = totalSec % 60;
+            updateDisplay();
+        };
+
+        // --- Alert Beep Sound (Web Audio API) ---
+        const playAlertBeep = () => {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+            const createNote = (freq, startTime, duration) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, startTime);
+
+                gain.gain.setValueAtTime(0.25, startTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.start(startTime);
+                osc.stop(startTime + duration);
+            };
+
+            // Double-double beep
+            createNote(880, audioCtx.currentTime, 0.1);
+            createNote(880, audioCtx.currentTime + 0.15, 0.1);
+            createNote(880, audioCtx.currentTime + 0.45, 0.1);
+            createNote(880, audioCtx.currentTime + 0.6, 0.1);
+        };
+
+        // Non-blocking notification
+        let notifTimer = null;
+        const showTimerNotification = () => {
+            timerNotification.textContent = "⏰ Time's up!";
+            timerNotification.classList.add('show');
+            playAlertBeep();
+            if (notifTimer) clearTimeout(notifTimer);
+            notifTimer = setTimeout(() => {
+                timerNotification.classList.remove('show');
+                notifTimer = null;
+            }, 3000);
+        };
+
+        // Track total seconds for countdown mode
+        let timerTotalSeconds = 0;
+
+        const startStop = () => {
+            if (status === Status_Types.STOPPED) {
+                timerStartTime = Date.now();
+                if (currentMode === 'infinity') {
+                    interval = window.setInterval(StopWatchUp, 250);
+                } else {
+                    timerTotalSeconds = minutes * 60 + seconds;
+                    timerBaseSeconds = 0;
+                    interval = window.setInterval(StopWatch, 250);
+                }
+                starTimerBtn.textContent = Button_Labels.Stop;
+                status = Status_Types.STARTED;
+            } else {
+                window.clearInterval(interval);
+                interval = null;
+                if (currentMode === 'infinity') {
+                    const elapsedMs = Date.now() - timerStartTime;
+                    timerBaseSeconds += Math.floor(elapsedMs / 1000);
+                }
+                timerStartTime = null;
+                starTimerBtn.textContent = Button_Labels.Start;
+                status = Status_Types.STOPPED;
+            }
+        };
+
+        const reset = () => {
+            window.clearInterval(interval);
+            interval = null;
+            status = Status_Types.STOPPED;
+            starTimerBtn.textContent = Button_Labels.Start;
+            seconds = 0;
+            hours = 0;
+            timerStartTime = null;
+            timerBaseSeconds = 0;
+            timerTotalSeconds = 0;
+
+            if (currentMode === 'pomodoro') {
+                minutes = defaultPomo;
+            } else if (currentMode === 'short') {
+                minutes = defaultShort;
+            } else if (currentMode === 'infinity') {
+                minutes = 0;
+            }
+            container.dataset.mode = currentMode;
+            updateDisplay();
+        };
+
+        // Mode Switchers
+        const modeButtons = { pomodoro: pomodoroBtn, short: breakBtn, infinity: infinityBtn };
+
+        const switchMode = (mode) => {
+            if (interval) window.clearInterval(interval);
+            interval = null;
+            currentMode = mode;
+            status = Status_Types.STOPPED;
+            starTimerBtn.textContent = Button_Labels.Start;
+            seconds = 0;
+            hours = 0;
+            timerStartTime = null;
+            timerBaseSeconds = 0;
+            timerTotalSeconds = 0;
+            if (mode === 'pomodoro') minutes = defaultPomo;
+            else if (mode === 'short') minutes = defaultShort;
+            else if (mode === 'infinity') minutes = 0;
+            container.dataset.mode = mode;
+            for (const key in modeButtons) {
+                modeButtons[key].classList.toggle('active-mode', key === mode);
+            }
+            updateDisplay();
+        };
+
+        pomodoroBtn.onclick = () => switchMode('pomodoro');
+        breakBtn.onclick = () => switchMode('short');
+        infinityBtn.onclick = () => switchMode('infinity');
+
+        starTimerBtn.onclick = startStop;
+        resetTimerBtn.onclick = reset;
+
+        // --- Memory Leak Prevention ---
+        window.addEventListener('beforeunload', () => {
+            if (interval) {
+                window.clearInterval(interval);
+                interval = null;
+            }
+        });
+
+        // --- Settings Logic ---
+        settingsBtn.onclick = () => {
+            settingsModal.classList.add("visible");
+        };
+
+        closeSettings.onclick = () => {
+            settingsModal.classList.remove("visible");
+        };
+
+        window.onclick = (event) => {
+            if (event.target === settingsModal) {
+                settingsModal.classList.remove("visible");
+            }
+            if (event.target === overlay) {
+                closeSidebarFunc();
+            }
+        };
+
+        saveSettingsBtn.onclick = () => {
+            const newPomo = parseInt(pomodoroInput.value);
+            const newShort = parseInt(shortBreakInput.value);
+
+            if (newPomo > 0 && newShort > 0) {
+                defaultPomo = newPomo;
+                defaultShort = newShort;
+
+                localStorage.setItem('pomoTime', defaultPomo);
+                localStorage.setItem('shortTime', defaultShort);
+
+                settingsModal.classList.remove("visible");
+                reset();
+            } else {
+                timerNotification.textContent = '⚠️ Please enter valid positive numbers';
+                showTimerNotification();
+            }
+        };
+
+        // --- Sidebar Todo Logic ---
+        const openSidebarFunc = () => {
+            sidebar.classList.add("open");
+            overlay.classList.add("active");
+        };
+
+        const closeSidebarFunc = () => {
+            sidebar.classList.remove("open");
+            overlay.classList.remove("active");
+        };
+
+        menuBtn.onclick = openSidebarFunc;
+        closeSidebar.onclick = closeSidebarFunc;
+
+        // Todo Data Management (persisted in localStorage)
+        let todos = JSON.parse(localStorage.getItem('todos')) || [];
+
+        const renderTodos = () => {
+            todoList.textContent = '';
+            const frag = document.createDocumentFragment();
+            todos.forEach((todo, index) => {
+                const li = document.createElement('li');
+                if (todo.completed) li.classList.add('completed');
+
+                const span = document.createElement('span');
+                span.textContent = todo.text;
+                span.dataset.action = 'toggle';
+                span.dataset.index = index;
+                span.style.cssText = 'cursor:pointer;flex-grow:1';
+
+                const btn = document.createElement('button');
+                btn.className = 'delete-task-btn';
+                btn.textContent = '×';
+                btn.dataset.action = 'delete';
+                btn.dataset.index = index;
+
+                li.append(span, btn);
+                frag.appendChild(li);
+            });
+            todoList.appendChild(frag);
+        };
+
+        const saveTodos = () => {
+            localStorage.setItem('todos', JSON.stringify(todos));
+            renderTodos();
+        };
+
+        const addTodo = () => {
+            const text = todoInput.value.trim();
+            if (text) {
+                todos.push({ text, completed: false });
+                todoInput.value = '';
+                saveTodos();
+            }
+        };
+
+        todoList.addEventListener('click', (e) => {
+            const target = e.target;
+            const index = parseInt(target.dataset.index);
+            if (isNaN(index)) return;
+
+            if (target.dataset.action === 'toggle') {
+                todos[index].completed = !todos[index].completed;
+                saveTodos();
+            } else if (target.dataset.action === 'delete') {
+                todos.splice(index, 1);
+                saveTodos();
+            }
+        });
+
+        addTodoBtn.onclick = addTodo;
+        todoInput.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") addTodo();
+        });
+
+        // Initial Render
+        renderTodos();
+
+        // =============================================================
+        // Audio Player — Bottom Bar
+        // =============================================================
+
+        const audioBar = document.getElementById('audioBar');
+        const syncBodyPadding = () => document.body.classList.toggle('audio-active', !audioBar.hidden);
+        const audioFileInput = document.getElementById('audioFileInput');
+        const audioOpenBtn = document.getElementById('audioOpenBtn');
+        const audioPlayBtn = document.getElementById('audioPlayBtn');
+        const audioPrevBtn = document.getElementById('audioPrevBtn');
+        const audioNextBtn = document.getElementById('audioNextBtn');
+        const audioRewBtn = document.getElementById('audioRewBtn');
+        const audioFwdBtn = document.getElementById('audioFwdBtn');
+        const audioCloseBtn = document.getElementById('audioCloseBtn');
+        const audioSeek = document.getElementById('audioSeek');
+        const audioTrackName = document.getElementById('audioTrackName');
+        const audioTimeDisplay = document.getElementById('audioTimeDisplay');
+        const audioAddMore = document.getElementById('audioAddMore');
+        const audioPlaylistInfo = document.getElementById('audioPlaylistInfo');
+        const audioVolume = document.getElementById('audioVolume');
+        const audioMuteBtn = document.getElementById('audioMuteBtn');
+        const audioMinBtn = document.getElementById('audioMinBtn');
+        const audioToggleBtn = document.getElementById('audioToggleBtn');
+        let savedVolume = 1;
+
+        const audio = new Audio();
+        let playlist = [];
+        let currentTrack = -1;
+        let audioSaveTimer = null;
+        let isSeeking = false;
+
+        // --- Format time helper ---
+        const fmtTime = (s) => {
+            if (isNaN(s) || !isFinite(s)) return '0:00';
+            const m = Math.floor(s / 60);
+            const sec = Math.floor(s % 60);
+            return `${m}:${sec < 10 ? '0' : ''}${sec}`;
+        };
+
+        // --- Progress persistence (keyed by filename) ---
+        const PROGRESS_KEY = 'audioProgress';
+
+        const getSavedProgress = () => {
+            try { return JSON.parse(localStorage.getItem(PROGRESS_KEY)) || {}; }
+            catch { return {}; }
+        };
+
+        const saveProgress = () => {
+            if (currentTrack < 0 || !playlist[currentTrack]) return;
+            const data = getSavedProgress();
+            data[playlist[currentTrack].name] = audio.currentTime;
+            localStorage.setItem(PROGRESS_KEY, JSON.stringify(data));
+        };
+
+        const restoreProgress = (fileName) => {
+            const data = getSavedProgress();
+            if (data[fileName] && data[fileName] > 0) {
+                audio.currentTime = data[fileName];
+            }
+        };
+
+        // --- Load and play a track ---
+        const loadTrack = (index) => {
+            if (index < 0 || index >= playlist.length) return;
+            if (currentTrack >= 0) saveProgress();
+            currentTrack = index;
+            const track = playlist[index];
+            audio.src = track.url;
+            audioTrackName.textContent = track.name;
+            audioPlaylistInfo.textContent = `${index + 1}/${playlist.length}`;
+            audio.addEventListener('loadedmetadata', function onMeta() {
+                restoreProgress(track.name);
+                audio.removeEventListener('loadedmetadata', onMeta);
+            });
+            audio.play().then(() => {
+                audioPlayBtn.textContent = '⏸';
+            }).catch(() => { });
+            audioBar.hidden = false;
+            syncBodyPadding();
+            audioToggleBtn.hidden = false;
+            audioToggleBtn.classList.add('ab-playing');
+        };
+
+        // --- File input handling ---
+        const handleFiles = (files) => {
+            if (!files || files.length === 0) return;
+
+            const isVideo = files[0].type.startsWith('video/');
+            if (isVideo) {
+                playVideo(files[0]);
+                return;
+            }
+
+            const audioFiles = Array.from(files).filter(f => f.type.startsWith('audio/'));
+            if (audioFiles.length === 0) return;
+
+            for (const file of audioFiles) {
+                playlist.push({
+                    name: file.name,
+                    url: URL.createObjectURL(file)
+                });
+            }
+            if (currentTrack < 0) {
+                loadTrack(0);
+            } else {
+                audioPlaylistInfo.textContent = `${currentTrack + 1}/${playlist.length}`;
+            }
+        };
+
+        const videoOpenBtn = document.getElementById('videoOpenBtn');
+        videoOpenBtn.onclick = () => audioFileInput.click();
+        audioOpenBtn.onclick = () => audioFileInput.click();
+        audioAddMore.onclick = () => audioFileInput.click();
+        audioFileInput.onchange = (e) => handleFiles(e.target.files);
+
+        // =============================================================
+        // Video Player Logic
+        // =============================================================
+        const videoPlayer = document.getElementById('videoPlayer');
+        const exitVideoBtn = document.getElementById('exitVideoBtn');
+        let topBarTimeout = null;
+        let currentVideoName = '';
+        let lastVideoSaveTime = 0;
+        const VIDEO_PROGRESS_KEY = 'videoProgress';
+
+        const getSavedVideoProgress = () => {
+            try { return JSON.parse(localStorage.getItem(VIDEO_PROGRESS_KEY)) || {}; }
+            catch { return {}; }
+        };
+
+        const saveVideoProgress = () => {
+            if (!currentVideoName) return;
+            const data = getSavedVideoProgress();
+            data[currentVideoName] = videoPlayer.currentTime;
+            localStorage.setItem(VIDEO_PROGRESS_KEY, JSON.stringify(data));
+        };
+
+        const restoreVideoProgress = () => {
+            if (!currentVideoName) return;
+            const data = getSavedVideoProgress();
+            if (data[currentVideoName] && data[currentVideoName] > 0) {
+                videoPlayer.currentTime = data[currentVideoName];
+            }
+        };
+
+        videoPlayer.addEventListener('timeupdate', () => {
+            const now = Date.now();
+            if (now - lastVideoSaveTime > 5000) {
+                lastVideoSaveTime = now;
+                saveVideoProgress();
+            }
+        });
+
+        videoPlayer.addEventListener('loadedmetadata', restoreVideoProgress);
+
+        const showTopBar = () => {
+            if (!document.body.classList.contains('video-mode')) return;
+            container.classList.add('show-bar');
+            clearTimeout(topBarTimeout);
+            topBarTimeout = setTimeout(() => {
+                const isHovering = container.matches(':hover');
+                if (!isHovering && !videoPlayer.paused) {
+                    container.classList.remove('show-bar');
+                }
+            }, 3000);
+        };
+
+        const playVideo = (file) => {
+            if (!audio.paused) {
+                audio.pause();
+                audioPlayBtn.textContent = '▶';
+            }
+            if (currentVideoName) saveVideoProgress();
+            currentVideoName = file.name;
+            videoPlayer.src = URL.createObjectURL(file);
+            videoPlayer.classList.add('active');
+            document.body.classList.add('video-mode');
+            videoPlayer.hidden = false;
+            exitVideoBtn.hidden = false;
+            videoPlayer.play().catch(() => { });
+
+            document.addEventListener('mousemove', showTopBar);
+            showTopBar();
+        };
+
+        exitVideoBtn.onclick = () => {
+            if (currentVideoName) saveVideoProgress();
+            videoPlayer.pause();
+            videoPlayer.src = '';
+            currentVideoName = '';
+            videoPlayer.hidden = true;
+            videoPlayer.classList.remove('active');
+            document.body.classList.remove('video-mode');
+            container.classList.remove('show-bar');
+            exitVideoBtn.hidden = true;
+            document.removeEventListener('mousemove', showTopBar);
+        };
+
+        videoPlayer.addEventListener('pause', showTopBar);
+        window.addEventListener('beforeunload', () => {
+            if (currentVideoName) saveVideoProgress();
+        });
+
+        // =============================================================
+        // Drag & Drop Support for Audio Files
+        // =============================================================
+        const dropOverlay = document.getElementById('dropOverlay');
+        let dragCounter = 0;
+
+        window.addEventListener('dragenter', (e) => {
+            e.preventDefault();
+            dragCounter++;
+            if (e.dataTransfer && e.dataTransfer.types.includes('Files')) {
+                dropOverlay.classList.add('active');
+            }
+        });
+
+        window.addEventListener('dragover', (e) => {
+            e.preventDefault();
+        });
+
+        window.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            dragCounter--;
+            if (dragCounter <= 0) {
+                dragCounter = 0;
+                dropOverlay.classList.remove('active');
+            }
+        });
+
+        window.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dragCounter = 0;
+            dropOverlay.classList.remove('active');
+
+            if (!e.dataTransfer || !e.dataTransfer.files.length) return;
+
+            const mediaFiles = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('audio/') || f.type.startsWith('video/'));
+            if (mediaFiles.length > 0) {
+                handleFiles(mediaFiles);
+            }
+        });
+
+        // --- Play / Pause ---
+        audioPlayBtn.onclick = () => {
+            if (!audio.src || playlist.length === 0) return;
+            if (audio.paused) {
+                audio.play();
+                audioPlayBtn.textContent = '⏸';
+            } else {
+                audio.pause();
+                audioPlayBtn.textContent = '▶';
+            }
+        };
+
+        // --- Seek ±10s ---
+        audioRewBtn.onclick = () => { audio.currentTime = Math.max(0, audio.currentTime - 10); };
+        audioFwdBtn.onclick = () => { audio.currentTime = Math.min(audio.duration || 0, audio.currentTime + 10); };
+
+        // --- Prev / Next ---
+        audioPrevBtn.onclick = () => {
+            if (playlist.length === 0) return;
+            const idx = (currentTrack - 1 + playlist.length) % playlist.length;
+            loadTrack(idx);
+        };
+        audioNextBtn.onclick = () => {
+            if (playlist.length === 0) return;
+            const idx = (currentTrack + 1) % playlist.length;
+            loadTrack(idx);
+        };
+
+        // --- Seek slider ---
+        audioSeek.oninput = () => { isSeeking = true; };
+        audioSeek.onchange = () => {
+            if (audio.duration) {
+                audio.currentTime = (audioSeek.value / 100) * audio.duration;
+            }
+            isSeeking = false;
+        };
+
+        // --- Time update ---
+        let lastSaveTime = 0;
+        audio.addEventListener('timeupdate', () => {
+            if (!isSeeking && audio.duration) {
+                audioSeek.value = (audio.currentTime / audio.duration) * 100;
+            }
+            audioTimeDisplay.textContent = `${fmtTime(audio.currentTime)} / ${fmtTime(audio.duration)}`;
+            const now = Date.now();
+            if (now - lastSaveTime > 5000) {
+                lastSaveTime = now;
+                saveProgress();
+            }
+        });
+
+        // --- Auto-advance to next track ---
+        audio.addEventListener('ended', () => {
+            saveProgress();
+            if (playlist.length > 1) {
+                const idx = (currentTrack + 1) % playlist.length;
+                loadTrack(idx);
+            } else {
+                audioPlayBtn.textContent = '▶';
+            }
+        });
+
+        // --- Speed control ---
+        const audioSpeed = document.getElementById('audioSpeed');
+        const audioSpeedVal = document.getElementById('audioSpeedVal');
+        audioSpeed.oninput = () => {
+            const rate = parseFloat(audioSpeed.value);
+            audio.playbackRate = rate;
+            audioSpeedVal.textContent = rate.toFixed(1) + 'x';
+        };
+
+        // --- Volume control ---
+        audioVolume.oninput = () => {
+            audio.volume = audioVolume.value / 100;
+            savedVolume = audio.volume;
+            audioMuteBtn.textContent = audio.volume === 0 ? '🔇' : '🔊';
+        };
+
+        audioMuteBtn.onclick = () => {
+            if (audio.volume > 0) {
+                savedVolume = audio.volume;
+                audio.volume = 0;
+                audioVolume.value = 0;
+                audioMuteBtn.textContent = '🔇';
+            } else {
+                audio.volume = savedVolume || 1;
+                audioVolume.value = audio.volume * 100;
+                audioMuteBtn.textContent = '🔊';
+            }
+        };
+
+        // --- Minimize / Show-Hide toggle ---
+        audioMinBtn.onclick = () => {
+            audioBar.hidden = true;
+            syncBodyPadding();
+            audioToggleBtn.classList.add('ab-playing');
+        };
+
+        audioToggleBtn.onclick = () => {
+            if (playlist.length === 0) {
+                audioFileInput.click();
+                return;
+            }
+            audioBar.hidden = !audioBar.hidden;
+            syncBodyPadding();
+        };
+
+        // --- Close audio bar (full stop) ---
+        audioCloseBtn.onclick = () => {
+            saveProgress();
+            audio.pause();
+            audio.src = '';
+            audioBar.hidden = true;
+            syncBodyPadding();
+            audioToggleBtn.hidden = true;
+            audioToggleBtn.classList.remove('ab-playing');
+            audioPlayBtn.textContent = '▶';
+            audioSeek.value = 0;
+            audioVolume.value = 100;
+            audioTimeDisplay.textContent = '0:00 / 0:00';
+            audioTrackName.textContent = '—';
+            playlist.forEach(t => URL.revokeObjectURL(t.url));
+            playlist = [];
+            currentTrack = -1;
+        };
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (currentTrack >= 0) saveProgress();
+        });
+
+        // =============================================================
+        // Prayer & Fullscreen (inline script merged)
+        // =============================================================
+        (function () {
+            const pBtn = document.getElementById('prayerBtn');
+            const pModal = document.getElementById('prayerModal');
+            const pClose = document.getElementById('closePrayer');
+            pBtn.onclick = () => pModal.classList.add('visible');
+            pClose.onclick = () => pModal.classList.remove('visible');
+            pModal.onclick = e => { if (e.target === pModal) pModal.classList.remove('visible'); };
+
+            const fsBtn = document.getElementById('fullscreenBtn');
+            fsBtn.onclick = () => {
+                if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen();
+                } else {
+                    document.exitFullscreen();
+                }
+            };
+            document.addEventListener('fullscreenchange', () => {
+                fsBtn.textContent = document.fullscreenElement ? '⛶' : '⛶';
+                fsBtn.title = document.fullscreenElement ? 'الخروج من ملء الشاشة' : 'ملء الشاشة';
+            });
+        })();
+
+        reset(); // Set initial state
+    </script>
+</body>
+
+</html>

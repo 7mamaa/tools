@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>محول النصوص العبقري</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Tajawal', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex items-center justify-center p-4">
+
+    <div class="bg-white rounded-3xl shadow-xl p-8 w-full max-w-2xl border border-gray-100">
+        
+        <div class="mb-6 text-center">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">محفظ النصوص العظيم 📜</h1>
+            <p class="text-gray-500">لأن نسخ ولصق النصوص في 'المفكرة' كان صعباً جداً عليك.</p>
+        </div>
+
+        <!-- رسالة الخطأ (بديل الـ Alert المزعج) -->
+        <div id="errorMsg" class="hidden mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative transition-all duration-300" role="alert">
+            <strong class="font-bold">عفواً يا عبقري!</strong>
+            <span class="block sm:inline"> لا يمكنك تحميل اللاشيء. اكتب نصاً أولاً.</span>
+        </div>
+
+        <!-- منطقة النص -->
+        <div class="mb-6">
+            <label for="textInput" class="block text-sm font-medium text-gray-700 mb-2">النص الثمين الخاص بك:</label>
+            <textarea id="textInput" rows="10" 
+                class="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-y text-left font-mono"
+                dir="auto"
+                placeholder="الصق إبداعاتك أو بياناتك هنا..."></textarea>
+        </div>
+
+        <!-- أدوات التحكم -->
+        <div class="flex flex-col sm:flex-row gap-4 items-center justify-between">
+            
+            <div class="w-full sm:w-1/2">
+                <label for="formatSelect" class="block text-sm font-medium text-gray-700 mb-2">اختر الصيغة السحرية:</label>
+                <select id="formatSelect" class="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 bg-gray-50 cursor-pointer">
+                    <option value="txt">نص عادي (.txt)</option>
+                    <option value="csv">بيانات مجدولة (.csv)</option>
+                    <option value="html">صفحة ويب (.html)</option>
+                </select>
+            </div>
+
+            <div class="w-full sm:w-1/2 flex items-end">
+                <button onclick="downloadFile()" 
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2 transform active:scale-95 h-[50px] mt-[28px]">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    تحميل الملف
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        /**
+         * دالة معقدة جداً لتحويل النص إلى ملف، تعتمد على تقنيات فضائية (Blob API).
+         */
+        function downloadFile() {
+            const textContent = document.getElementById('textInput').value;
+            const fileFormat = document.getElementById('formatSelect').value;
+            const errorElement = document.getElementById('errorMsg');
+
+            // التحقق من وجود نص (لأن بعض المستخدمين يحبون تحميل الفراغ)
+            if (!textContent.trim()) {
+                errorElement.classList.remove('hidden');
+                // إخفاء الرسالة بعد 3 ثواني
+                setTimeout(() => {
+                    errorElement.classList.add('hidden');
+                }, 3000);
+                return;
+            }
+
+            // تحديد نوع الـ MIME بناءً على اختيارك العظيم
+            let mimeType = 'text/plain';
+            if (fileFormat === 'csv') mimeType = 'text/csv';
+            else if (fileFormat === 'html') mimeType = 'text/html';
+
+            // إنشاء الـ Blob السحري
+            const blob = new Blob([textContent], { type: mimeType });
+            
+            // إنشاء رابط وهمي للتحميل
+            const downloadUrl = URL.createObjectURL(blob);
+            const anchorElement = document.createElement('a');
+            
+            anchorElement.href = downloadUrl;
+            anchorElement.download = `my_precious_data.${fileFormat}`;
+            
+            // محاكاة الضغط على الرابط
+            document.body.appendChild(anchorElement);
+            anchorElement.click();
+            
+            // التنظيف بعد الانتهاء لكي لا نلوث الذاكرة
+            document.body.removeChild(anchorElement);
+            URL.revokeObjectURL(downloadUrl);
+        }
+    </script>
+</body>
+</html>

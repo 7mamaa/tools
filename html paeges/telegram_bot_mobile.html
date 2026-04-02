@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TG Master Mobile</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --panel-bg: #1e293b;
+            --primary: #3b82f6;
+            --accent: #6366f1;
+            --text: #f1f5f9;
+            --border: rgba(255,255,255,0.08);
+            --input-bg: rgba(0,0,0,0.3);
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; font-family: 'Segoe UI', sans-serif; }
+
+        body {
+            margin: 0;
+            background: var(--bg-dark);
+            color: var(--text);
+            padding-bottom: 100px; /* مساحة للزر العائم */
+            overflow-x: hidden;
+        }
+
+        /* --- الهيكل الرئيسي --- */
+        .header {
+            padding: 20px;
+            background: rgba(30, 41, 59, 0.95);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h2 { margin: 0; font-size: 18px; background: linear-gradient(to right, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        .container { padding: 15px; }
+
+        /* --- التبويبات (Tabs) --- */
+        .tabs {
+            display: flex;
+            background: var(--input-bg);
+            padding: 4px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            font-size: 14px;
+            border-radius: 8px;
+            color: #94a3b8;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+        .tab.active { background: var(--panel-bg); color: var(--primary); box-shadow: 0 2px 10px rgba(0,0,0,0.2); font-weight: bold; }
+
+        /* --- الحقول والإدخال --- */
+        .input-box {
+            position: relative;
+            margin-bottom: 12px;
+        }
+        .input-box i {
+            position: absolute;
+            left: 15px; top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+        }
+        input, textarea, select {
+            width: 100%;
+            background: var(--panel-bg);
+            border: 1px solid var(--border);
+            padding: 16px 16px 16px 45px;
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            transition: 0.2s;
+        }
+        input:focus, textarea:focus { border-color: var(--primary); background: #253045; }
+
+        /* --- شريط التنسيق --- */
+        .toolbar {
+            display: flex; gap: 8px; margin-bottom: 10px; overflow-x: auto; padding-bottom: 5px;
+        }
+        .tool-btn {
+            background: var(--panel-bg); border: 1px solid var(--border);
+            color: #cbd5e1; width: 44px; height: 44px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .tool-btn:active { background: var(--primary); color: white; border-color: var(--primary); }
+
+        /* --- شبكة الأزرار --- */
+        .grid-area {
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .row-card {
+            background: var(--panel-bg);
+            padding: 10px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+        }
+        .btns-wrapper { display: flex; gap: 8px; margin-bottom: 10px; }
+        .tg-btn {
+            flex: 1; background: #2b5278; padding: 12px 5px; border-radius: 8px;
+            text-align: center; font-size: 13px; font-weight: 600; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+        }
+        .tg-btn.add { background: rgba(255,255,255,0.05); border: 1px dashed #64748b; color: #94a3b8; }
+        
+        .row-actions {
+            display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid var(--border); padding-top: 8px;
+        }
+        .action-icon {
+            width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+            background: rgba(255,255,255,0.05); border-radius: 8px; color: #94a3b8; font-size: 14px;
+        }
+        .action-icon.del { color: #ef4444; background: rgba(239,68,68,0.1); }
+
+        /* --- الزر الرئيسي العائم --- */
+        .main-fab {
+            position: fixed; bottom: 20px; right: 20px; left: 20px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white; padding: 18px; border-radius: 16px;
+            text-align: center; font-weight: bold; font-size: 16px;
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4);
+            border: none; z-index: 80; display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+
+        /* --- Bottom Sheet Modal (الحل السحري) --- */
+        .bottom-sheet-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(3px);
+            z-index: 100; display: none; opacity: 0; transition: opacity 0.3s;
+            align-items: flex-end; /* يخلي النافذة تطلع من تحت */
+        }
+        .bottom-sheet {
+            background: #1e293b; width: 100%;
+            border-radius: 24px 24px 0 0;
+            padding: 25px 20px 40px 20px;
+            transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+            border-top: 1px solid var(--border);
+        }
+        .bottom-sheet.active { transform: translateY(0); }
+        .sheet-handle {
+            width: 40px; height: 5px; background: #334155; border-radius: 10px;
+            margin: 0 auto 20px auto;
+        }
+        
+        /* --- زر المعاينة --- */
+        .preview-fab {
+            position: fixed; bottom: 90px; right: 20px;
+            width: 50px; height: 50px; border-radius: 50%;
+            background: #334155; color: white; border: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3); z-index: 70;
+        }
+
+        /* --- شاشة المعاينة --- */
+        .preview-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 200; display: none; flex-direction: column;
+        }
+        .close-preview {
+            position: absolute; top: 20px; left: 20px; background: rgba(255,255,255,0.2);
+            border: none; color: white; padding: 8px 15px; border-radius: 20px;
+        }
+        
+        .notification {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            background: #10b981; color: white; padding: 10px 20px; border-radius: 20px;
+            font-size: 14px; display: none; z-index: 300; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h2><i class="fa-solid fa-layer-group"></i> TG Architect</h2>
+        <div style="font-size: 12px; color: #10b981;">● Online</div>
+    </div>
+
+    <div class="container">
+        <div class="tabs">
+            <div class="tab active" onclick="setMode('new')" id="tabNew">رسالة</div>
+            <div class="tab" onclick="setMode('edit')" id="tabEdit">تعديل</div>
+            <div class="tab" onclick="setMode('buttons')" id="tabButtons">أزرار</div>
+        </div>
+
+        <div class="input-box">
+            <i class="fa-solid fa-key"></i>
+            <input type="text" id="botToken" placeholder="Bot Token" onchange="saveCreds()">
+        </div>
+        <div class="input-box">
+            <i class="fa-solid fa-user-group"></i>
+            <input type="text" id="chatId" placeholder="Chat ID" onchange="saveCreds()">
+        </div>
+        <div class="input-box" id="msgIdBox" style="display:none;">
+            <i class="fa-solid fa-hashtag"></i>
+            <input type="number" id="msgId" placeholder="Message ID (للتعديل)">
+        </div>
+
+        <div id="textEditor">
+            <div style="font-size: 13px; color: #94a3b8; margin-bottom: 8px;">محتوى الرسالة</div>
+            <div class="toolbar">
+                <div class="tool-btn" onclick="insertTag('b')"><b>B</b></div>
+                <div class="tool-btn" onclick="insertTag('i')"><i>I</i></div>
+                <div class="tool-btn" onclick="insertTag('code')"><i class="fa-solid fa-code"></i></div>
+                <div class="tool-btn" onclick="insertLink()"><i class="fa-solid fa-link"></i></div>
+                <div class="tool-btn" onclick="clearText()"><i class="fa-solid fa-trash"></i></div>
+            </div>
+            <textarea id="msgText" rows="5" placeholder="اكتب هنا..." oninput="updatePreview()"></textarea>
+        </div>
+
+        <div style="margin-top: 25px;">
+            <div style="font-size: 13px; color: #94a3b8; margin-bottom: 8px;">الأزرار الشفافة</div>
+            <div id="gridContainer" class="grid-area"></div>
+            
+            <button onclick="addRow()" style="width: 100%; padding: 15px; margin-top: 10px; background: rgba(59, 130, 246, 0.1); color: var(--primary); border: 1px dashed var(--primary); border-radius: 12px; font-weight: bold;">
+                <i class="fa-solid fa-plus"></i> إضافة صف جديد
+            </button>
+        </div>
+    </div>
+
+    <button class="main-fab" id="sendBtn" onclick="sendRequest()">
+        <i class="fa-solid fa-paper-plane"></i> إرسال الآن
+    </button>
+
+    <button class="preview-fab" onclick="togglePreview(true)">
+        <i class="fa-solid fa-eye"></i>
+    </button>
+
+    <div class="bottom-sheet-overlay" id="sheetOverlay" onclick="closeSheet(event)">
+        <div class="bottom-sheet" id="sheetContent">
+            <div class="sheet-handle"></div>
+            <h3 style="margin: 0 0 20px 0; color: white;">تخصيص الزر</h3>
+            
+            <div class="input-box">
+                <i class="fa-regular fa-pen-to-square"></i>
+                <input type="text" id="btnText" placeholder="نص الزر">
+            </div>
+            
+            <div class="input-box">
+                <i class="fa-solid fa-list"></i>
+                <select id="btnType" onchange="toggleValInput()">
+                    <option value="url">رابط خارجي (URL)</option>
+                    <option value="callback_data">أمر برمجي (Callback)</option>
+                    <option value="switch_inline_query">بحث (Switch)</option>
+                </select>
+            </div>
+            
+            <div class="input-box">
+                <i class="fa-solid fa-link"></i>
+                <input type="text" id="btnValue" placeholder="https://...">
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button onclick="saveBtn()" style="flex: 2; background: var(--primary); border: none; padding: 15px; border-radius: 12px; color: white; font-weight: bold;">حفظ</button>
+                <button onclick="closeSheet(null, true)" style="flex: 1; background: #334155; border: none; padding: 15px; border-radius: 12px; color: white;">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="preview-overlay" id="previewScreen">
+        <button class="close-preview" onclick="togglePreview(false)">إغلاق ✕</button>
+        <div style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 20px;">
+            <div style="background: #182533; padding: 15px; border-radius: 15px; width: 100%; max-width: 350px;">
+                <div style="color: #6ab3f3; font-size: 14px; font-weight: bold; margin-bottom: 5px;">Bot Name</div>
+                <div id="previewContent" style="color: white; font-size: 15px; line-height: 1.5; white-space: pre-wrap;"></div>
+                <div id="previewBtns" style="margin-top: 10px; display: flex; flex-direction: column; gap: 5px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notify">تم الإرسال بنجاح!</div>
+
+<script>
+    let mode = 'new';
+    let rows = [[{text: 'قناتنا', type: 'url', val: 'https://t.me/telegram'}]];
+    let editPos = null;
+
+    // --- التهيئة ---
+    window.onload = () => {
+        if(localStorage.getItem('t')) document.getElementById('botToken').value = localStorage.getItem('t');
+        if(localStorage.getItem('c')) document.getElementById('chatId').value = localStorage.getItem('c');
+        renderGrid();
+    };
+
+    function saveCreds() {
+        localStorage.setItem('t', document.getElementById('botToken').value);
+        localStorage.setItem('c', document.getElementById('chatId').value);
+    }
+
+    // --- إدارة التبويبات ---
+    function setMode(m) {
+        mode = m;
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        if(m === 'new') {
+            document.getElementById('tabNew').classList.add('active');
+            document.getElementById('textEditor').style.display = 'block';
+            document.getElementById('msgIdBox').style.display = 'none';
+            document.getElementById('sendBtn').innerHTML = '<i class="fa-solid fa-paper-plane"></i> إرسال جديد';
+        } else if (m === 'edit') {
+            document.getElementById('tabEdit').classList.add('active');
+            document.getElementById('textEditor').style.display = 'block';
+            document.getElementById('msgIdBox').style.display = 'block';
+            document.getElementById('sendBtn').innerHTML = '<i class="fa-solid fa-pen"></i> حفظ التعديلات';
+        } else {
+            document.getElementById('tabButtons').classList.add('active');
+            document.getElementById('textEditor').style.display = 'none';
+            document.getElementById('msgIdBox').style.display = 'block';
+            document.getElementById('sendBtn').innerHTML = '<i class="fa-solid fa-gamepad"></i> تحديث الأزرار';
+        }
+    }
+
+    // --- الشبكة (Grid System) ---
+    function renderGrid() {
+        const div = document.getElementById('gridContainer');
+        div.innerHTML = '';
+        rows.forEach((row, r) => {
+            const card = document.createElement('div');
+            card.className = 'row-card';
+            
+            let html = `<div class="btns-wrapper">`;
+            row.forEach((btn, c) => {
+                html += `<div class="tg-btn" onclick="openSheet(${r}, ${c})">${btn.text}</div>`;
+            });
+            if(row.length < 8) {
+                html += `<div class="tg-btn add" onclick="addBtn(${r})"><i class="fa-solid fa-plus"></i></div>`;
+            }
+            html += `</div>`;
+            
+            html += `
+                <div class="row-actions">
+                    <div class="action-icon" onclick="moveRow(${r}, -1)"><i class="fa-solid fa-arrow-up"></i></div>
+                    <div class="action-icon" onclick="moveRow(${r}, 1)"><i class="fa-solid fa-arrow-down"></i></div>
+                    <div class="action-icon del" onclick="delRow(${r})"><i class="fa-solid fa-trash"></i></div>
+                </div>
+            `;
+            
+            card.innerHTML = html;
+            div.appendChild(card);
+        });
+        updatePreview();
+    }
+
+    // --- عمليات الشبكة ---
+    function addRow() { rows.push([{text: 'زر جديد', type: 'url', val: 'https://'}]); renderGrid(); }
+    function addBtn(r) { rows[r].push({text: 'فرعي', type: 'callback_data', val: 'cmd'}); renderGrid(); }
+    function delRow(r) { if(confirm('حذف الصف؟')) { rows.splice(r, 1); renderGrid(); } }
+    function moveRow(r, d) {
+        if(r+d < 0 || r+d >= rows.length) return;
+        [rows[r], rows[r+d]] = [rows[r+d], rows[r]];
+        renderGrid();
+    }
+
+    // --- Bottom Sheet Logic ---
+    function openSheet(r, c) {
+        editPos = {r, c};
+        const btn = rows[r][c];
+        document.getElementById('btnText').value = btn.text;
+        document.getElementById('btnType').value = btn.type;
+        document.getElementById('btnValue').value = btn.val;
+        toggleValInput();
+        
+        const overlay = document.getElementById('sheetOverlay');
+        const content = document.getElementById('sheetContent');
+        overlay.style.display = 'flex';
+        setTimeout(() => {
+            overlay.style.opacity = '1';
+            content.classList.add('active');
+        }, 10);
+    }
+
+    function closeSheet(e, force) {
+        if(force || e.target.id === 'sheetOverlay') {
+            const content = document.getElementById('sheetContent');
+            const overlay = document.getElementById('sheetOverlay');
+            content.classList.remove('active');
+            overlay.style.opacity = '0';
+            setTimeout(() => { overlay.style.display = 'none'; }, 300);
+        }
+    }
+
+    function saveBtn() {
+        const t = document.getElementById('btnText').value;
+        const v = document.getElementById('btnValue').value;
+        if(!t || !v) return alert('أكمل البيانات');
+        
+        rows[editPos.r][editPos.c] = {
+            text: t,
+            type: document.getElementById('btnType').value,
+            val: v
+        };
+        closeSheet(null, true);
+        renderGrid();
+    }
+    
+    function toggleValInput() {
+        const type = document.getElementById('btnType').value;
+        const input = document.getElementById('btnValue');
+        if(type === 'url') input.placeholder = 'https://example.com';
+        else if(type === 'callback_data') input.placeholder = 'command_id';
+        else input.placeholder = 'query text';
+    }
+
+    // --- أدوات النص ---
+    function insertTag(tag) {
+        const el = document.getElementById('msgText');
+        const val = el.value;
+        const start = el.selectionStart;
+        const end = el.selectionEnd;
+        const txt = val.substring(start, end) || 'نص';
+        const replace = `<${tag}>${txt}</${tag}>`;
+        el.value = val.substring(0, start) + replace + val.substring(end);
+        updatePreview();
+    }
+    function insertLink() {
+        const url = prompt('الرابط:');
+        if(url) insertTag(`a href="${url}"`);
+    }
+    function clearText() { document.getElementById('msgText').value = ''; updatePreview(); }
+
+    // --- المعاينة ---
+    function updatePreview() {
+        document.getElementById('previewContent').innerHTML = document.getElementById('msgText').value
+            .replace(/\n/g, '<br>')
+            .replace(/<b>/g, '<strong>').replace(/<\/b>/g, '</strong>')
+            .replace(/<i>/g, '<em>').replace(/<\/i>/g, '</em>');
+            
+        const div = document.getElementById('previewBtns');
+        div.innerHTML = '';
+        rows.forEach(row => {
+            const rDiv = document.createElement('div');
+            rDiv.style.cssText = 'display:flex; gap:5px;';
+            row.forEach(btn => {
+                const b = document.createElement('div');
+                b.style.cssText = 'flex:1; background:rgba(255,255,255,0.1); padding:10px; text-align:center; border-radius:5px; font-size:13px; font-weight:bold; cursor:default;';
+                b.innerText = btn.text;
+                rDiv.appendChild(b);
+            });
+            div.appendChild(rDiv);
+        });
+    }
+
+    function togglePreview(show) {
+        const p = document.getElementById('previewScreen');
+        if(show) { updatePreview(); p.style.display = 'flex'; }
+        else p.style.display = 'none';
+    }
+
+    // --- الإرسال ---
+    async function sendRequest() {
+        const btn = document.getElementById('sendBtn');
+        const oldTxt = btn.innerHTML;
+        btn.innerHTML = 'جاري الاتصال...';
+        btn.disabled = true;
+
+        const token = document.getElementById('botToken').value;
+        const chatId = document.getElementById('chatId').value;
+        const text = document.getElementById('msgText').value;
+        const msgId = document.getElementById('msgId').value;
+        
+        let url = `https://api.telegram.org/bot${token}/`;
+        let body = { chat_id: chatId, parse_mode: 'HTML' };
+        
+        // بناء الكيبورد
+        body.reply_markup = { inline_keyboard: rows.map(r => r.map(b => {
+            let o = {text: b.text}; o[b.type] = b.val; return o;
+        }))};
+
+        if(mode === 'new') {
+            url += 'sendMessage';
+            body.text = text;
+        } else if (mode === 'edit') {
+            url += 'editMessageText';
+            body.message_id = msgId;
+            body.text = text;
+        } else {
+            url += 'editMessageReplyMarkup';
+            body.message_id = msgId;
+        }
+
+        try {
+            const req = await fetch(url, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(body)
+            });
+            const res = await req.json();
+            if(res.ok) showNotify('تمت العملية بنجاح! 🚀');
+            else showNotify('خطأ: ' + res.description);
+        } catch(e) { showNotify('خطأ في الاتصال'); }
+
+        btn.innerHTML = oldTxt;
+        btn.disabled = false;
+    }
+
+    function showNotify(msg) {
+        const n = document.getElementById('notify');
+        n.innerText = msg;
+        n.style.display = 'block';
+        setTimeout(() => n.style.display = 'none', 3000);
+    }
+</script>
+
+</body>
+</html>

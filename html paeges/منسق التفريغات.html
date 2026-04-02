@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منسق الملاحظات الطبية الذكي</title>
+    
+    <!-- خط الشاشة العادية -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <!-- مكتبة التحويل -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <style>
+        :root {
+            --primary-color: #0b5394;
+            --secondary-color: #3d85c6;
+            --bg-color: #eef2f5;
+            --box-bg: #ffffff;
+            --text-color: #333333;
+        }
+
+        /* الثيمات الجديدة المستوحاة من الملفات الاحترافية */
+        [data-theme="surgical"] {
+            --primary-color: #117a65;
+            --secondary-color: #48c9b0;
+            --bg-color: #e8f8f5;
+        }
+
+        [data-theme="classic"] {
+            --primary-color: #2c3e50;
+            --secondary-color: #7f8c8d;
+            --bg-color: #f4f6f6;
+        }
+
+        [data-theme="warm"] {
+            --primary-color: #7b241c;
+            --secondary-color: #c0392b;
+            --bg-color: #fdedec;
+        }
+
+        [data-theme="minimal"] {
+            --primary-color: #212f3d;
+            --secondary-color: #566573;
+            --bg-color: #ffffff;
+            --box-bg: #fdfdfd;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: var(--box-bg);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-title {
+            text-align: center;
+            color: var(--primary-color);
+            margin-top: 0;
+        }
+
+        textarea {
+            width: 100%;
+            height: 250px;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 16px;
+            box-sizing: border-box;
+            margin-bottom: 20px;
+            resize: vertical;
+        }
+
+        .btn-group { display: flex; gap: 15px; flex-wrap: wrap; align-items: center; }
+        
+        select {
+            padding: 15px;
+            border: 2px solid var(--secondary-color);
+            border-radius: 10px;
+            font-family: 'Cairo', sans-serif;
+            font-size: 16px;
+            background: var(--box-bg);
+            color: var(--text-color);
+            cursor: pointer;
+            flex: 1;
+            min-width: 150px;
+            outline: none;
+        }
+
+        button {
+            flex: 1; min-width: 150px; padding: 15px; border: none; border-radius: 10px;
+            cursor: pointer; font-family: 'Cairo', sans-serif; font-size: 18px; font-weight: bold; color: white;
+            transition: 0.3s;
+        }
+        
+        .btn-gen { background: var(--primary-color); }
+        .btn-gen:hover { background: var(--secondary-color); }
+        
+        .btn-pdf { background: #27ae60; display: none; }
+        .btn-pdf:hover { background: #2ecc71; }
+
+        /* منطقة المعاينة على الشاشة */
+        #previewArea {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px dashed #ccc;
+            display: none;
+        }
+
+        /* رسالة الخطأ لتنبيه المستخدم بمنع النوافذ المنبثقة */
+        #errorMsg {
+            display: none;
+            background: #e74c3c;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+            font-weight: bold;
+            line-height: 1.6;
+        }
+
+        /* تنسيقات النص الطبي المشتركة */
+        .md-content h1 { color: var(--primary-color); border-bottom: 2px solid var(--secondary-color); padding-bottom: 10px; }
+        .md-content h2 { color: var(--secondary-color); border-bottom: 1px solid #eee; padding-bottom: 5px; margin-top: 30px; }
+        .md-content table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        .md-content th, .md-content td { border: 1px solid #ccc; padding: 12px; text-align: right; }
+        .md-content th { background: var(--primary-color); color: white; }
+        .md-content blockquote { background: #eef7fa; border-right: 5px solid var(--secondary-color); padding: 15px; margin: 20px 0; border-radius: 4px; }
+        .md-content p, .md-content li { line-height: 1.8; font-size: 16px; }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2 class="header-title">🩺 منسق الملاحظات الطبية الاحترافي</h2>
+        
+        <textarea id="markdownInput" placeholder="قم بلصق محتوى الـ Markdown هنا..."></textarea>
+        
+        <div class="btn-group">
+            <select id="themeSelector" onchange="changeTheme()">
+                <option value="default">الأزرق السريري (الافتراضي)</option>
+                <option value="surgical">الأخضر الجراحي (للعمليات)</option>
+                <option value="classic">التقرير الكلاسيكي (رسمي)</option>
+                <option value="warm">الاستشارة الدافئة (عنابي)</option>
+                <option value="minimal">المينيمال (بسيط ونظيف)</option>
+            </select>
+            <button class="btn-gen" onclick="processText()">معاينة التنسيق ✨</button>
+            <button id="pdfBtn" class="btn-pdf" onclick="openInNewTab()">فتح صفحة للطباعة 📄</button>
+        </div>
+        
+        <div id="errorMsg"></div>
+
+        <div id="previewArea" class="md-content"></div>
+    </div>
+
+    <script>
+        function changeTheme() {
+            const theme = document.getElementById('themeSelector').value;
+            document.body.setAttribute('data-theme', theme);
+        }
+
+        function processText() {
+            const input = document.getElementById('markdownInput').value;
+            const errorBox = document.getElementById('errorMsg');
+            
+            if(!input.trim()) {
+                errorBox.innerHTML = "هل تمزح؟ الصق النص أولاً! 🙄";
+                errorBox.style.display = 'block';
+                setTimeout(() => errorBox.style.display = 'none', 3000);
+                return;
+            }
+
+            // تحويل الماركداون وعرضه في المعاينة فقط
+            const htmlResult = marked.parse(input);
+            document.getElementById('previewArea').innerHTML = htmlResult;
+
+            document.getElementById('previewArea').style.display = 'block';
+            document.getElementById('pdfBtn').style.display = 'block';
+            errorBox.style.display = 'none';
+        }
+
+        function openInNewTab() {
+            const printContent = document.getElementById('previewArea').innerHTML;
+            const errorBox = document.getElementById('errorMsg');
+            const activeTheme = document.body.getAttribute('data-theme') || 'default';
+            
+            // استخراج الألوان بناءً على الثيم المختار لتطبيقها في نافذة الطباعة
+            let themeCSS = "";
+            if(activeTheme === "surgical") themeCSS = "--primary-color: #117a65; --secondary-color: #48c9b0;";
+            else if(activeTheme === "classic") themeCSS = "--primary-color: #2c3e50; --secondary-color: #7f8c8d;";
+            else if(activeTheme === "warm") themeCSS = "--primary-color: #7b241c; --secondary-color: #c0392b;";
+            else if(activeTheme === "minimal") themeCSS = "--primary-color: #212f3d; --secondary-color: #566573;";
+            else themeCSS = "--primary-color: #0b5394; --secondary-color: #3d85c6;";
+            
+            try {
+                // فتح نافذة جديدة نظيفة
+                const printWindow = window.open('', '_blank');
+                
+                if (printWindow) {
+                    errorBox.style.display = 'none';
+                    // حقن الكود مع الثيم المختار والتنسيقات الصارمة لحل مشكلة قص الصفحة من اليسار
+                    printWindow.document.write(`
+                        <!DOCTYPE html>
+                        <html lang="ar" dir="rtl">
+                        <head>
+                            <meta charset="UTF-8">
+                            <title>ملاحظات طبية منسقة</title>
+                            <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+                            <style>
+                                :root { ${themeCSS} }
+                                @page {
+                                    size: A4 portrait;
+                                    margin: 20mm; /* الهوامش القياسية للطباعة */
+                                }
+                                body { 
+                                    font-family: 'Cairo', Arial, sans-serif; 
+                                    direction: rtl; 
+                                    line-height: 1.8; 
+                                    color: #000; 
+                                    background: white; 
+                                    width: 100%; /* العرض الكامل للورقة يمنع مشكلة القص */
+                                    margin: 0; 
+                                    padding: 0;
+                                    box-sizing: border-box;
+                                }
+                                h1 { color: var(--primary-color); border-bottom: 2px solid var(--secondary-color); padding-bottom: 10px; }
+                                h2 { color: var(--secondary-color); border-bottom: 1px solid #eee; padding-bottom: 5px; margin-top: 30px; }
+                                table { width: 100%; border-collapse: collapse; margin: 20px 0; table-layout: fixed; }
+                                th, td { border: 1px solid #ccc; padding: 12px; text-align: right; word-wrap: break-word; }
+                                th { background: var(--primary-color); color: white; }
+                                blockquote { background: #f9f9f9; border-right: 5px solid var(--secondary-color); padding: 15px; margin: 20px 0; border-radius: 4px; }
+                            </style>
+                        </head>
+                        <body>
+                            ${printContent}
+                        </body>
+                        </html>
+                    `);
+                    printWindow.document.close();
+                } else {
+                    throw new Error("Pop-up Blocked");
+                }
+            } catch (e) {
+                // رسالة في حال كان المتصفح يمنع فتح النوافذ المنبثقة
+                errorBox.innerHTML = "متصفحك يمنع النوافذ المنبثقة! 🙄 يرجى السماح بها من شريط العنوان (Pop-up Blocker) ليتم فتح الصفحة.";
+                errorBox.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>
