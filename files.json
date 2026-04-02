@@ -1,6 +1,6 @@
 [
   {
-    "url": "prompt_manager.html",
+    "url": "html paeges/prompt_manager.html",
     "title": "مدير البرومبت",
     "description": "نظام ذكي لإدارة وحفظ وتصنيف النصوص والبرومبتات الخاصة بالذكاء الاصطناعي مع إمكانيات البحث والتصدير.",
     "icon": "fa-solid fa-shapes",
@@ -9,7 +9,7 @@
     "iconColor": "#3b82f6"
   },
   {
-    "url": "telegram_bot_mobile.html",
+    "url": "html paeges/telegram_bot_mobile.html",
     "title": "تليجرام بوت (موبايل)",
     "description": "واجهة مخصصة للهواتف لإدارة بوت التليجرام، إرسال الرسائل وتعديل الأزرار بسهولة.",
     "icon": "fa-solid fa-mobile-screen-button",
@@ -18,7 +18,7 @@
     "iconColor": "#10b981"
   },
   {
-    "url": "telegram_bot_desktop.html",
+    "url": "html paeges/telegram_bot_desktop.html",
     "title": "تليجرام بوت (سطح المكتب)",
     "description": "لوحة تحكم كاملة لإدارة البوت مع محاكي للمعاينة المباشرة وأدوات تحرير متقدمة.",
     "icon": "fa-solid fa-desktop",
@@ -27,7 +27,7 @@
     "iconColor": "#8b5cf6"
   },
   {
-    "url": "Pomodoro.html",
+    "url": "html paeges/Pomodoro.html",
     "title": "Pomodoro ToDo",
     "description": "تطبيق لإدارة المهام مع تقنية بومودورو للتركيز وزيادة الإنتاجية.",
     "icon": "fa-solid fa-list-check",
@@ -36,7 +36,7 @@
     "iconColor": "#f59e0b"
   },
   {
-    "url": "منسق التفريغات.html",
+    "url": "html paeges/منسق التفريغات.html",
     "title": "منسق الملاحظات",
     "description": "أداة ذكية لتنسيق التفريغات الطبية وتحويلها من Markdown إلى تقارير احترافية.",
     "icon": "fa-solid fa-file-medical",
@@ -45,7 +45,7 @@
     "iconColor": "#f43f5e"
   },
   {
-    "url": "FILE_marger.html",
+    "url": "html paeges/FILE_marger.html",
     "title": "دمج الملفات",
     "description": "أداة سريعة لدمج ملفات TXT المتعددة معاً وتحميلها في ملف واحد في ثوانٍ.",
     "icon": "fa-solid fa-layer-group",
@@ -54,7 +54,7 @@
     "iconColor": "#818cf8"
   },
   {
-    "url": "csv-html-txt.html",
+    "url": "html paeges/csv-html-txt.html",
     "title": "محول النصوص",
     "description": "أداة سريعة تحول النصوص العادية إلى صيغ متعددة مثل CSV و HTML.",
     "icon": "fa-solid fa-file-export",
@@ -63,7 +63,7 @@
     "iconColor": "#2dd4bf"
   },
   {
-    "url": "MARKDAWIN/index.html",
+    "url": "html paeges/MARKDAWIN/index.html",
     "title": "محرر ومصمم ماركداون",
     "description": "أداة لعرض وتحرير نصوص Markdown بسهولة وشكل متناسق.",
     "icon": "fa-brands fa-markdown",
