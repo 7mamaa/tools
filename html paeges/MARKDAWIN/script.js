@@ -1471,28 +1471,7 @@ class GTMarkdaWin {
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>📝 GT-MARKDAWIN v2.0</h1>
-        <div class="subtitle">مارك دَوِّنْ محرر عربي عصري</div>
-    </div>
-    
-    <div class="meta-info">
-        <div class="date">
-            <strong>التاريخ:</strong> ${printDate}
-        </div>
-        <div class="direction">
-            <strong>الاتجاه:</strong> ${currentDir === 'rtl' ? 'من اليمين لليسار' : 'من اليسار لليمين'}
-        </div>
-    </div>
-    
-    <div class="content">
-        ${this.preview.innerHTML}
-    </div>
-    
-    <div class="footer">
-        <p>تم إنشاء هذا المستند بواسطة GT-MARKDAWIN v2.0</p>
-        <p>${printDate}</p>
-    </div>
+    ${this.preview.innerHTML}
 </body>
 </html>`;
       
