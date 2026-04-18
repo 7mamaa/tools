@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌙 قيام داود - شبين الكوم</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; }
+        .phase-card { transition: all 0.3s; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-indigo-950 to-black text-white min-h-screen">
+    <div class="max-w-2xl mx-auto p-6">
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold mb-2 flex items-center justify-center gap-3">
+                🌙 قيام داود عليه السلام
+            </h1>
+            <p class="text-xl text-emerald-400">شبين الكوم - المنوفية</p>
+            <div id="currentDate" class="text-lg mt-2"></div>
+        </div>
+
+        <!-- حالة الآن -->
+        <div class="bg-white/10 backdrop-blur-xl rounded-3xl p-6 mb-8 text-center phase-card" id="phaseCard">
+            <p class="text-sm text-emerald-300">الآن:</p>
+            <p id="phase" class="text-3xl font-bold my-2">جاري التحميل...</p>
+            <p id="currentTime" class="text-5xl font-mono tracking-widest"></p>
+            <p id="nextEvent" class="text-sm mt-3 text-amber-300"></p>
+        </div>
+
+        <!-- مواقيت اليوم -->
+        <div class="bg-white/10 backdrop-blur-xl rounded-3xl p-6 mb-8">
+            <h2 class="text-xl font-semibold mb-4 text-center">مواقيت الصلاة اليوم</h2>
+            <div class="grid grid-cols-2 gap-4" id="prayerTimes">
+                <!-- يتم ملؤها بالجافاسكريبت -->
+            </div>
+        </div>
+
+        <!-- جدول قيام داود -->
+        <div class="bg-white/10 backdrop-blur-xl rounded-3xl p-6">
+            <h2 class="text-2xl font-bold mb-6 text-center text-emerald-400">📅 جدول قيام داود اليوم</h2>
+            <div id="dawoodSchedule" class="space-y-6">
+                <!-- يتم ملؤها بالجافاسكريبت -->
+            </div>
+        </div>
+
+        <div class="text-center mt-10 text-xs text-gray-400">
+            <p>تم الجلب من Aladhan API • يتحدث تلقائياً كل يوم</p>
+            <button onclick="loadData()" 
+                    class="mt-4 bg-emerald-600 hover:bg-emerald-700 px-8 py-3 rounded-2xl text-sm font-medium">
+                🔄 تحديث الآن
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let ishaDate, fajrDate, sleep1End, prayStart, prayEnd, sleep2Start;
+        let ishaTimeStr, fajrTimeStr;
+
+        async function getDateStr(d) {
+            const day = String(d.getDate()).padStart(2, '0');
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            return `\( {day}- \){month}-${d.getFullYear()}`;
+        }
+
+        async function fetchTimings(dateStr) {
+            const url = `https://api.aladhan.com/v1/timings?latitude=30.55258&longitude=31.00904&method=5&date=${dateStr}`;
+            const res = await fetch(url);
+            if (!res.ok) throw new Error("خطأ في الاتصال");
+            const json = await res.json();
+            return json.data.timings;
+        }
+
+        function timeToDate(timeStr, baseDate) {
+            const [h, m] = timeStr.split(':').map(Number);
+            const d = new Date(baseDate);
+            d.setHours(h, m, 0, 0);
+            return d;
+        }
+
+        function formatTime(date) {
+            return date.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit', hour12: false });
+        }
+
+        async function loadData() {
+            document.getElementById('phase').textContent = "جاري التحميل...";
+            
+            try {
+                const today = new Date();
+                const tomorrow = new Date(today);
+                tomorrow.setDate(tomorrow.getDate() + 1);
+
+                const todayStr = await getDateStr(today);
+                const tomorrowStr = await getDateStr(tomorrow);
+
+                const todayTimings = await fetchTimings(todayStr);
+                const tomorrowTimings = await fetchTimings(tomorrowStr);
+
+                ishaTimeStr = todayTimings.Isha;
+                fajrTimeStr = tomorrowTimings.Fajr;
+
+                ishaDate = timeToDate(ishaTimeStr, today);
+                fajrDate = timeToDate(fajrTimeStr, tomorrow);
+
+                const duration = fajrDate - ishaDate;
+                const half = duration / 2;
+                const third = duration / 3;
+
+                sleep1End = new Date(ishaDate.getTime() + half);
+                prayStart = sleep1End;
+                prayEnd = new Date(prayStart.getTime() + third);
+                sleep2Start = prayEnd;
+
+                // عرض مواقيت الصلاة
+                const prayerHTML = `
+                    <div class="bg-white/5 rounded-2xl p-4 text-center">
+                        <p class="text-emerald-300 text-sm">العشاء</p>
+                        <p class="text-3xl font-bold">${ishaTimeStr}</p>
+                    </div>
+                    <div class="bg-white/5 rounded-2xl p-4 text-center">
+                        <p class="text-emerald-300 text-sm">الفجر (غداً)</p>
+                        <p class="text-3xl font-bold">${fajrTimeStr}</p>
+                    </div>
+                `;
+                document.getElementById('prayerTimes').innerHTML = prayerHTML;
+
+                // جدول داود
+                const scheduleHTML = `
+                    <div class="flex justify-between items-center bg-white/5 p-5 rounded-2xl">
+                        <div>
+                            <span class="text-emerald-400">🛌 النوم الأول</span><br>
+                            <span class="text-xl">من ${formatTime(ishaDate)} إلى ${formatTime(sleep1End)}</span>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center bg-white/5 p-5 rounded-2xl border border-emerald-400">
+                        <div>
+                            <span class="text-emerald-400">🌙 القيام (تهجد)</span><br>
+                            <span class="text-xl">من ${formatTime(prayStart)} إلى ${formatTime(prayEnd)}</span>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center bg-white/5 p-5 rounded-2xl">
+                        <div>
+                            <span class="text-emerald-400">🛌 النوم الثاني</span><br>
+                            <span class="text-xl">من ${formatTime(sleep2Start)} إلى ${formatTime(fajrDate)}</span>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('dawoodSchedule').innerHTML = scheduleHTML;
+
+                document.getElementById('currentDate').textContent = today.toLocaleDateString('ar-EG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+                updateLiveClock();
+            } catch (e) {
+                document.getElementById('phase').innerHTML = `❌ تعذر الجلب<br><small class="text-red-300">${e.message}</small>`;
+            }
+        }
+
+        function getCurrentPhase() {
+            const now = new Date();
+            if (!ishaDate) return { phase: "جاري الحساب...", next: "" };
+
+            if (now < ishaDate) return { phase: "⏳ قبل بدء الليل", next: `العشاء ${formatTime(ishaDate)}` };
+            if (now < sleep1End) return { phase: "🛌 النوم الأول", next: `القيام ${formatTime(prayStart)}` };
+            if (now < prayEnd) return { phase: "🌙 وقت القيام", next: `النوم ${formatTime(sleep2Start)}` };
+            if (now < fajrDate) return { phase: "🛌 النوم الثاني", next: `الفجر ${formatTime(fajrDate)}` };
+            return { phase: "☀️ بعد الفجر", next: "غداً إن شاء الله" };
+        }
+
+        function updateLiveClock() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+            document.getElementById('currentTime').textContent = timeStr;
+
+            const phaseInfo = getCurrentPhase();
+            document.getElementById('phase').textContent = phaseInfo.phase;
+            document.getElementById('nextEvent').textContent = phaseInfo.next;
+
+            // تغيير لون الكارت حسب المرحلة
+            const card = document.getElementById('phaseCard');
+            if (phaseInfo.phase.includes('قيام')) card.classList.add('border-emerald-400');
+            else card.classList.remove('border-emerald-400');
+        }
+
+        // تحديث كل 10 ثواني
+        setInterval(updateLiveClock, 10000);
+
+        // تحميل أول مرة
+        window.onload = loadData;
+    </script>
+</body>
+</html>
