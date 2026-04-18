@@ -70,5 +70,15 @@
     "badge": "أدوات",
     "iconBg": "#374151",
     "iconColor": "#d1d5db"
+  },
+  {
+    "url": "html paeges/dawwod-qiam.html",
+    "title": "داود - قيام",
+    "description": "قيام داود",
+    "icon": "fa-solid fa-moon",
+    "badge": "الإسلاميات",
+    "iconBg": "#1a3a3a",
+    "iconColor": "#10b981"
   }
+  
 ]
