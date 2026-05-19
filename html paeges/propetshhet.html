@@ -3,498 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مدير البرومبتات الذكي | Smart Prompt Hub</title>
-    <!-- Tailwind CSS CDN -->
+    <title>مدير البرومبتات الذكي - النسخة الكاملة</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts - Tajawal & Inter -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Tajawal', 'Inter', sans-serif;
-        }
-        /* Custom Scrollbar for sleek UI */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #1f2937;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #4b5563;
-            border-radius: 3px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #6b7280;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap');
+        body { font-family: 'Tajawal', sans-serif; }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white">
+<body class="bg-slate-950 text-slate-100 min-h-screen">
 
-    <!-- Header Section -->
-    <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md sticky top-0 z-50 px-4 py-4 sm:px-8">
-        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div class="flex items-center gap-3">
-                <div class="p-2.5 bg-indigo-600/20 text-indigo-400 rounded-xl border border-indigo-500/30 shadow-lg shadow-indigo-500/10">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
-                    </svg>
-                </div>
-                <div>
-                    <h1 class="text-xl font-bold bg-gradient-to-l from-indigo-200 to-white bg-clip-text text-transparent">مدير البرومبتات الذكي</h1>
-                    <p class="text-xs text-slate-400 mt-0.5">لوحة تحكم تفاعلية لاستيراد ونسخ البرومبتات من شيت جوجل تلقائياً</p>
-                </div>
+    <div class="max-w-6xl mx-auto p-4 md:p-8">
+        <header class="mb-8 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div>
+                <h1 class="text-3xl font-bold text-indigo-400">مدير البرومبتات</h1>
+                <p class="text-slate-400 text-sm mt-1">نظام استيراد آمن ومباشر من جوجل شيت</p>
             </div>
-            
-            <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
-                <!-- Sync Status Badge -->
-                <div id="sync-status" class="flex items-center gap-2 px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-xs font-medium text-slate-300">
-                    <span class="relative flex h-2 w-2">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-2 w-2 bg-yellow-500"></span>
-                    </span>
-                    جاري جلب البيانات...
-                </div>
-                <!-- Manual Reload Button -->
-                <button id="btn-reload" class="p-2 bg-slate-800 hover:bg-indigo-600 text-slate-300 hover:text-white rounded-lg border border-slate-700 hover:border-indigo-500 transition-all duration-300 cursor-pointer" title="تحديث البيانات">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H18.2" />
-                    </svg>
-                </button>
+            <div id="sync-status" class="px-4 py-2 rounded-lg bg-slate-900 border border-slate-800 text-xs text-slate-400">
+                جاري الاتصال...
             </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <section class="lg:col-span-4 flex flex-col gap-4">
+                <input type="text" id="search" placeholder="ابحث في العناوين أو المحتوى..." 
+                       class="w-full bg-slate-900 border border-slate-700 p-3 rounded-lg focus:outline-none focus:border-indigo-500">
+                <div id="list" class="flex flex-col gap-2 overflow-y-auto max-h-[60vh] pr-1">
+                    </div>
+            </section>
+
+            <section class="lg:col-span-8 flex flex-col h-[70vh]">
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 flex flex-col h-full shadow-2xl">
+                    <div class="flex justify-between items-center mb-4 border-b border-slate-800 pb-4">
+                        <h2 id="active-title" class="text-xl font-bold text-indigo-300">اختر برومبت للعرض</h2>
+                        <button id="copy-btn" class="hidden bg-indigo-600 px-4 py-2 rounded-lg font-bold hover:bg-indigo-500 transition">نسخ النص</button>
+                    </div>
+                    <pre id="active-body" class="flex-1 bg-slate-950 p-4 rounded-lg overflow-y-auto whitespace-pre-wrap text-sm leading-relaxed text-slate-300 border border-slate-800"></pre>
+                </div>
+            </section>
         </div>
-    </header>
+    </div>
 
-    <!-- Main Container -->
-    <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-6 sm:px-8 grid grid-cols-1 lg:grid-cols-12 gap-6">
-        
-        <!-- Left Sidebar: Search and Prompt List (4 Columns on large screen) -->
-        <section class="lg:col-span-4 flex flex-col gap-4 h-fit max-h-[calc(100vh-140px)] sticky top-24">
-            
-            <!-- Search and Filter Card -->
-            <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-xl flex flex-col gap-3">
-                <h2 class="text-sm font-semibold text-slate-300 flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                    البحث السريع والتصفية
-                </h2>
-                <div class="relative">
-                    <input 
-                        type="text" 
-                        id="search-input" 
-                        placeholder="ابحث باسم البرومبت أو المحتوى..." 
-                        class="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 text-slate-100 placeholder-slate-500 rounded-lg py-2.5 px-4 pr-10 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500/30 transition-all duration-200"
-                    />
-                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-500">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
-                    </div>
-                </div>
-                <div class="flex justify-between items-center text-xs text-slate-400">
-                    <span>إجمالي البرومبتات: <strong id="stats-total" class="text-indigo-400">0</strong></span>
-                    <span id="stats-filtered-container" class="hidden">النتائج المطابقة: <strong id="stats-filtered" class="text-green-400">0</strong></span>
-                </div>
-            </div>
-
-            <!-- Prompts List Card -->
-            <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-xl flex flex-col gap-3 flex-1 overflow-hidden">
-                <h2 class="text-sm font-semibold text-slate-300">قائمة العناوين المتاحة</h2>
-                
-                <!-- Loading Skeleton -->
-                <div id="list-loading" class="flex flex-col gap-2 overflow-y-auto pr-1">
-                    <div class="animate-pulse bg-slate-950/60 border border-slate-800/40 rounded-lg p-3 h-14"></div>
-                    <div class="animate-pulse bg-slate-950/60 border border-slate-800/40 rounded-lg p-3 h-14"></div>
-                    <div class="animate-pulse bg-slate-950/60 border border-slate-800/40 rounded-lg p-3 h-14"></div>
-                </div>
-
-                <!-- Actual Prompts List Container -->
-                <div id="prompts-list" class="hidden flex flex-col gap-2 overflow-y-auto max-h-[400px] lg:max-h-[500px] pr-1">
-                    <!-- Cards will be dynamically injected here -->
-                </div>
-
-                <!-- Empty State within list -->
-                <div id="list-empty" class="hidden py-8 text-center text-slate-500 text-sm flex flex-col items-center justify-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span>لا توجد برومبتات مطابقة للبحث</span>
-                </div>
-            </div>
-        </section>
-
-        <!-- Right Content Area: Prompt Viewer (8 Columns on large screen) -->
-        <section class="lg:col-span-8 flex flex-col h-full min-h-[450px]">
-            <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-xl flex flex-col h-full gap-4 relative overflow-hidden">
-                
-                <!-- Top ambient light effect -->
-                <div class="absolute -top-12 left-1/2 -translate-x-1/2 w-72 h-32 bg-indigo-500/10 blur-3xl pointer-events-none rounded-full"></div>
-
-                <!-- Initial Empty State / Instructions -->
-                <div id="viewer-placeholder" class="flex flex-col items-center justify-center text-center py-20 my-auto gap-4">
-                    <div class="p-4 bg-indigo-600/15 rounded-full text-indigo-400 border border-indigo-500/20">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
-                        </svg>
-                    </div>
-                    <div>
-                        <h3 class="text-lg font-bold text-slate-200">اختر برومبت لعرضه</h3>
-                        <p class="text-sm text-slate-400 max-w-sm mt-1 mx-auto leading-relaxed">
-                            اضغط على أي عنوان برومبت من القائمة الجانبية لعرض محتواه وتفاصيله بشكل كامل ونسخه بلمسة واحدة.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Active Viewer Content (Hidden initially) -->
-                <div id="viewer-content" class="hidden flex flex-col h-full gap-4">
-                    <!-- Title and Actions -->
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-800 pb-4">
-                        <div class="flex items-center gap-2.5">
-                            <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
-                            <h2 id="active-title" class="text-lg font-bold text-white tracking-wide">عنوان البرومبت المختار</h2>
-                        </div>
-                        
-                        <!-- Actions Row -->
-                        <div class="flex items-center gap-2 w-full sm:w-auto">
-                            <!-- Copy Button -->
-                            <button id="btn-copy" class="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-bold text-sm shadow-lg shadow-indigo-600/20 hover:shadow-indigo-500/30 transition-all duration-200 cursor-pointer active:scale-95">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
-                                </svg>
-                                <span>نسخ البرومبت الكامل</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Prompt Display Pane -->
-                    <div class="relative flex-1 bg-slate-950 border border-slate-800 rounded-xl p-4 overflow-hidden flex flex-col min-h-[250px]">
-                        <!-- Quick Stats of selected prompt -->
-                        <div class="flex justify-between items-center text-xs text-slate-500 border-b border-slate-900 pb-2 mb-3">
-                            <span>صيغة النص: <strong>نص عادي (Plain Text)</strong></span>
-                            <span>عدد الحروف: <strong id="active-char-count" class="text-slate-300">0</strong> حرف</span>
-                        </div>
-                        <!-- Scrollable Text Area -->
-                        <div class="flex-1 overflow-y-auto pr-1">
-                            <pre id="active-body" class="whitespace-pre-wrap text-slate-200 text-sm leading-relaxed font-sans font-light select-text"></pre>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Toast Success Notification -->
-                <div id="toast" class="absolute bottom-6 left-6 transform translate-y-20 opacity-0 bg-emerald-500 text-white px-5 py-3 rounded-lg shadow-2xl flex items-center gap-2.5 transition-all duration-300 pointer-events-none border border-emerald-400 z-50">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span class="font-bold text-sm">تم نسخ البرومبت بنجاح يا ريس!</span>
-                </div>
-
-            </div>
-        </section>
-
-    </main>
-
-    <!-- Footer Area -->
-    <footer class="border-t border-slate-900 bg-slate-950 text-slate-500 py-4 text-center text-xs">
-        <p>مربوط تلقائياً مع شيت جوجل العام الخاص بك. جميع التعديلات تظهر هنا بمجرد تحديث الشيت ومزامنته.</p>
-    </footer>
-
-    <!-- JS Logic -->
     <script>
-        // Google Sheet CSV Export Endpoint
-        const SHEET_URL = "https://docs.google.com/spreadsheets/d/1TW8HooLYJhAVyzgJIOOSWaH4OxbM62FEoGtAdiA6h8E/edit?usp=sharing";
-        
-        // Extract the ID from Google Sheet URL to prepare secure export link
-        function getCSVExportUrl(url) {
+        const SHEET_ID = "1TW8HooLYJhAVyzgJIOOSWaH4OxbM62FEoGtAdiA6h8E";
+        const URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
+        let prompts = [];
+
+        async function init() {
             try {
-                const matches = url.match(/\/d\/([a-zA-Z0-9-_]+)/);
-                if (matches && matches[1]) {
-                    return `https://docs.google.com/spreadsheets/d/${matches[1]}/export?format=csv&id=${matches[1]}`;
-                }
+                const res = await fetch(URL);
+                const text = await res.text();
+                const json = JSON.parse(text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1));
+                prompts = json.table.rows.map(r => ({
+                    title: r.c[0]?.v || "",
+                    content: r.c[1]?.v || ""
+                })).filter(p => p.title && p.title !== "Prompt_Title");
+                
+                render(prompts);
+                document.getElementById('sync-status').innerText = "متصل بنجاح";
             } catch (e) {
-                console.error("Error parsing Google Sheet URL", e);
-            }
-            // Fallback direct link
-            return "https://docs.google.com/spreadsheets/d/1TW8HooLYJhAVyzgJIOOSWaH4OxbM62FEoGtAdiA6h8E/export?format=csv";
-        }
-
-        const EXPORT_URL = getCSVExportUrl(SHEET_URL);
-
-        // Core App State
-        let promptsData = [];
-        let filteredPrompts = [];
-        let activePromptIndex = null;
-
-        // Elements Cache
-        const syncStatus = document.getElementById('sync-status');
-        const btnReload = document.getElementById('btn-reload');
-        const searchInput = document.getElementById('search-input');
-        const statsTotal = document.getElementById('stats-total');
-        const statsFilteredContainer = document.getElementById('stats-filtered-container');
-        const statsFiltered = document.getElementById('stats-filtered');
-        const promptsList = document.getElementById('prompts-list');
-        const listLoading = document.getElementById('list-loading');
-        const listEmpty = document.getElementById('list-empty');
-        const viewerPlaceholder = document.getElementById('viewer-placeholder');
-        const viewerContent = document.getElementById('viewer-content');
-        const activeTitle = document.getElementById('active-title');
-        const activeBody = document.getElementById('active-body');
-        const activeCharCount = document.getElementById('active-char-count');
-        const btnCopy = document.getElementById('btn-copy');
-        const toast = document.getElementById('toast');
-
-        // CSV Parser for complex strings (supporting multi-line and quotes)
-        function parseCSV(text) {
-            let lines = [];
-            let row = [""];
-            let inQuotes = false;
-            for (let i = 0; i < text.length; i++) {
-                let c = text[i];
-                let next = text[i+1];
-                if (c === '"') {
-                    if (inQuotes && next === '"') {
-                        row[row.length - 1] += '"';
-                        i++;
-                    } else {
-                        inQuotes = !inQuotes;
-                    }
-                } else if (c === ',' && !inQuotes) {
-                    row.push('');
-                } else if ((c === '\r' || c === '\n') && !inQuotes) {
-                    if (c === '\r' && next === '\n') { i++; }
-                    lines.push(row);
-                    row = [""];
-                } else {
-                    row[row.length - 1] += c;
-                }
-            }
-            if (row.length > 1 || row[0] !== "") {
-                lines.push(row);
-            }
-            return lines;
-        }
-
-        // Fetch data from Google Sheets
-        async function fetchPrompts() {
-            setSyncingState(true);
-            try {
-                const response = await fetch(EXPORT_URL);
-                if (!response.ok) throw new Error("فشل الاتصال بشيت جوجل. تأكد من إعدادات المشاركة للعامة.");
-                
-                const csvText = await response.text();
-                const parsedRows = parseCSV(csvText);
-                
-                // Expects Header: [Prompt_Title, Prompt_Content]
-                // Filter out empty rows and skip the header (Row 1)
-                const validRows = parsedRows.filter(row => row.length >= 2 && row[0].trim() !== "");
-                
-                promptsData = [];
-                for (let i = 1; i < validRows.length; i++) {
-                    const title = validRows[i][0].trim();
-                    const content = validRows[i][1].trim();
-                    promptsData.push({ title, content });
-                }
-
-                // Render
-                statsTotal.textContent = promptsData.length;
-                filteredPrompts = [...promptsData];
-                renderPromptsList();
-                setSyncingState(false, true);
-
-            } catch (error) {
-                console.error(error);
-                setSyncingState(false, false, error.message);
+                document.getElementById('sync-status').innerText = "خطأ في الاتصال";
             }
         }
 
-        // Update UI states according to network connection
-        function setSyncingState(isSyncing, isSuccess = true, errorMsg = "") {
-            if (isSyncing) {
-                syncStatus.innerHTML = `
-                    <span class="relative flex h-2 w-2">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-2 w-2 bg-yellow-500"></span>
-                    </span>
-                    جاري جلب البيانات...
-                `;
-                syncStatus.className = "flex items-center gap-2 px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-xs font-medium text-slate-300";
-                listLoading.classList.remove('hidden');
-                promptsList.classList.add('hidden');
-                listEmpty.classList.add('hidden');
-            } else {
-                listLoading.classList.add('hidden');
-                promptsList.classList.remove('hidden');
-                
-                if (isSuccess) {
-                    syncStatus.innerHTML = `
-                        <span class="relative flex h-2 w-2">
-                            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                        </span>
-                        متزامن تلقائياً
-                    `;
-                    syncStatus.className = "flex items-center gap-2 px-3 py-1.5 bg-emerald-950/40 border border-emerald-800/40 rounded-lg text-xs font-medium text-emerald-400";
-                } else {
-                    syncStatus.innerHTML = `
-                        <span class="relative flex h-2 w-2">
-                            <span class="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
-                        </span>
-                        فشل المزامنة
-                    `;
-                    syncStatus.className = "flex items-center gap-2 px-3 py-1.5 bg-rose-950/40 border border-rose-800/40 rounded-lg text-xs font-medium text-rose-400";
-                    showErrorState(errorMsg);
-                }
-            }
-        }
-
-        // Show elegant error feedback inside container
-        function showErrorState(msg) {
-            promptsList.innerHTML = "";
-            listEmpty.classList.remove('hidden');
-            listEmpty.innerHTML = `
-                <div class="text-rose-400 font-semibold mb-1">خطأ في جلب البيانات</div>
-                <div class="text-xs text-slate-400 max-w-xs px-2 mb-3">تأكد من فتح شيت جوجل للعامة (أي شخص لديه الرابط يمكنه العرض).</div>
-                <button onclick="fetchPrompts()" class="text-xs font-bold text-indigo-400 hover:text-white bg-indigo-950 hover:bg-indigo-900 border border-indigo-900 px-3 py-1.5 rounded-md transition duration-200 cursor-pointer">
-                    إعادة المحاولة
-                </button>
-            `;
-        }
-
-        // Render Prompts inside the sidebar list
-        function renderPromptsList() {
-            promptsList.innerHTML = "";
-            
-            if (filteredPrompts.length === 0) {
-                listEmpty.classList.remove('hidden');
-                return;
-            }
-            
-            listEmpty.classList.add('hidden');
-            
-            filteredPrompts.forEach((prompt, index) => {
-                const card = document.createElement('div');
-                const isSelected = activePromptIndex !== null && filteredPrompts[activePromptIndex] && filteredPrompts[activePromptIndex].title === prompt.title;
-                
-                card.className = `p-3 rounded-lg border text-right cursor-pointer transition-all duration-200 flex flex-col gap-1 select-none ${
-                    isSelected 
-                        ? 'bg-indigo-600/10 border-indigo-500/50 shadow-md shadow-indigo-500/5' 
-                        : 'bg-slate-950 hover:bg-slate-900/60 border-slate-800 hover:border-slate-700'
-                }`;
-                
-                card.innerHTML = `
-                    <div class="flex items-start justify-between gap-2">
-                        <span class="text-sm font-semibold tracking-wide truncate flex-1 ${isSelected ? 'text-indigo-300' : 'text-slate-200'}">
-                            ${prompt.title}
-                        </span>
-                        <!-- Secondary action inside card: Instant Copy Button -->
-                        <button onclick="event.stopPropagation(); instantCopyPrompt('${prompt.content.replace(/'/g, "\\'")}')" class="p-1 text-slate-500 hover:text-indigo-400 hover:bg-slate-800/80 rounded transition duration-200 cursor-pointer" title="نسخ فوري للبرومبت">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
-                            </svg>
-                        </button>
-                    </div>
-                    <p class="text-[11px] text-slate-500 truncate pl-4">${prompt.content}</p>
-                `;
-                
-                card.addEventListener('click', () => {
-                    selectPrompt(prompt, index);
-                });
-                
-                promptsList.appendChild(card);
+        function render(data) {
+            const list = document.getElementById('list');
+            list.innerHTML = "";
+            data.forEach((item, i) => {
+                const div = document.createElement('div');
+                div.className = "p-4 bg-slate-900 border border-slate-800 rounded-lg cursor-pointer hover:bg-slate-800 transition";
+                div.innerHTML = `<h3 class="font-bold">${item.title}</h3><p class="text-xs text-slate-500 truncate">${item.content.substring(0, 50)}...</p>`;
+                div.onclick = () => {
+                    document.getElementById('active-title').innerText = item.title;
+                    document.getElementById('active-body').innerText = item.content;
+                    document.getElementById('copy-btn').classList.remove('hidden');
+                };
+                list.appendChild(div);
             });
         }
 
-        // Handle prompt selection
-        function selectPrompt(prompt, index) {
-            activePromptIndex = index;
-            
-            // Re-render list to highlight chosen card
-            renderPromptsList();
-            
-            // Populate Viewer
-            activeTitle.textContent = prompt.title;
-            activeBody.textContent = prompt.content;
-            activeCharCount.textContent = prompt.content.length.toLocaleString('ar-EG');
-            
-            // Show Viewer content area
-            viewerPlaceholder.classList.add('hidden');
-            viewerContent.classList.remove('hidden');
-        }
-
-        // Custom Safe Copy Function (works robustly inside iFrames)
-        function copyTextToClipboard(text) {
-            const textArea = document.createElement("textarea");
-            textArea.value = text;
-            textArea.style.top = "0";
-            textArea.style.left = "0";
-            textArea.style.position = "fixed";
-            document.body.appendChild(textArea);
-            textArea.focus();
-            textArea.select();
-            
-            let successful = false;
-            try {
-                successful = document.execCommand('copy');
-            } catch (err) {
-                console.error('Fallback Copy failed', err);
-            }
-            
-            document.body.removeChild(textArea);
-            return successful;
-        }
-
-        // Fire Success Toast Message
-        function fireToast() {
-            toast.className = "absolute bottom-6 left-6 transform translate-y-0 opacity-100 bg-emerald-600 text-white px-5 py-3 rounded-lg shadow-2xl flex items-center gap-2.5 transition-all duration-300 pointer-events-none border border-emerald-500 z-50";
-            setTimeout(() => {
-                toast.className = "absolute bottom-6 left-6 transform translate-y-20 opacity-0 bg-emerald-600 text-white px-5 py-3 rounded-lg shadow-2xl flex items-center gap-2.5 transition-all duration-300 pointer-events-none border border-emerald-500 z-50";
-            }, 3000);
-        }
-
-        // Active prompt full copy action
-        btnCopy.addEventListener('click', () => {
-            if (activePromptIndex !== null && filteredPrompts[activePromptIndex]) {
-                const text = filteredPrompts[activePromptIndex].content;
-                const result = copyTextToClipboard(text);
-                if (result) fireToast();
-            }
-        });
-
-        // Instant copy from the list item directly
-        window.instantCopyPrompt = function(text) {
-            const result = copyTextToClipboard(text);
-            if (result) fireToast();
+        document.getElementById('search').oninput = (e) => {
+            const term = e.target.value.toLowerCase();
+            render(prompts.filter(p => p.title.toLowerCase().includes(term) || p.content.toLowerCase().includes(term)));
         };
 
-        // Real-time Search Handler
-        searchInput.addEventListener('input', (e) => {
-            const query = e.target.value.toLowerCase().trim();
-            
-            if (query === "") {
-                filteredPrompts = [...promptsData];
-                statsFilteredContainer.classList.add('hidden');
-            } else {
-                filteredPrompts = promptsData.filter(prompt => {
-                    return prompt.title.toLowerCase().includes(query) || 
-                           prompt.content.toLowerCase().includes(query);
-                });
-                statsFiltered.textContent = filteredPrompts.length;
-                statsFilteredContainer.classList.remove('hidden');
-            }
-            
-            renderPromptsList();
-        });
+        document.getElementById('copy-btn').onclick = () => {
+            const text = document.getElementById('active-body').innerText;
+            navigator.clipboard.writeText(text).then(() => alert("تم نسخ البرومبت بنجاح!"));
+        };
 
-        // Manual reload listener
-        btnReload.addEventListener('click', () => {
-            fetchPrompts();
-        });
-
-        // Initialize App on DOM Ready
-        window.addEventListener('DOMContentLoaded', () => {
-            fetchPrompts();
-        });
+        init();
     </script>
 </body>
 </html>
