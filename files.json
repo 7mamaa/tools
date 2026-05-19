@@ -79,6 +79,16 @@
     "badge": "الإسلاميات",
     "iconBg": "#1a3a3a",
     "iconColor": "#10b981"
-  }
+  },
+  {
+  "url": "html paeges/propetshhet.html",
+  "title": "مدير البرومبتات",
+  "description": "استيراد وإدارة البرومبتات من شيت جوجل تلقائياً",
+  "icon": "fa-solid fa-terminal",
+  "badge": "أدوات ذكية",
+  "iconBg": "#1e1b4b",
+  "iconColor": "#6366f1"
+}
+
   
 ]
