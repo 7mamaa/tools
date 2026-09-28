@@ -1,67 +1,324 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="midnight" data-layout="studio">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PomoDoro</title>
+    <title>Pomodoro Focus Studio</title>
+    <link rel="icon" id="pageFavicon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2246%22 fill=%22%23e94560%22/></svg>">
     <style>
+        :root {
+            --bg-main: #1a1a2e;
+            --bg-card: #16213e;
+            --bg-subtle: #0f172a;
+            --accent-pomo: #e94560;
+            --accent-short: #1abc9c;
+            --accent-long: #3498db;
+            --accent-infinity: #9b59b6;
+            --accent-current: var(--accent-pomo);
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --shadow-card: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+            --transition-smooth: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --font-stack: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        [data-theme="forest"] {
+            --bg-main: #132219;
+            --bg-card: #1b3325;
+            --bg-subtle: #0b1610;
+            --accent-pomo: #2ecc71;
+            --accent-short: #1abc9c;
+            --accent-long: #27ae60;
+            --accent-infinity: #16a085;
+            --border-color: rgba(46, 204, 113, 0.2);
+        }
+
+        [data-theme="charcoal"] {
+            --bg-main: #121214;
+            --bg-card: #1e1e24;
+            --bg-subtle: #0a0a0c;
+            --accent-pomo: #ff5e57;
+            --accent-short: #0be881;
+            --accent-long: #4bcffa;
+            --accent-infinity: #d2dae2;
+            --border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        [data-theme="oled"] {
+            --bg-main: #000000;
+            --bg-card: #0a0a0a;
+            --bg-subtle: #050505;
+            --accent-pomo: #ff3366;
+            --accent-short: #00ffcc;
+            --accent-long: #3399ff;
+            --accent-infinity: #cc66ff;
+            --border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Ambient Motion Gradient Background (Optional) */
+        body.mesh-gradient-active {
+            background: linear-gradient(135deg, var(--bg-main) 0%, var(--bg-subtle) 50%, var(--bg-card) 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 18s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
         * {
             margin: 0;
             padding: 0;
-            box-sizing: border-box
+            box-sizing: border-box;
+            user-select: none;
         }
 
         body {
-            font-family: system-ui, sans-serif;
+            font-family: var(--font-stack);
             min-height: 100vh;
             min-height: 100dvh;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            background: #1a1a2e;
-            color: #eee;
-            padding: 16px;
+            flex-direction: column;
+            background: var(--bg-main);
+            color: var(--text-main);
+            transition: background 0.3s ease, color 0.3s ease;
+            overflow-x: hidden;
+            position: relative;
         }
 
         body.audio-active {
-            padding-bottom: 110px;
+            padding-bottom: 125px;
         }
 
-        .container {
-            width: auto;
-            height: auto;
-            max-width: 92vw;
-            padding: 36px 28px;
-            border-radius: 16px;
-            background: #16213e;
-            text-align: center;
-            position: relative
+        /* Top Slim Progress Bar */
+        #topProgressBar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            width: 0%;
+            background: var(--accent-current);
+            z-index: 99999;
+            transition: width 0.3s ease, background 0.3s ease;
+            box-shadow: 0 0 10px var(--accent-current);
         }
 
-        .menu-btn {
-            background: #1a1a2e;
-            border: none;
-            color: #aaa;
-            width: 36px;
-            height: 36px;
+        html {
+            overflow-x: hidden;
+        }
+
+
+        .desktop-header {
+            width: 100%;
+            padding: 8px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            position: sticky;
+            top: 0;
+            background: rgba(26, 26, 46, 0.88);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .brand-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Layout Switcher Pill */
+        .layout-pill-btn {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 6px 12px;
             border-radius: 8px;
+            font-size: 0.78rem;
             cursor: pointer;
             display: flex;
             align-items: center;
-            justify-content: center
+            gap: 6px;
+            transition: var(--transition-smooth);
         }
 
+        .layout-pill-btn:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        /* Workspace Grid for Desktop (Studio Mode) */
+        .workspace-wrapper {
+            flex: 1;
+            width: 100%;
+            max-width: 1420px;
+            margin: 0 auto;
+            padding: 8px 24px 20px;
+            display: grid;
+            grid-template-columns: minmax(310px, 350px) minmax(400px, 520px) minmax(310px, 350px);
+            gap: 20px;
+            align-items: start;
+            justify-content: center;
+            transition: var(--transition-smooth);
+        }
+
+        /* In Compact Layout */
+        html[data-layout="compact"] .workspace-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            max-width: 580px;
+        }
+
+        html[data-layout="compact"] .desktop-side-col {
+            display: none;
+        }
+
+        html[data-layout="compact"] .container {
+            width: 480px;
+            max-width: 95vw;
+        }
+
+        /* Side Columns */
+        .desktop-side-col {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            min-width: 0;
+        }
+
+        .side-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            padding: 16px;
+            box-shadow: var(--shadow-card);
+            transition: var(--transition-smooth);
+            overflow: hidden;
+        }
+
+        .side-card-title {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Center Column: Timer Container */
+        .center-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            width: 100%;
+            min-width: 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: min(520px, 96vw);
+            padding: 16px 22px 14px;
+            border-radius: 22px;
+            background: var(--bg-card);
+            text-align: center;
+            position: relative;
+            box-shadow: var(--shadow-card);
+            border: 1px solid var(--border-color);
+            transition: var(--transition-smooth);
+            z-index: 50;
+            overflow: visible;
+        }
+
+        /* Zen Mode (Double click anywhere on background) */
+        body.zen-active .container {
+            background: transparent;
+            border: none;
+            box-shadow: none;
+        }
+
+        body.zen-active .desktop-header,
+        body.zen-active .desktop-side-col,
+        body.zen-active .hide-in-zen {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .container:hover .hide-in-zen {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Hotkey Tag Badges */
+        .hotkey-badge {
+            display: inline-block;
+            font-size: 0.65rem;
+            padding: 1px 5px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.12);
+            color: var(--text-muted);
+            margin-left: 5px;
+            font-family: monospace;
+            font-weight: normal;
+            vertical-align: middle;
+        }
+
+        /* Modes Buttons */
         .butto--container {
             display: flex;
             justify-content: center;
+            align-items: center;
             gap: 6px;
-            margin-bottom: 8px
+            margin-bottom: 6px;
+            flex-wrap: wrap;
         }
 
-        .butto--container:last-of-type {
-            margin-top: 8px;
-            margin-bottom: 0
+        .icon-btn {
+            background: var(--bg-main);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            width: 36px;
+            height: 36px;
+            border-radius: 9px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition-smooth);
+            position: relative;
+        }
+
+        .icon-btn:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .icon-btn svg {
+            width: 17px;
+            height: 17px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
         }
 
         .butto {
@@ -69,83 +326,423 @@
             border-radius: 10px;
             font-family: inherit;
             font-weight: 600;
-            cursor: pointer
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
         }
 
         .butto--comand {
-            padding: 8px 16px;
+            padding: 6px 12px;
             font-size: .82rem;
-            background: #1a1a2e;
-            color: #888
+            background: var(--bg-main);
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
         }
 
         .butto--comand.active-mode {
-            background: #0f3460;
-            color: #fff
+            background: var(--accent-current);
+            color: #fff;
+            border-color: transparent;
+            box-shadow: 0 4px 14px -3px var(--accent-current);
+        }
+
+        /* Large Desktop Circular Clock Wrapper */
+        .clock-wrapper {
+            position: relative;
+            width: clamp(170px, 28vh, 230px);
+            height: clamp(170px, 28vh, 230px);
+            margin: 4px auto 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: visible;
+        }
+
+        .progress-ring {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+
+        .progress-ring__circle-bg {
+            stroke: rgba(255, 255, 255, 0.06);
+            stroke-width: 9;
+            fill: transparent;
+        }
+
+        .progress-ring__circle {
+            stroke: var(--accent-current);
+            stroke-width: 9;
+            stroke-linecap: round;
+            fill: transparent;
+            stroke-dasharray: 942.48; /* 2 * PI * 150 */
+            stroke-dashoffset: 0;
+            transition: stroke-dashoffset 0.3s ease, stroke 0.3s ease;
+        }
+
+        /* Box Breathing Visualization on Break Mode */
+        body.breathing-active .progress-ring__circle {
+            animation: boxBreathingAnim 16s infinite ease-in-out;
+        }
+
+        @keyframes boxBreathingAnim {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            25% { transform: scale(1.04); opacity: 1; } /* Inhale 4s */
+            50% { transform: scale(1.04); opacity: 1; } /* Hold 4s */
+            75% { transform: scale(0.96); opacity: 0.7; } /* Exhale 4s */
+        }
+
+        .clock-center-content {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
 
         .clock {
-            font-size: clamp(3rem, 12vw, 5.5rem);
+            font-size: clamp(2.6rem, 5.5vh, 3.8rem);
             font-weight: 800;
-            color: #eee;
-            padding: clamp(12px, 3vh, 24px) 0;
-            letter-spacing: -2px;
-            line-height: 1
+            color: var(--text-main);
+            letter-spacing: -1.5px;
+            line-height: 1;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .estimated-finish-pill {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            margin-top: 5px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2px 8px;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+        }
+
+        .overtime-badge {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: #ef4444;
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-top: 4px;
+            display: none;
+            animation: pulse 1.5s infinite;
+        }
+
+        /* 4-Cycle Pomodoro Progress Dots */
+        .cycle-dots {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin: 6px 0 10px;
+        }
+
+        .cycle-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+            transition: var(--transition-smooth);
+        }
+
+        .cycle-dot.completed {
+            background: var(--accent-current);
+            box-shadow: 0 0 10px var(--accent-current);
+        }
+
+        /* Timer Buttons */
+        .timer-controls-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            flex-wrap: nowrap;
         }
 
         .butto--timer {
-            padding: clamp(8px, 2vw, 12px) clamp(14px, 4vw, 26px);
-            font-size: clamp(.75rem, 2.5vw, .9rem);
+            padding: 9px 20px;
+            font-size: .88rem;
             color: #fff;
-            background: #e94560
+            background: var(--accent-current);
+            box-shadow: 0 4px 14px -3px var(--accent-current);
+            white-space: nowrap;
         }
 
-        [data-mode="short"] .butto--timer {
-            background: #1abc9c
+        .butto--timer.secondary {
+            background: var(--bg-main);
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+            box-shadow: none;
         }
 
-        [data-mode="infinity"] .butto--timer {
-            background: #9b59b6
+        .butto--timer.secondary:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.08);
         }
 
-        [data-mode="infinity"] .clock {
-            color: #c39bd3
+        .quick-time-btn {
+            font-size: 0.76rem;
+            padding: 7px 11px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .quick-time-btn:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        /* Daily Target Goal Progress */
+        .daily-goal-box {
+            background: var(--bg-main);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 8px 12px;
+            margin-top: 8px;
+            text-align: left;
+        }
+
+        .daily-goal-bar-bg {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 3px;
+            margin-top: 6px;
+            overflow: hidden;
+        }
+
+        .daily-goal-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--accent-current);
+            border-radius: 4px;
+            transition: width 0.4s ease;
+        }
+
+        /* Scratchpad / Brain Dump Quick Notes */
+        .scratchpad-textarea {
+            width: 100%;
+            height: 120px;
+            background: var(--bg-main);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 10px 12px;
+            color: var(--text-main);
+            font-family: inherit;
+            font-size: 0.84rem;
+            resize: vertical;
+            outline: none;
+            line-height: 1.5;
+        }
+
+        .scratchpad-textarea:focus {
+            border-color: var(--accent-current);
+        }
+
+        /* 4-Channel Ambient Sound Atmosphere Mixer */
+        .ambient-mixer-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .mixer-channel {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            font-size: 0.82rem;
+            color: var(--text-muted);
+        }
+
+        .mixer-channel span {
+            width: 80px;
+            white-space: nowrap;
+        }
+
+        .mixer-channel input[type="range"] {
+            flex: 1;
+            height: 4px;
+            cursor: pointer;
+            accent-color: var(--accent-current);
+        }
+
+        /* Timeline Session Log */
+        .session-timeline {
+            max-height: 180px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            font-size: 0.8rem;
+        }
+
+        .timeline-item {
+            padding: 8px 10px;
+            background: var(--bg-main);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-muted);
+        }
+
+        .timeline-item strong {
+            color: var(--text-main);
+        }
+
+        /* Eye Care Break Toast */
+        .eyecare-toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #0284c7;
+            color: #fff;
+            padding: 14px 20px;
+            border-radius: 14px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+            z-index: 9999;
+            font-size: 0.88rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+
+        .eyecare-toast.show {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Todo Tags */
+        .task-tag {
+            font-size: 0.7rem;
+            padding: 1px 6px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.08);
+            color: #38bdf8;
+            margin-right: 6px;
+        }
+
+        /* Mobile Adaptations */
+        @media (max-width: 820px) {
+            .workspace-wrapper {
+                grid-template-columns: 1fr;
+                max-width: 480px;
+                padding: 10px 16px;
+            }
+            .desktop-side-col {
+                display: none;
+            }
+            .desktop-header {
+                padding: 10px 16px;
+            }
+            .clock-wrapper {
+                width: 220px;
+                height: 220px;
+            }
+        }
+
+        /* ═══ Restored missing classes ═══ */
+        .active-task-badge {
+            margin: 0 auto 14px;
+            padding: 6px 14px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            max-width: 90%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            display: none;
+            border: 1px dashed var(--border-color);
+        }
+
+        .active-task-badge.show {
+            display: inline-block;
+        }
+
+        .mini-stats-strip {
+            margin-top: 14px;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 12px;
+        }
+
+        .mini-stats-strip span strong {
+            color: var(--text-main);
         }
 
         .timer-notification {
             position: fixed;
             top: 20px;
             left: 50%;
-            transform: translateX(-50%);
-            background: #27ae60;
+            transform: translateX(-50%) translateY(-20px);
+            background: #10b981;
             color: #fff;
-            padding: 14px 28px;
-            border-radius: 12px;
-            font-weight: 700;
-            font-size: 1rem;
+            padding: 12px 24px;
+            border-radius: 14px;
+            font-weight: 600;
+            font-size: .92rem;
             z-index: 10000;
-            display: none
+            opacity: 0;
+            pointer-events: none;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .timer-notification.show {
-            display: block
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateX(-50%) translateY(0);
         }
 
         .sidebar {
             position: fixed;
             top: 0;
-            left: -360px;
-            width: 340px;
-            max-width: 85vw;
+            left: -380px;
+            width: 360px;
+            max-width: 88vw;
             height: 100vh;
-            background: #0f0f23;
+            background: var(--bg-subtle);
+            border-right: 1px solid var(--border-color);
             z-index: 1000;
             display: flex;
-            flex-direction: column
+            flex-direction: column;
+            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
         }
 
         .sidebar.open {
-            left: 0
+            left: 0;
         }
 
         .sidebar-header {
@@ -153,100 +750,178 @@
             justify-content: space-between;
             align-items: center;
             padding: 20px;
-            border-bottom: 1px solid #222
+            border-bottom: 1px solid var(--border-color);
         }
 
         .sidebar-header h2 {
-            color: #ddd;
-            font-size: 1.2rem
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-main);
         }
 
         .close-btn {
-            background: #1a1a2e;
-            border: none;
-            color: #aaa;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
             width: 32px;
             height: 32px;
             border-radius: 8px;
-            font-size: 1.2rem;
             cursor: pointer;
             display: flex;
             align-items: center;
-            justify-content: center
+            justify-content: center;
+            font-size: 1.1rem;
+            transition: var(--transition-smooth);
+        }
+
+        .close-btn:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.1);
         }
 
         .todo-input-container {
             display: flex;
             gap: 6px;
-            padding: 14px 20px
+            padding: 12px 16px 8px;
+            align-items: center;
+        }
+
+        .side-card .todo-input-container {
+            padding: 0 0 10px !important;
+            gap: 6px;
         }
 
         .todo-input-container input {
             flex: 1;
-            padding: 10px 14px;
-            border-radius: 8px;
-            border: 1px solid #333;
-            background: #1a1a2e;
+            min-width: 0;
+            padding: 8px 10px;
+            border-radius: 9px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-main);
             color: #fff;
             font-family: inherit;
-            font-size: .88rem;
-            outline: none
+            font-size: .84rem;
+            outline: none;
         }
 
-        .todo-input-container button {
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
+        .todo-input-container input:focus {
+            border-color: var(--accent-current);
+        }
+
+        .todo-input-container input[type="number"] {
+            width: 46px;
+            flex: 0 0 46px;
+            padding: 8px 4px;
+            text-align: center;
+        }
+
+        .todo-input-container .icon-btn {
+            flex: 0 0 34px;
+            width: 34px;
+            height: 34px;
+            border-radius: 9px;
+            font-size: 1.1rem;
+            line-height: 1;
+        }
+
+        .todo-toolbar {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 20px 10px;
+            font-size: 0.76rem;
+            color: var(--text-muted);
+        }
+
+        .todo-toolbar button {
+            background: none;
             border: none;
-            background: #27ae60;
-            color: #fff;
-            font-size: 1.3rem;
-            font-weight: 700;
-            cursor: pointer
+            color: var(--text-muted);
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .todo-toolbar button:hover {
+            color: var(--text-main);
         }
 
         .todo-list {
             list-style: none;
             padding: 6px 20px 20px;
             overflow-y: auto;
-            flex: 1
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
         }
 
         .todo-list li {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 12px;
-            margin-bottom: 4px;
-            border-radius: 8px;
-            background: #1a1a2e;
-            color: #ccc;
-            font-size: .88rem
+            padding: 10px 12px;
+            border-radius: 10px;
+            background: var(--bg-card);
+            color: var(--text-main);
+            font-size: .86rem;
+            border: 1px solid var(--border-color);
+            gap: 8px;
+            transition: var(--transition-smooth);
         }
 
-        .todo-list li.completed span {
+        .todo-list li.active-focus-task {
+            border-color: var(--accent-pomo);
+            background: rgba(233, 69, 96, 0.1);
+        }
+
+        .todo-list li.completed span.task-text {
             text-decoration: line-through;
-            color: #555
+            color: var(--text-muted);
+            opacity: 0.6;
         }
 
-        .delete-task-btn {
+        .task-pomos {
+            font-size: 0.74rem;
+            color: var(--text-muted);
+            background: rgba(255, 255, 255, 0.06);
+            padding: 2px 6px;
+            border-radius: 6px;
+            white-space: nowrap;
+        }
+
+        .task-actions {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .task-btn {
             background: none;
             border: none;
-            color: #555;
-            font-size: 1.2rem;
-            cursor: pointer
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .task-btn:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.08);
         }
 
         .overlay {
             position: fixed;
             inset: 0;
             background: rgba(0, 0, 0, .6);
+            backdrop-filter: blur(2px);
             z-index: 999;
-            display: none
+            display: none;
         }
 
         .overlay.active {
-            display: block
+            display: block;
         }
 
         .modal {
@@ -256,215 +931,251 @@
             justify-content: center;
             align-items: center;
             z-index: 2000;
-            background: rgba(0, 0, 0, .7)
+            background: rgba(0, 0, 0, .7);
+            backdrop-filter: blur(4px);
         }
 
         .modal.visible {
-            display: flex
+            display: flex;
         }
 
         .modal-content {
-            width: 360px;
-            max-width: 88vw;
-            background: #16213e;
-            border-radius: 16px;
-            padding: 28px;
-            position: relative
+            width: 420px;
+            max-width: 90vw;
+            max-height: 88vh;
+            overflow-y: auto;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 26px;
+            position: relative;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
         }
 
         .modal-content h2 {
-            color: #ddd;
+            color: var(--text-main);
             font-size: 1.2rem;
-            margin-bottom: 20px
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .close {
+        .modal-content .close {
             position: absolute;
-            top: 14px;
-            right: 16px;
-            background: #1a1a2e;
-            border: none;
+            top: 18px;
+            right: 18px;
+            background: var(--bg-main);
+            border: 1px solid var(--border-color);
             border-radius: 8px;
             width: 32px;
             height: 32px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #aaa;
+            color: var(--text-muted);
+            cursor: pointer;
             font-size: 1.2rem;
-            cursor: pointer
         }
 
         .setting-group {
-            margin-bottom: 14px
+            margin-bottom: 14px;
         }
 
         .setting-group label {
             display: block;
-            color: #888;
+            color: var(--text-muted);
             font-size: .82rem;
-            margin-bottom: 6px
+            margin-bottom: 6px;
         }
 
-        .setting-group input {
+        .setting-group select {
             width: 100%;
-            padding: 10px 14px;
+            padding: 9px 12px;
             border-radius: 8px;
-            border: 1px solid #333;
-            background: #1a1a2e;
+            border: 1px solid var(--border-color);
+            background: var(--bg-main);
             color: #fff;
             font-family: inherit;
-            font-size: .95rem;
-            outline: none
+            font-size: .9rem;
+            outline: none;
         }
 
-        .modal .butto--timer {
-            background: #27ae60
+        .setting-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            font-size: 0.84rem;
+            color: var(--text-main);
+            cursor: pointer;
         }
 
-        @media(max-width:400px) {
-            .container {
-                padding: 20px 12px
-            }
-
-            .butto--comand {
-                padding: 6px 10px;
-                font-size: .75rem
-            }
+        .setting-checkbox input {
+            accent-color: var(--accent-pomo);
+            width: 16px;
+            height: 16px;
         }
 
-        @media(max-height:500px) {
-            .clock {
-                padding: 8px 0
-            }
-
-            .butto--container {
-                margin-bottom: 4px
-            }
-        }
-
+        /* Premium Floating Audio Bar */
         #audioBar {
             position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: #0f0f23;
-            border-top: 1px solid #333;
-            padding: 8px 12px;
-            z-index: 900;
-            font-size: .82rem
+            bottom: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 32px);
+            max-width: 680px;
+            background: rgba(18, 18, 36, 0.92);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 10px 16px;
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.55), 0 0 1px rgba(255, 255, 255, 0.15) inset;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            transition: var(--transition-smooth);
+        }
+
+        #audioBar[hidden] {
+            display: none !important;
         }
 
         #audioBar .ab-row {
             display: flex;
             align-items: center;
-            gap: 6px;
-            margin-bottom: 4px
-        }
-
-        #audioBar .ab-row:last-child {
-            margin-bottom: 0
-        }
-
-        #audioBar button {
-            background: #1a1a2e;
-            border: none;
-            color: #aaa;
-            padding: 5px 8px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: .78rem;
-            font-family: inherit
-        }
-
-
-
-        #audioSeek {
-            flex: 1;
-            height: 4px;
-            cursor: pointer;
-            accent-color: #e94560
+            gap: 8px;
+            width: 100%;
         }
 
         #audioTrackName {
             flex: 1;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text-main);
             overflow: hidden;
             white-space: nowrap;
             text-overflow: ellipsis;
-            color: #888;
-            font-size: .76rem
         }
 
-        #audioVolume {
-            width: 60px;
+        #audioTimeDisplay {
+            font-size: 0.74rem;
+            color: var(--text-muted);
+            font-variant-numeric: tabular-nums;
+            white-space: nowrap;
+        }
+
+        #audioBar button {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: var(--transition-smooth);
+            flex-shrink: 0;
+            padding: 0;
+        }
+
+        #audioBar button:hover {
+            background: rgba(255, 255, 255, 0.14);
+            border-color: rgba(255, 255, 255, 0.25);
+            transform: scale(1.05);
+        }
+
+        #audioPlayBtn {
+            background: var(--accent-pomo) !important;
+            border-color: transparent !important;
+            color: #fff !important;
+            width: 34px !important;
+            height: 34px !important;
+            border-radius: 10px !important;
+            font-size: 0.95rem !important;
+            box-shadow: 0 4px 12px -2px var(--accent-pomo);
+        }
+
+        #audioPlayBtn:hover {
+            transform: scale(1.08) !important;
+            filter: brightness(1.1);
+        }
+
+        #audioCloseBtn:hover {
+            background: #e94560 !important;
+            color: #fff !important;
+            border-color: transparent !important;
+        }
+
+        #audioSeek {
+            flex: 1;
+            height: 5px;
+            cursor: pointer;
+            accent-color: var(--accent-pomo);
+            border-radius: 3px;
+        }
+
+        #audioVolume, #audioSpeed {
             height: 4px;
             cursor: pointer;
-            accent-color: #27ae60
+            accent-color: var(--accent-short);
+            border-radius: 2px;
         }
 
-        #audioSpeed {
-            width: 80px;
-            height: 4px;
-            cursor: pointer;
-            accent-color: #e94560
+        #audioAddMore {
+            width: auto !important;
+            padding: 2px 10px !important;
+            font-size: 0.72rem !important;
+            height: 24px !important;
+            border-radius: 6px !important;
         }
 
-        #audioToggleBtn.ab-playing {
-            background: #0f3460;
-            color: #fff
+        .ambient-controls {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.04);
+            padding: 4px 8px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
         }
 
-        /* --- Drag & Drop Overlay --- */
         #dropOverlay {
+            display: none;
             position: fixed;
             inset: 0;
-            background: rgba(15, 15, 35, .88);
-            z-index: 9999;
-            display: none;
-            justify-content: center;
+            z-index: 9000;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(6px);
             align-items: center;
-            flex-direction: column;
-            gap: 12px;
-            pointer-events: none
+            justify-content: center;
         }
 
         #dropOverlay.active {
-            display: flex
-        }
-
-        #dropOverlay .drop-icon {
-            font-size: 4rem;
-            line-height: 1
+            display: flex;
         }
 
         #dropOverlay .drop-border {
-            border: 3px dashed #e94560;
+            border: 2px dashed var(--accent-pomo);
             border-radius: 24px;
             padding: 48px 64px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 10px
+            gap: 10px;
         }
 
-        #dropOverlay .drop-text {
-            color: #ccc;
-            font-size: 1.1rem;
-            font-weight: 600
-        }
-
-        #dropOverlay .drop-hint {
-            color: #666;
-            font-size: .8rem
-        }
-
-        /* --- Fullscreen Video Player --- */
         .video-player {
             position: fixed;
             inset: 0;
             width: 100%;
             height: 100%;
-            object-fit: contain;
+            object-fit: cover;
             background: #000;
             z-index: 10;
             display: none;
@@ -475,134 +1186,557 @@
         }
 
         body.video-mode {
-            padding: 0;
+            padding: 0 !important;
             background: #000;
+            overflow: hidden;
+        }
+
+        body.video-mode .desktop-header,
+        body.video-mode .desktop-side-col,
+        body.video-mode #topProgressBar {
+            display: none !important;
+        }
+
+        body.video-mode .workspace-wrapper {
+            padding: 0 !important;
+            max-width: 100% !important;
+            margin: 0 !important;
+            display: block !important;
+        }
+
+        body.video-mode .center-col {
+            display: block !important;
+            width: 100% !important;
         }
 
         body.video-mode .container {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            width: 100%;
-            max-width: 100%;
-            border-radius: 0;
+            top: 16px;
+            left: 50%;
+            transform: translate(-50%, -120%);
+            width: calc(100% - 32px);
+            max-width: 820px;
+            border-radius: 16px;
             display: flex;
             flex-direction: row;
             align-items: center;
-            justify-content: center;
-            gap: clamp(10px, 2vw, 24px);
-            padding: 10px 24px;
-            z-index: 20;
-            background: rgba(15, 15, 35, 0.9);
-            border-bottom: 1px solid #333;
-            transform: translateY(-100%);
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            justify-content: space-between;
+            padding: 10px 20px;
+            z-index: 100;
+            background: rgba(15, 15, 30, 0.88);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6);
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+            opacity: 0;
+            pointer-events: none;
         }
 
         body.video-mode .container.show-bar {
-            transform: translateY(0);
+            transform: translate(-50%, 0);
+            opacity: 1;
+            pointer-events: auto;
         }
 
-        body.video-mode .container .clock {
-            font-size: clamp(2rem, 3vw, 3rem);
-            padding: 0;
-            margin: 0;
+        /* Hide elements that clutter the video top bar */
+        body.video-mode .progress-ring,
+        body.video-mode .cycle-dots,
+        body.video-mode .daily-goal-box,
+        body.video-mode .mini-stats-strip,
+        body.video-mode #menuBtn,
+        body.video-mode #activeTaskBadge,
+        body.video-mode .hotkey-badge {
+            display: none !important;
         }
 
-        body.video-mode .container .butto--container {
-            margin: 0;
+        /* Sleek inline mode switchers in video mode */
+        body.video-mode .butto--container {
+            margin: 0 !important;
+            gap: 4px !important;
+            flex-wrap: nowrap;
+        }
+
+        body.video-mode .butto--comand {
+            padding: 5px 10px !important;
+            font-size: 0.76rem !important;
+            border-radius: 8px !important;
+        }
+
+        /* Center clock in video mode */
+        body.video-mode .clock-wrapper {
+            width: auto !important;
+            height: auto !important;
+            margin: 0 14px !important;
+            position: static;
+        }
+
+        body.video-mode .clock-center-content {
+            flex-direction: row;
+            gap: 8px;
+            align-items: baseline;
+        }
+
+        body.video-mode .clock {
+            font-size: 1.85rem !important;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        body.video-mode .estimated-finish-pill {
+            margin-top: 0 !important;
+            font-size: 0.7rem !important;
+            padding: 1px 6px !important;
+        }
+
+        body.video-mode .timer-controls-row {
+            margin: 0 !important;
+            gap: 6px !important;
+        }
+
+        body.video-mode .butto--timer {
+            padding: 6px 14px !important;
+            font-size: 0.8rem !important;
+            border-radius: 8px !important;
+        }
+
+        body.video-mode .quick-time-btn {
+            padding: 5px 8px !important;
+            font-size: 0.72rem !important;
+            border-radius: 6px !important;
+        }
+
+        body.video-mode .icon-btn {
+            width: 32px !important;
+            height: 32px !important;
+            border-radius: 8px !important;
+        }
+
+        body.video-mode #exitVideoBtn {
+            background: #e94560 !important;
+            color: #fff !important;
+            border-color: transparent !important;
+            box-shadow: 0 0 12px rgba(233, 69, 96, 0.4);
+            margin-left: 6px;
+        }
+
+        .heatmap-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px;
+            margin-top: 10px;
+        }
+
+        .heatmap-cell {
+            aspect-ratio: 1;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
+            font-size: 0.68rem;
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
         }
 
-        @media(max-width: 800px) {
-            body.video-mode .container {
-                flex-wrap: wrap;
-                padding: 10px;
-                justify-content: space-around;
-                gap: 8px;
-            }
+        .heatmap-cell.active-1 { background: rgba(233, 69, 96, 0.3); color: #fff; }
+
+        .heatmap-cell.active-2 { background: rgba(233, 69, 96, 0.6); color: #fff; }
+
+        .heatmap-cell.active-3 { background: rgba(233, 69, 96, 0.9); color: #fff; }
+
+        .prayer-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .prayer-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 14px;
+            border-radius: 10px;
+            background: var(--bg-main);
+            border: 1px solid var(--border-color);
+            font-size: 0.88rem;
+        }
+
+        .prayer-item.next-prayer {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
         }
     </style>
 </head>
 
 <body>
-    <!-- Drag & Drop Overlay -->
+    <!-- Top Ultra-Slim Progress Line -->
+    <div id="topProgressBar"></div>
+
+    <!-- Drag & Drop Media Overlay -->
     <div id="dropOverlay">
         <div class="drop-border">
-            <span class="drop-icon">🎵🎬</span>
-            <span class="drop-text">Drop media files here</span>
-            <span class="drop-hint">Audio & Video supported</span>
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent-pomo)"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <span style="color:#eee;font-weight:600;font-size:1.1rem">Drop media files here</span>
+            <span style="color:#888;font-size:0.85rem">Audio & Video supported</span>
         </div>
     </div>
-    <div id="timerNotification" class="timer-notification">⏰ Time's up!</div>
-    <div id="Container" class="container" data-mode="pomodoro">
-        <div class="butto--container">
-            <button id="menuBtn" class="menu-btn" aria-label="Open todo list">
-                <svg width="20" height="20" viewBox="0 0 448 512" fill="currentColor">
-                    <path
-                        d="M0 96C0 78.3 14.3 64 32 64h384c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zm0 160c0-17.7 14.3-32 32-32h384c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zm448 160c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32h384c17.7 0 32 14.3 32 32z" />
-                </svg>
+
+    <!-- Notification Toast -->
+    <div id="timerNotification" class="timer-notification">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span id="notifMessage">Time's up!</span>
+    </div>
+
+    <!-- Eye Care 20-20-20 Toast -->
+    <div id="eyeCareToast" class="eyecare-toast">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/></svg>
+        <div>
+            <strong>Eye Care: Look 20ft away!</strong>
+            <div style="font-size:0.75rem;opacity:0.85">Relax your eyes for 20 seconds.</div>
+        </div>
+    </div>
+
+    <!-- Top Desktop Studio Header -->
+    <header class="desktop-header">
+        <div class="brand-title">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="color:var(--accent-pomo)"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span>Pomodoro Studio</span>
+        </div>
+        <div class="header-actions">
+            <button id="layoutToggleBtn" class="layout-pill-btn" title="Toggle Studio / Compact Card view">
+                <span id="layoutBtnText">Compact Mode</span>
             </button>
-            <button id="pomodoro" class="butto butto--comand active-mode">Pomodoro</button>
-            <button id="break" class="butto butto--comand">Break</button>
-            <button id="infinity-mode" class="butto butto--comand">∞ Infinity</button>
+            <button id="zenBtn" class="layout-pill-btn" title="Zen Focus Mode (Dbl-click background)">
+                <span>Zen Mode</span>
+            </button>
+            <button id="exportMdBtn" class="layout-pill-btn" title="Copy Daily Summary to Clipboard (Markdown)">
+                <span>Copy Summary</span>
+            </button>
         </div>
-        <div id="counterElement" class="clock">25:00</div>
-        <div class="butto--container">
-            <button id="startStop" class="butto butto--timer">Start</button>
-            <button id="reset" class="butto butto--timer">Reset</button>
-            <button id="settingsBtn" class="butto butto--timer">Settings</button>
+    </header>
+
+    <!-- Studio 3-Column Workspace -->
+    <main class="workspace-wrapper">
+        <!-- LEFT COLUMN: Tasks & Scratchpad -->
+        <aside class="desktop-side-col">
+            <!-- Active & To-Do Card -->
+            <div class="side-card">
+                <div class="side-card-title">
+                    <span>Tasks & Priorities</span>
+                    <button id="dockClearDoneBtn" style="background:none;border:none;color:var(--text-muted);font-size:0.75rem;cursor:pointer">Clear Done</button>
+                </div>
+                <div class="todo-input-container">
+                    <input type="text" id="todoInput" placeholder="Add task with #tag...">
+                    <input type="number" id="todoPomoEst" value="1" min="1" max="10" title="Estimated Pomodoros">
+                    <button id="addTodoBtn" class="icon-btn" style="background:var(--accent-pomo);color:#fff">+</button>
+                </div>
+                <ul id="todoList" class="todo-list" style="max-height:260px;padding:0;"></ul>
+            </div>
+
+            <!-- Scratchpad / Brain Dump Quick Notes -->
+            <div class="side-card">
+                <div class="side-card-title">
+                    <span>Brain Dump / Scratchpad</span>
+                    <span style="font-size:0.7rem;color:var(--text-muted)">Auto-saved</span>
+                </div>
+                <textarea id="scratchpadNotes" class="scratchpad-textarea" placeholder="Jot down distracting thoughts or quick ideas here to keep your mind clear..."></textarea>
+            </div>
+        </aside>
+
+        <!-- CENTER COLUMN: Focus Clock & Hero Controls -->
+        <div class="center-col">
+            <div id="Container" class="container" data-mode="pomodoro">
+                <!-- Modes Switcher -->
+                <div class="butto--container hide-in-zen">
+                    <button id="menuBtn" class="icon-btn" title="To-Do List Drawer (T)" aria-label="Open todo list">
+                        <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                    </button>
+                    <button id="pomodoro" class="butto butto--comand active-mode">Pomodoro</button>
+                    <button id="break" class="butto butto--comand">Break</button>
+                    <button id="longBreak" class="butto butto--comand">Long Break</button>
+                    <button id="infinity-mode" class="butto butto--comand">∞ Infinity</button>
+                </div>
+
+                <!-- Active Focus Task Indicator -->
+                <div id="activeTaskBadge" class="active-task-badge hide-in-zen">
+                    Focus: <strong id="activeTaskText">None</strong>
+                </div>
+
+                <!-- Clock with Circular SVG Progress Ring -->
+                <div class="clock-wrapper">
+                    <svg class="progress-ring" width="100%" height="100%" viewBox="0 0 320 320">
+                        <circle class="progress-ring__circle-bg" cx="160" cy="160" r="150" />
+                        <circle id="progressCircle" class="progress-ring__circle" cx="160" cy="160" r="150" />
+                    </svg>
+                    <div class="clock-center-content">
+                        <div id="counterElement" class="clock">25:00</div>
+                        <div id="overtimeBadge" class="overtime-badge">+Overtime</div>
+                        <div id="estimatedFinishPill" class="estimated-finish-pill">Ends at —:—</div>
+                    </div>
+                </div>
+
+                <!-- 4-Cycle Pomodoro Progress Dots -->
+                <div id="cycleDots" class="cycle-dots hide-in-zen" title="4 Pomodoros until Long Break">
+                    <div class="cycle-dot"></div>
+                    <div class="cycle-dot"></div>
+                    <div class="cycle-dot"></div>
+                    <div class="cycle-dot"></div>
+                </div>
+
+                <!-- Primary Control Buttons & Quick Adjust -->
+                <div class="butto--container timer-controls-row">
+                    <button id="quickMinus" class="quick-time-btn hide-in-zen" title="-5 Minutes">-5m</button>
+                    <button id="startStop" class="butto butto--timer">
+                        <span>Start</span>
+                        <span class="hotkey-badge hide-in-zen">Space</span>
+                    </button>
+                    <button id="reset" class="butto butto--timer secondary hide-in-zen">
+                        <span>Reset</span>
+                        <span class="hotkey-badge">R</span>
+                    </button>
+                    <button id="quickPlus" class="quick-time-btn hide-in-zen" title="+5 Minutes">+5m</button>
+                </div>
+
+                <!-- Utility Action Row with Clean SVG Icons -->
+                <div class="butto--container hide-in-zen" style="margin-top: 10px;">
+                    <button id="settingsBtn" class="icon-btn" title="Settings">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    </button>
+                    <button id="statsBtn" class="icon-btn" title="Stats & History">
+                        <svg viewBox="0 0 24 24"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+                    </button>
+                    <button id="audioOpenBtn" class="icon-btn" title="Audio Player">
+                        <svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                    </button>
+                    <button id="videoOpenBtn" class="icon-btn" title="Study Video">
+                        <svg viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+                    </button>
+                    <button id="pipBtn" class="icon-btn" title="Picture in Picture">
+                        <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><rect x="12" y="9" width="8" height="6" rx="1"/></svg>
+                    </button>
+                    <button id="prayerBtn" class="icon-btn" title="Prayer Times">
+                        <svg viewBox="0 0 24 24"><path d="M12 2C8 6 8 10 8 12v6h8v-6c0-2 0-6-4-10z"/><line x1="4" y1="22" x2="20" y2="22"/></svg>
+                    </button>
+                    <button id="fullscreenBtn" class="icon-btn" title="Fullscreen (F)">
+                        <svg viewBox="0 0 24 24"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+                        <span class="hotkey-badge" style="position:absolute;bottom:2px;right:2px;font-size:0.55rem">F</span>
+                    </button>
+                    <button id="audioToggleBtn" class="icon-btn" title="Show/Hide Bottom Audio" hidden>
+                        <svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                    </button>
+                    <button id="exitVideoBtn" class="icon-btn" title="Close Video" hidden style="background:#e94560;color:#fff;">
+                        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                </div>
+
+                <!-- Daily Target Goal Strip -->
+                <div class="daily-goal-box hide-in-zen">
+                    <div style="display:flex;justify-content:space-between;font-size:0.78rem;">
+                        <span>Daily Target: <strong id="goalFraction">0/8</strong></span>
+                        <span id="goalPercent">0%</span>
+                    </div>
+                    <div class="daily-goal-bar-bg">
+                        <div id="dailyGoalFill" class="daily-goal-bar-fill"></div>
+                    </div>
+                </div>
+
+                <input type="file" id="audioFileInput" accept="audio/*,video/*" multiple hidden>
+            </div>
         </div>
-        <div class="butto--container">
-            <button id="videoOpenBtn" class="butto butto--timer" title="Video Player">🎬</button>
-            <button id="audioOpenBtn" class="butto butto--timer" title="Music Player">🎵</button>
-            <button id="audioToggleBtn" class="butto butto--timer" title="Show/Hide Player" hidden>🔊</button>
-            <button id="prayerBtn" class="butto butto--timer" title="مواقيت الصلاة">🕌</button>
-            <button id="fullscreenBtn" class="butto butto--timer" title="ملء الشاشة">⛶</button>
-            <button id="exitVideoBtn" class="butto butto--timer" title="إغلاق الفيديو" hidden
-                style="background:#e94560">❌</button>
-        </div>
-        <input type="file" id="audioFileInput" accept="audio/*,video/*" multiple hidden>
-    </div>
+
+        <!-- RIGHT COLUMN: Atmosphere Mixer & Session Timeline -->
+        <aside class="desktop-side-col">
+            <!-- 4-Channel Ambient Atmosphere Mixer -->
+            <div class="side-card">
+                <div class="side-card-title">
+                    <span>Atmosphere Sound Mixer</span>
+                    <button id="masterAmbientMute" style="background:none;border:none;color:var(--accent-current);font-size:0.75rem;cursor:pointer">Mute All</button>
+                </div>
+                <div class="ambient-mixer-grid">
+                    <div class="mixer-channel">
+                        <span>🌧️ Rain</span>
+                        <input type="range" id="volRain" min="0" max="100" value="0">
+                    </div>
+                    <div class="mixer-channel">
+                        <span>🌊 Ocean</span>
+                        <input type="range" id="volOcean" min="0" max="100" value="0">
+                    </div>
+                    <div class="mixer-channel">
+                        <span>🍃 Wind</span>
+                        <input type="range" id="volWind" min="0" max="100" value="0">
+                    </div>
+                    <div class="mixer-channel">
+                        <span>📻 Brown Noise</span>
+                        <input type="range" id="volBrown" min="0" max="100" value="0">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Session Timeline History -->
+            <div class="side-card">
+                <div class="side-card-title">
+                    <span>Today's Sessions Timeline</span>
+                    <span id="sideSessionCount" style="font-size:0.75rem;color:var(--text-muted)">0 Done</span>
+                </div>
+                <div id="sessionTimeline" class="session-timeline">
+                    <div style="color:var(--text-muted);font-size:0.76rem;text-align:center;padding:12px 0;">No sessions completed today yet.</div>
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <!-- Sidebar To-Do Drawer (For Mobile & Compact view) -->
     <div id="sidebar" class="sidebar">
         <div class="sidebar-header">
-            <h2>📝 To-Do List</h2>
+            <h2>Tasks & Focus</h2>
             <button id="closeSidebar" class="close-btn">&times;</button>
         </div>
         <div class="todo-input-container">
-            <input type="text" id="todoInput" placeholder="Add a new task...">
-            <button id="addTodoBtn">+</button>
+            <input type="text" id="drawerTodoInput" placeholder="Add task...">
+            <input type="number" id="drawerTodoPomoEst" value="1" min="1" max="10" title="Estimated Pomodoros" style="width:60px">
+            <button id="drawerAddTodoBtn" class="icon-btn" style="background:var(--accent-pomo);color:#fff">+</button>
         </div>
-        <ul id="todoList" class="todo-list"></ul>
+        <div class="todo-toolbar">
+            <span>Click to toggle | 🎯 Focus</span>
+            <button id="clearCompletedBtn">Clear Done</button>
+        </div>
+        <ul id="drawerTodoList" class="todo-list"></ul>
     </div>
+
+    <!-- Background Dim Overlay -->
     <div id="overlay" class="overlay"></div>
+
+    <!-- Ambient Video Player -->
     <video id="videoPlayer" class="video-player" controls hidden></video>
+    <canvas id="pipCanvas" width="300" height="300" style="display:none"></canvas>
+
+    <!-- Settings Modal -->
     <div id="settingsModal" class="modal">
         <div class="modal-content">
             <span id="closeSettings" class="close">&times;</span>
-            <h2>⚙️ Timer Settings</h2>
+            <h2>Settings</h2>
+            
             <div class="setting-group">
-                <label for="pomodoroTime">Pomodoro (minutes)</label>
+                <label>Theme</label>
+                <select id="themeSelect">
+                    <option value="midnight">Deep Midnight</option>
+                    <option value="forest">Forest Green</option>
+                    <option value="charcoal">Minimal Charcoal</option>
+                    <option value="oled">OLED Ultra-Black</option>
+                </select>
+            </div>
+
+            <div class="setting-group">
+                <label>Pomodoro Duration (min)</label>
                 <input type="number" id="pomodoroTime" value="25" min="1">
             </div>
             <div class="setting-group">
-                <label for="shortBreakTime">Short Break (minutes)</label>
+                <label>Short Break Duration (min)</label>
                 <input type="number" id="shortBreakTime" value="5" min="1">
             </div>
+            <div class="setting-group">
+                <label>Long Break Duration (min)</label>
+                <input type="number" id="longBreakTime" value="15" min="1">
+            </div>
+            <div class="setting-group">
+                <label>Daily Pomodoros Target</label>
+                <input type="number" id="dailyTargetInput" value="8" min="1" max="30">
+            </div>
 
-            <button id="saveSettings" class="butto butto--timer" style="width:100%;margin-top:16px">Save</button>
+            <div class="setting-group">
+                <label>Alarm Sound</label>
+                <select id="alarmSoundSelect">
+                    <option value="beep">Digital Beep (Double)</option>
+                    <option value="bell">Zen Singing Bowl</option>
+                    <option value="chime">Gentle Marimba</option>
+                    <option value="radar">Soft Pulse</option>
+                </select>
+            </div>
+
+            <label class="setting-checkbox">
+                <input type="checkbox" id="autoStartBreaksCheck">
+                Auto-start breaks & pomodoros
+            </label>
+            <label class="setting-checkbox">
+                <input type="checkbox" id="autoAudioSyncCheck" checked>
+                Auto-sync audio with session mode
+            </label>
+            <label class="setting-checkbox">
+                <input type="checkbox" id="boxBreathingCheck" checked>
+                Guided Box-Breathing animation during breaks
+            </label>
+            <label class="setting-checkbox">
+                <input type="checkbox" id="eyeCareReminderCheck" checked>
+                20-20-20 Eye Care reminders
+            </label>
+            <label class="setting-checkbox">
+                <input type="checkbox" id="tickingSoundCheck">
+                Clock mechanical ticking sound
+            </label>
+            <label class="setting-checkbox">
+                <input type="checkbox" id="wakeLockCheck" checked>
+                Keep screen awake while focusing
+            </label>
+            <label class="setting-checkbox">
+                <input type="checkbox" id="strictSilentCheck">
+                Strict Silent Mode (visual only)
+            </label>
+            <label class="setting-checkbox">
+                <input type="checkbox" id="meshGradientCheck">
+                Ambient dynamic mesh gradient background
+            </label>
+            <label class="setting-checkbox">
+                <input type="checkbox" id="desktopNotifCheck">
+                Desktop notifications
+            </label>
+
+            <button id="saveSettings" class="butto butto--timer" style="width:100%;margin-top:16px">Save Settings</button>
+        </div>
+    </div>
+
+    <!-- Stats & History Modal -->
+    <div id="statsModal" class="modal">
+        <div class="modal-content">
+            <span id="closeStats" class="close">&times;</span>
+            <h2>Stats & Continuity</h2>
+            <div style="font-size:0.9rem;line-height:1.6;color:var(--text-muted)">
+                <p>Total Completed Sessions: <strong id="statTotalPomos" style="color:var(--text-main)">0</strong></p>
+                <p>Total Focus Time: <strong id="statTotalMinutes" style="color:var(--text-main)">0 min</strong></p>
+            </div>
+
+            <div style="margin-top:16px;">
+                <label style="font-size:0.8rem;color:var(--text-muted)">Last 7 Days Activity</label>
+                <div id="heatmapGrid" class="heatmap-grid"></div>
+            </div>
+
+            <div style="margin-top:20px;display:flex;gap:8px">
+                <button id="exportDataBtn" class="butto butto--timer secondary" style="flex:1">Export JSON</button>
+                <button id="importDataBtn" class="butto butto--timer secondary" style="flex:1">Import JSON</button>
+                <input type="file" id="importFileInput" accept=".json" hidden>
+            </div>
         </div>
     </div>
 
     <!-- Prayer Times Modal -->
     <div id="prayerModal" class="modal">
-        <div class="modal-content" style="padding:14px;width:390px;max-height:85vh;overflow-y:auto">
+        <div class="modal-content" style="width:400px;">
             <span id="closePrayer" class="close">&times;</span>
-            <h2>🕌 مواقيت الصلاة</h2>
-            <div style="display:flex;justify-content:center">
+            <h2>🕌 Prayer Times</h2>
+            <div style="display:flex;gap:6px;margin-bottom:12px;">
+                <button id="offlinePrayerTab" class="butto butto--comand active-mode" style="flex:1">Offline Times</button>
+                <button id="onlinePrayerTab" class="butto butto--comand" style="flex:1">Widget</button>
+            </div>
+
+            <div id="offlinePrayerView">
+                <div class="prayer-list" id="prayerListContainer"></div>
+                <p style="font-size:0.75rem;color:var(--text-muted);margin-top:10px;text-align:center;">Calculated locally for current day (Cairo angle)</p>
+            </div>
+
+            <div id="onlinePrayerView" style="display:none;justify-content:center">
                 <iframe title="prayerWidget"
-                    style="width:100%;max-width:350px;height:358px;border:1px solid #333;border-radius:12px"
+                    style="width:100%;max-width:350px;height:358px;border:1px solid var(--border-color);border-radius:12px"
                     scrolling="no" src="https://www.islamicfinder.org/prayer-widget/42626924/shafi/2/0/19.5/17.5"
                     frameborder="0">
                 </iframe>
@@ -614,9 +1748,11 @@
     <div id="audioBar" hidden>
         <div class="ab-row">
             <span id="audioTrackName">—</span>
-            <span id="audioTimeDisplay" style="color:#aaa;font-size:.76rem">0:00 / 0:00</span>
-            <button id="audioMuteBtn" title="Mute">🔊</button>
-            <input type="range" id="audioVolume" min="0" max="100" value="100" step="1">
+            <span id="audioTimeDisplay" style="color:var(--text-muted);font-size:.76rem">0:00 / 0:00</span>
+            <button id="audioMuteBtn" title="Mute">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+            </button>
+            <input type="range" id="audioVolume" min="0" max="100" value="100" step="1" style="width:65px">
             <button id="audioMinBtn" title="Minimize">▼</button>
             <button id="audioCloseBtn" title="Close">✕</button>
         </div>
@@ -629,354 +1765,748 @@
             <input type="range" id="audioSeek" min="0" max="100" value="0" step="0.1">
         </div>
         <div class="ab-row">
-            <span style="color:#666;font-size:.72rem">Speed:</span>
-            <input type="range" id="audioSpeed" min="1" max="3" value="1" step="0.1">
-            <span id="audioSpeedVal" style="color:#aaa;font-size:.72rem;min-width:28px">1x</span>
+            <span style="color:var(--text-muted);font-size:.72rem">Speed:</span>
+            <input type="range" id="audioSpeed" min="1" max="3" value="1" step="0.1" style="width:75px">
+            <span id="audioSpeedVal" style="color:var(--text-muted);font-size:.72rem;min-width:28px">1x</span>
             <span style="flex:1"></span>
-            <button id="audioAddMore" title="Add more files">+ Files</button>
-            <span id="audioPlaylistInfo" style="color:#666;font-size:.72rem"></span>
+            <button id="audioAddMore" title="Add files">+ Files</button>
+            <span id="audioPlaylistInfo" style="color:var(--text-muted);font-size:.72rem"></span>
         </div>
     </div>
 
-    <!-- ============================================================= -->
-    <!-- ALL JAVASCRIPT MERGED INLINE (constants.js + index.js + inline scripts) -->
-    <!-- ============================================================= -->
+    <!-- JAVASCRIPT ENGINE -->
     <script>
         // =============================================================
-        // constants.js — Status Labels & Types
+        // 1. STATE & LOCALSTORAGE INIT
         // =============================================================
+        const Button_Labels = { Start: "Start", Stop: "Stop", Reset: "Reset" };
+        const Status_Types = { STOPPED: 0, STARTED: 1 };
 
-        // Status Labels for buttons
-        const Button_Labels = {
-            Start: "Start",
-            Stop: "Stop",
-            Reset: "Reset",
-            break: "break"
-        }
+        let defaultPomo = parseInt(localStorage.getItem('pomoTime')) || 25;
+        let defaultShort = parseInt(localStorage.getItem('shortTime')) || 5;
+        let defaultLong = parseInt(localStorage.getItem('longTime')) || 15;
+        let dailyTarget = parseInt(localStorage.getItem('dailyTarget')) || 8;
+        let currentTheme = localStorage.getItem('pomoTheme') || 'midnight';
+        let currentLayout = localStorage.getItem('pomoLayout') || 'studio'; // 'studio' or 'compact'
+        let alarmSound = localStorage.getItem('alarmSound') || 'beep';
+        let autoStartNext = localStorage.getItem('autoStartNext') === 'true';
+        let autoAudioSync = localStorage.getItem('autoAudioSync') !== 'false';
+        let boxBreathing = localStorage.getItem('boxBreathing') !== 'false';
+        let eyeCareReminder = localStorage.getItem('eyeCareReminder') !== 'false';
+        let tickingSound = localStorage.getItem('tickingSound') === 'true';
+        let keepWakeLock = localStorage.getItem('wakeLock') !== 'false';
+        let strictSilent = localStorage.getItem('strictSilent') === 'true';
+        let meshGradient = localStorage.getItem('meshGradient') === 'true';
+        let desktopNotif = localStorage.getItem('desktopNotif') === 'true';
 
-        // Define variables to hold stopwatch status
-        const Status_Types = {
-            STOPPED: 0,
-            STARTED: 1
-        }
+        // Apply attributes to DOM
+        document.documentElement.dataset.theme = currentTheme;
+        document.documentElement.dataset.layout = currentLayout;
+        if (meshGradient) document.body.classList.add('mesh-gradient-active');
 
-        // =============================================================
-        // index.js — PomodoroToDo Optimized JavaScript (Extreme Minimalism)
-        //
-        // OPTIMIZATIONS APPLIED:
-        // 1. Event delegation — O(1) listeners instead of O(n) per todo/history item
-        // 2. DocumentFragment — batch DOM writes (single reflow per render)
-        // 3. Single-pass counters — one loop instead of 3x .filter() calls
-        // 4. Set-based streak lookup — O(1) instead of O(n) includes()
-        // 5. Memory leak cleanup — beforeunload clears interval
-        // 6. Non-blocking notification — replaces thread-blocking alert()
-        // 7. data-mode attribute — 1 DOM write replaces 14 classList calls
-        // 8. Cached date strings — no redundant Date objects in loops
-        // =============================================================
+        // Timer Runtime
+        let minutes = defaultPomo;
+        let seconds = 0;
+        let hours = 0;
+        let interval = null;
+        let status = Status_Types.STOPPED;
+        let currentMode = 'pomodoro'; // 'pomodoro', 'short', 'long', 'infinity'
+        let timerStartTime = null;
+        let timerBaseSeconds = 0;
+        let timerTotalSeconds = defaultPomo * 60;
+        let isOvertime = false;
+        let completedCycles = parseInt(localStorage.getItem('completedCycles')) || 0;
 
-        // --- Constants & Config (names preserved exactly) ---
+        // Stats history & Timeline
+        let statsHistory = JSON.parse(localStorage.getItem('statsHistory')) || {};
+        let timelineSessions = JSON.parse(localStorage.getItem('timelineSessions')) || [];
+        let totalPomosCount = parseInt(localStorage.getItem('totalPomosCount')) || 0;
+        let totalFocusMinutes = parseInt(localStorage.getItem('totalFocusMinutes')) || 0;
+
+        // Elements
+        const container = document.getElementById("Container");
         const starTimerBtn = document.getElementById("startStop");
         const resetTimerBtn = document.getElementById("reset");
         const counterElement = document.getElementById("counterElement");
-        const pomodoroBtn = document.getElementById("pomodoro");
-        const breakBtn = document.getElementById("break");
-        const infinityBtn = document.getElementById("infinity-mode");
-        const container = document.getElementById("Container");
-
-        // Settings Elements
-        const settingsBtn = document.getElementById("settingsBtn");
-        const settingsModal = document.getElementById("settingsModal");
-        const closeSettings = document.getElementById("closeSettings");
-        const saveSettingsBtn = document.getElementById("saveSettings");
-        const pomodoroInput = document.getElementById("pomodoroTime");
-        const shortBreakInput = document.getElementById("shortBreakTime");
-
-        // Sidebar Elements
-        const menuBtn = document.getElementById("menuBtn");
-        const sidebar = document.getElementById("sidebar");
-        const closeSidebar = document.getElementById("closeSidebar");
-        const overlay = document.getElementById("overlay");
-        const todoInput = document.getElementById("todoInput");
-        const addTodoBtn = document.getElementById("addTodoBtn");
-        const todoList = document.getElementById("todoList");
-
-
-
-        // Non-blocking notification element (replaces alert)
+        const overtimeBadge = document.getElementById("overtimeBadge");
+        const estimatedFinishPill = document.getElementById("estimatedFinishPill");
+        const progressCircle = document.getElementById("progressCircle");
+        const topProgressBar = document.getElementById("topProgressBar");
+        const cycleDotsContainer = document.getElementById("cycleDots");
+        const quickMinusBtn = document.getElementById("quickMinus");
+        const quickPlusBtn = document.getElementById("quickPlus");
+        const activeTaskBadge = document.getElementById("activeTaskBadge");
+        const activeTaskText = document.getElementById("activeTaskText");
         const timerNotification = document.getElementById("timerNotification");
+        const notifMessage = document.getElementById("notifMessage");
+        const pageFavicon = document.getElementById("pageFavicon");
+        const eyeCareToast = document.getElementById("eyeCareToast");
+        const dailyGoalFill = document.getElementById("dailyGoalFill");
+        const goalFraction = document.getElementById("goalFraction");
+        const goalPercent = document.getElementById("goalPercent");
+        const sessionTimeline = document.getElementById("sessionTimeline");
+        const sideSessionCount = document.getElementById("sideSessionCount");
+        const scratchpadNotes = document.getElementById("scratchpadNotes");
+        const layoutToggleBtn = document.getElementById("layoutToggleBtn");
+        const layoutBtnText = document.getElementById("layoutBtnText");
+        const zenBtn = document.getElementById("zenBtn");
+        const exportMdBtn = document.getElementById("exportMdBtn");
 
-        // Default Times (in minutes) - Load from LocalStorage or default
-        let defaultPomo = parseInt(localStorage.getItem('pomoTime')) || 25;
-        let defaultShort = parseInt(localStorage.getItem('shortTime')) || 5;
+        // Radius = 150 -> Circumference = 2 * PI * 150 = 942.48
+        const CIRCUMFERENCE = 942.48;
+        progressCircle.style.strokeDasharray = CIRCUMFERENCE;
 
-        // Current Timer State
-        let minutes = defaultPomo;
-        let seconds = 0;
-        let hours = 0; // Used only in infinity mode
-        let interval = null;
-        let status = Status_Types.STOPPED;
-        let currentMode = 'pomodoro'; // 'pomodoro', 'short', 'infinity'
+        // Modes map
+        const modeButtons = {
+            pomodoro: document.getElementById("pomodoro"),
+            short: document.getElementById("break"),
+            long: document.getElementById("longBreak"),
+            infinity: document.getElementById("infinity-mode")
+        };
 
-        // Real-time tracking variables — prevents timer drift
-        let timerStartTime = null;
-        let timerBaseSeconds = 0;
+        // Initialize Scratchpad
+        scratchpadNotes.value = localStorage.getItem('scratchpadContent') || '';
+        scratchpadNotes.oninput = () => {
+            localStorage.setItem('scratchpadContent', scratchpadNotes.value);
+        };
 
-        // Initialize Inputs
-        pomodoroInput.value = defaultPomo;
-        shortBreakInput.value = defaultShort;
+        // =============================================================
+        // 2. THEMES & COLOR HANDLING
+        // =============================================================
+        const updateAccentColor = () => {
+            let color = 'var(--accent-pomo)';
+            if (currentMode === 'short') color = 'var(--accent-short)';
+            else if (currentMode === 'long') color = 'var(--accent-long)';
+            else if (currentMode === 'infinity') color = 'var(--accent-infinity)';
+            document.documentElement.style.setProperty('--accent-current', color);
+            topProgressBar.style.background = color;
+        };
 
-        // --- Timer Logic ---
-        const getFormattedNumber = (number) => (number > 9 ? number : `0${number}`);
+        // =============================================================
+        // 3. LAYOUT & ZEN TOGGLE
+        // =============================================================
+        const updateLayoutDisplay = () => {
+            document.documentElement.dataset.layout = currentLayout;
+            layoutBtnText.textContent = (currentLayout === 'studio') ? 'Compact Mode' : 'Studio Mode';
+            localStorage.setItem('pomoLayout', currentLayout);
+        };
+        updateLayoutDisplay();
 
-        const updateDisplay = () => {
-            if (currentMode === 'infinity') {
-                counterElement.textContent = `${getFormattedNumber(hours)}:${getFormattedNumber(minutes)}:${getFormattedNumber(seconds)}`;
-            } else {
-                counterElement.textContent = `${getFormattedNumber(minutes)}:${getFormattedNumber(seconds)}`;
+        layoutToggleBtn.onclick = () => {
+            currentLayout = (currentLayout === 'studio') ? 'compact' : 'studio';
+            updateLayoutDisplay();
+        };
+
+        zenBtn.onclick = () => {
+            document.body.classList.toggle('zen-active');
+        };
+
+        document.body.ondblclick = (e) => {
+            // Once inside Zen mode, exit on a double-click anywhere at all —
+            // the header/button that normally toggles it is intentionally
+            // hidden while zen-active, so this must not be limited to a
+            // specific background element or the user gets stuck.
+            if (document.body.classList.contains('zen-active')) {
+                document.body.classList.remove('zen-active');
+                return;
+            }
+            if (e.target === document.body || e.target === container || e.target.classList.contains('workspace-wrapper')) {
+                document.body.classList.add('zen-active');
             }
         };
 
-        // Count-DOWN timer using real elapsed time
-        const StopWatch = () => {
-            const elapsedMs = Date.now() - timerStartTime;
+        // =============================================================
+        // 4. WAKE LOCK API
+        // =============================================================
+        let wakeLockSentinel = null;
+        const requestWakeLock = async () => {
+            if (!keepWakeLock || currentMode !== 'pomodoro') return;
+            try {
+                if ('wakeLock' in navigator) wakeLockSentinel = await navigator.wakeLock.request('screen');
+            } catch (err) {}
+        };
+        const releaseWakeLock = () => {
+            if (wakeLockSentinel) { wakeLockSentinel.release().catch(() => {}); wakeLockSentinel = null; }
+        };
+
+        // =============================================================
+        // 5. WEB AUDIO & 4-CHANNEL AMBIENT ATMOSPHERE MIXER
+        // =============================================================
+        let audioCtx = null;
+        const getAudioContext = () => {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            return audioCtx;
+        };
+
+        // Channel Nodes
+        let noiseNodes = { rain: null, ocean: null, wind: null, brown: null };
+        let gainNodes = { rain: null, ocean: null, wind: null, brown: null };
+
+        const setupMixerChannels = () => {
+            const ctx = getAudioContext();
+            
+            // Brown Noise
+            const bufferSize = 2 * ctx.sampleRate;
+            const brownBuf = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+            const bOut = brownBuf.getChannelData(0);
+            let lastOut = 0.0;
+            for (let i = 0; i < bufferSize; i++) {
+                const white = Math.random() * 2 - 1;
+                bOut[i] = (lastOut + (0.02 * white)) / 1.02;
+                lastOut = bOut[i];
+                bOut[i] *= 3.5;
+            }
+            noiseNodes.brown = ctx.createBufferSource();
+            noiseNodes.brown.buffer = brownBuf;
+            noiseNodes.brown.loop = true;
+            gainNodes.brown = ctx.createGain();
+            gainNodes.brown.gain.value = 0;
+            noiseNodes.brown.connect(gainNodes.brown);
+            gainNodes.brown.connect(ctx.destination);
+            noiseNodes.brown.start();
+
+            // Rain (White noise filtered with Bandpass)
+            const rainBuf = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+            const rOut = rainBuf.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) rOut[i] = Math.random() * 2 - 1;
+            noiseNodes.rain = ctx.createBufferSource();
+            noiseNodes.rain.buffer = rainBuf;
+            noiseNodes.rain.loop = true;
+            const rainFilter = ctx.createBiquadFilter();
+            rainFilter.type = 'lowpass';
+            rainFilter.frequency.value = 1000;
+            gainNodes.rain = ctx.createGain();
+            gainNodes.rain.gain.value = 0;
+            noiseNodes.rain.connect(rainFilter);
+            rainFilter.connect(gainNodes.rain);
+            gainNodes.rain.connect(ctx.destination);
+            noiseNodes.rain.start();
+
+            // Wind (Low frequency oscillation)
+            noiseNodes.wind = ctx.createBufferSource();
+            noiseNodes.wind.buffer = rainBuf;
+            noiseNodes.wind.loop = true;
+            const windFilter = ctx.createBiquadFilter();
+            windFilter.type = 'bandpass';
+            windFilter.frequency.value = 400;
+            gainNodes.wind = ctx.createGain();
+            gainNodes.wind.gain.value = 0;
+            noiseNodes.wind.connect(windFilter);
+            windFilter.connect(gainNodes.wind);
+            gainNodes.wind.connect(ctx.destination);
+            noiseNodes.wind.start();
+
+            // Ocean (Sine modulation wave)
+            noiseNodes.ocean = ctx.createBufferSource();
+            noiseNodes.ocean.buffer = brownBuf;
+            noiseNodes.ocean.loop = true;
+            const oceanFilter = ctx.createBiquadFilter();
+            oceanFilter.type = 'lowpass';
+            oceanFilter.frequency.value = 350;
+            gainNodes.ocean = ctx.createGain();
+            gainNodes.ocean.gain.value = 0;
+            noiseNodes.ocean.connect(oceanFilter);
+            oceanFilter.connect(gainNodes.ocean);
+            gainNodes.ocean.connect(ctx.destination);
+            noiseNodes.ocean.start();
+        };
+
+        const setChannelVolume = (channel, percent) => {
+            getAudioContext();
+            if (!gainNodes.brown) setupMixerChannels();
+            const gain = gainNodes[channel];
+            if (!gain) return;
+            const val = (percent / 100) * 0.08;
+            gain.gain.setTargetAtTime(val, audioCtx.currentTime, 0.2); // Smooth fade
+        };
+
+        document.getElementById('volRain').oninput = (e) => setChannelVolume('rain', e.target.value);
+        document.getElementById('volOcean').oninput = (e) => setChannelVolume('ocean', e.target.value);
+        document.getElementById('volWind').oninput = (e) => setChannelVolume('wind', e.target.value);
+        document.getElementById('volBrown').oninput = (e) => setChannelVolume('brown', e.target.value);
+
+        let mixerMuted = false;
+        document.getElementById('masterAmbientMute').onclick = () => {
+            mixerMuted = !mixerMuted;
+            document.getElementById('masterAmbientMute').textContent = mixerMuted ? 'Unmute All' : 'Mute All';
+            ['rain', 'ocean', 'wind', 'brown'].forEach(ch => {
+                const el = document.getElementById(`vol${ch.charAt(0).toUpperCase() + ch.slice(1)}`);
+                setChannelVolume(ch, mixerMuted ? 0 : el.value);
+            });
+        };
+
+        // Mechanical Ticking
+        const playTickSound = () => {
+            if (!tickingSound || strictSilent || status !== Status_Types.STARTED) return;
+            try {
+                const ctx = getAudioContext();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(1200, ctx.currentTime);
+                gain.gain.setValueAtTime(0.015, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.03);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.03);
+            } catch(e) {}
+        };
+
+        // Alarms
+        const playAlarmChime = () => {
+            if (strictSilent) return;
+            const ctx = getAudioContext();
+            const now = ctx.currentTime;
+
+            if (alarmSound === 'beep') {
+                const playBeep = (time, freq) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(freq, time);
+                    gain.gain.setValueAtTime(0.2, time);
+                    gain.gain.exponentialRampToValueAtTime(0.01, time + 0.12);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(time);
+                    osc.stop(time + 0.12);
+                };
+                playBeep(now, 880); playBeep(now + 0.15, 880); playBeep(now + 0.45, 880);
+            } else if (alarmSound === 'bell') {
+                [440, 880, 1320].forEach(f => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.frequency.setValueAtTime(f, now);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, now + 2.5);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(now); osc.stop(now + 2.5);
+                });
+            } else {
+                [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(f, now + i * 0.1);
+                    gain.gain.setValueAtTime(0.2, now + i * 0.1);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.1 + 0.6);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(now + i * 0.1); osc.stop(now + i * 0.1 + 0.6);
+                });
+            }
+        };
+
+        // =============================================================
+        // 6. NOTIFICATIONS & 20-20-20 EYE CARE REMINDER
+        // =============================================================
+        let notifTimer = null;
+        const triggerNotification = (msg) => {
+            notifMessage.textContent = msg;
+            timerNotification.classList.add('show');
+            playAlarmChime();
+
+            if (desktopNotif && "Notification" in window && Notification.permission === "granted") {
+                new Notification("Pomodoro Studio", { body: msg });
+            }
+
+            if (!audio.paused) { audio.pause(); audioPlayBtn.textContent = '▶'; }
+
+            if (notifTimer) clearTimeout(notifTimer);
+            notifTimer = setTimeout(() => { timerNotification.classList.remove('show'); }, 4000);
+        };
+
+        // Eye Care Timer (Every 20 minutes)
+        setInterval(() => {
+            if (eyeCareReminder && status === Status_Types.STARTED) {
+                eyeCareToast.classList.add('show');
+                setTimeout(() => eyeCareToast.classList.remove('show'), 6000);
+            }
+        }, 20 * 60 * 1000);
+
+        // =============================================================
+        // 7. CORE TIMER ENGINE
+        // =============================================================
+        const getFormattedNumber = (n) => (n > 9 ? n : `0${n}`);
+
+        const updateEstimatedFinishTime = () => {
+            if (currentMode === 'infinity' || status === Status_Types.STOPPED) {
+                estimatedFinishPill.textContent = 'Ends at —:—';
+                return;
+            }
+            const remainingSec = minutes * 60 + seconds;
+            const end = new Date(Date.now() + remainingSec * 1000);
+            estimatedFinishPill.textContent = `Ends at ${getFormattedNumber(end.getHours())}:${getFormattedNumber(end.getMinutes())}`;
+        };
+
+        const updateDisplay = () => {
+            let str = '';
+            if (currentMode === 'infinity') {
+                str = `${getFormattedNumber(hours)}:${getFormattedNumber(minutes)}:${getFormattedNumber(seconds)}`;
+            } else {
+                str = `${getFormattedNumber(minutes)}:${getFormattedNumber(seconds)}`;
+            }
+            counterElement.textContent = str;
+            document.title = `(${str}) Pomodoro Studio`;
+
+            if (currentMode !== 'infinity') {
+                const total = timerTotalSeconds || 1;
+                const remaining = minutes * 60 + seconds;
+                const frac = isOvertime ? 0 : Math.max(0, Math.min(1, remaining / total));
+                const offset = CIRCUMFERENCE - (frac * CIRCUMFERENCE);
+                progressCircle.style.strokeDashoffset = offset;
+                topProgressBar.style.width = `${((total - remaining) / total) * 100}%`;
+            } else {
+                progressCircle.style.strokeDashoffset = 0;
+                topProgressBar.style.width = '100%';
+            }
+            updateEstimatedFinishTime();
+        };
+
+        let lastTickSec = -1;
+        const tickCountdown = () => {
+            const now = Date.now();
+            const elapsedMs = now - timerStartTime;
             const elapsedSec = Math.floor(elapsedMs / 1000) + timerBaseSeconds;
             const remaining = timerTotalSeconds - elapsedSec;
 
+            if (elapsedSec !== lastTickSec) {
+                lastTickSec = elapsedSec;
+                playTickSound();
+                incrementActiveTaskTime();
+            }
+
             if (remaining <= 0) {
-                window.clearInterval(interval);
-                interval = null;
-                minutes = 0;
-                seconds = 0;
-                status = Status_Types.STOPPED;
-                starTimerBtn.textContent = Button_Labels.Start;
-                timerStartTime = null;
-                timerBaseSeconds = 0;
-                showTimerNotification();
+                if (!isOvertime) {
+                    isOvertime = true;
+                    overtimeBadge.style.display = 'block';
+                    onTimerCompleted();
+                }
+                const overSec = Math.abs(remaining);
+                minutes = Math.floor(overSec / 60);
+                seconds = overSec % 60;
             } else {
                 minutes = Math.floor(remaining / 60);
                 seconds = remaining % 60;
             }
+
             updateDisplay();
+            saveTimerState();
         };
 
-        // Count-UP stopwatch for infinity mode using real elapsed time
-        const StopWatchUp = () => {
+        const tickStopwatchUp = () => {
             const elapsedMs = Date.now() - timerStartTime;
             const totalSec = Math.floor(elapsedMs / 1000) + timerBaseSeconds;
-
             hours = Math.floor(totalSec / 3600);
             minutes = Math.floor((totalSec % 3600) / 60);
             seconds = totalSec % 60;
             updateDisplay();
+            saveTimerState();
         };
 
-        // --- Alert Beep Sound (Web Audio API) ---
-        const playAlertBeep = () => {
-            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const onTimerCompleted = () => {
+            triggerNotification(currentMode === 'pomodoro' ? "🎉 Session finished! Enjoy your break." : "⚡ Break is over! Let's get to work.");
 
-            const createNote = (freq, startTime, duration) => {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
+            if (currentMode === 'pomodoro') {
+                completedCycles++;
+                localStorage.setItem('completedCycles', completedCycles);
+                renderCycleDots();
+                recordSessionStats();
+                incrementActiveTaskPomo();
 
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(freq, startTime);
-
-                gain.gain.setValueAtTime(0.25, startTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
-
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-
-                osc.start(startTime);
-                osc.stop(startTime + duration);
-            };
-
-            // Double-double beep
-            createNote(880, audioCtx.currentTime, 0.1);
-            createNote(880, audioCtx.currentTime + 0.15, 0.1);
-            createNote(880, audioCtx.currentTime + 0.45, 0.1);
-            createNote(880, audioCtx.currentTime + 0.6, 0.1);
+                if (autoStartNext) {
+                    const nextMode = (completedCycles % 4 === 0) ? 'long' : 'short';
+                    setTimeout(() => switchMode(nextMode, true), 1500);
+                }
+            } else {
+                if (autoStartNext) setTimeout(() => switchMode('pomodoro', true), 1500);
+            }
         };
-
-        // Non-blocking notification
-        let notifTimer = null;
-        const showTimerNotification = () => {
-            timerNotification.textContent = "⏰ Time's up!";
-            timerNotification.classList.add('show');
-            playAlertBeep();
-            if (notifTimer) clearTimeout(notifTimer);
-            notifTimer = setTimeout(() => {
-                timerNotification.classList.remove('show');
-                notifTimer = null;
-            }, 3000);
-        };
-
-        // Track total seconds for countdown mode
-        let timerTotalSeconds = 0;
 
         const startStop = () => {
+            getAudioContext();
             if (status === Status_Types.STOPPED) {
                 timerStartTime = Date.now();
                 if (currentMode === 'infinity') {
-                    interval = window.setInterval(StopWatchUp, 250);
+                    interval = setInterval(tickStopwatchUp, 250);
                 } else {
-                    timerTotalSeconds = minutes * 60 + seconds;
-                    timerBaseSeconds = 0;
-                    interval = window.setInterval(StopWatch, 250);
+                    if (!isOvertime) timerTotalSeconds = (timerTotalSeconds > 0) ? timerTotalSeconds : (minutes * 60 + seconds);
+                    interval = setInterval(tickCountdown, 250);
                 }
-                starTimerBtn.textContent = Button_Labels.Stop;
+                starTimerBtn.querySelector('span:first-child').textContent = Button_Labels.Stop;
                 status = Status_Types.STARTED;
+                requestWakeLock();
             } else {
-                window.clearInterval(interval);
+                clearInterval(interval);
                 interval = null;
-                if (currentMode === 'infinity') {
-                    const elapsedMs = Date.now() - timerStartTime;
-                    timerBaseSeconds += Math.floor(elapsedMs / 1000);
-                }
+                const elapsedMs = Date.now() - timerStartTime;
+                timerBaseSeconds += Math.floor(elapsedMs / 1000);
                 timerStartTime = null;
-                starTimerBtn.textContent = Button_Labels.Start;
+                starTimerBtn.querySelector('span:first-child').textContent = Button_Labels.Start;
                 status = Status_Types.STOPPED;
+                releaseWakeLock();
             }
+            saveTimerState();
         };
 
         const reset = () => {
-            window.clearInterval(interval);
+            if (interval) clearInterval(interval);
             interval = null;
             status = Status_Types.STOPPED;
-            starTimerBtn.textContent = Button_Labels.Start;
-            seconds = 0;
-            hours = 0;
-            timerStartTime = null;
-            timerBaseSeconds = 0;
-            timerTotalSeconds = 0;
+            starTimerBtn.querySelector('span:first-child').textContent = Button_Labels.Start;
+            seconds = 0; hours = 0; isOvertime = false;
+            overtimeBadge.style.display = 'none';
+            timerStartTime = null; timerBaseSeconds = 0;
+            releaseWakeLock();
 
-            if (currentMode === 'pomodoro') {
-                minutes = defaultPomo;
-            } else if (currentMode === 'short') {
-                minutes = defaultShort;
-            } else if (currentMode === 'infinity') {
-                minutes = 0;
-            }
-            container.dataset.mode = currentMode;
+            if (currentMode === 'pomodoro') minutes = defaultPomo;
+            else if (currentMode === 'short') minutes = defaultShort;
+            else if (currentMode === 'long') minutes = defaultLong;
+            else if (currentMode === 'infinity') minutes = 0;
+
+            timerTotalSeconds = minutes * 60;
             updateDisplay();
+            saveTimerState();
         };
 
-        // Mode Switchers
-        const modeButtons = { pomodoro: pomodoroBtn, short: breakBtn, infinity: infinityBtn };
-
-        const switchMode = (mode) => {
-            if (interval) window.clearInterval(interval);
+        const switchMode = (mode, autoStart = false) => {
+            if (interval) clearInterval(interval);
             interval = null;
             currentMode = mode;
             status = Status_Types.STOPPED;
-            starTimerBtn.textContent = Button_Labels.Start;
-            seconds = 0;
-            hours = 0;
-            timerStartTime = null;
-            timerBaseSeconds = 0;
-            timerTotalSeconds = 0;
-            if (mode === 'pomodoro') minutes = defaultPomo;
-            else if (mode === 'short') minutes = defaultShort;
-            else if (mode === 'infinity') minutes = 0;
+            starTimerBtn.querySelector('span:first-child').textContent = Button_Labels.Start;
+            seconds = 0; hours = 0; isOvertime = false;
+            overtimeBadge.style.display = 'none';
+            timerStartTime = null; timerBaseSeconds = 0;
+            releaseWakeLock();
+
+            if (mode === 'pomodoro') {
+                minutes = defaultPomo;
+                document.body.classList.remove('breathing-active');
+            } else if (mode === 'short') {
+                minutes = defaultShort;
+                if (boxBreathing) document.body.classList.add('breathing-active');
+            } else if (mode === 'long') {
+                minutes = defaultLong;
+                if (boxBreathing) document.body.classList.add('breathing-active');
+            } else if (mode === 'infinity') {
+                minutes = 0;
+                document.body.classList.remove('breathing-active');
+            }
+
+            timerTotalSeconds = minutes * 60;
             container.dataset.mode = mode;
+
             for (const key in modeButtons) {
                 modeButtons[key].classList.toggle('active-mode', key === mode);
             }
+
+            updateAccentColor();
             updateDisplay();
+            saveTimerState();
+
+            if (autoStart) startStop();
         };
 
-        pomodoroBtn.onclick = () => switchMode('pomodoro');
-        breakBtn.onclick = () => switchMode('short');
-        infinityBtn.onclick = () => switchMode('infinity');
+        // Quick adjust ±5 min
+        quickMinusBtn.onclick = () => {
+            if (currentMode === 'infinity') return;
+            if (minutes > 5) { minutes -= 5; timerTotalSeconds = Math.max(60, timerTotalSeconds - 300); updateDisplay(); }
+        };
+        quickPlusBtn.onclick = () => {
+            if (currentMode === 'infinity') return;
+            minutes += 5; timerTotalSeconds += 300; updateDisplay();
+        };
 
+        modeButtons.pomodoro.onclick = () => switchMode('pomodoro');
+        modeButtons.short.onclick = () => switchMode('short');
+        modeButtons.long.onclick = () => switchMode('long');
+        modeButtons.infinity.onclick = () => switchMode('infinity');
         starTimerBtn.onclick = startStop;
         resetTimerBtn.onclick = reset;
 
-        // --- Memory Leak Prevention ---
-        window.addEventListener('beforeunload', () => {
-            if (interval) {
-                window.clearInterval(interval);
-                interval = null;
-            }
-        });
-
-        // --- Settings Logic ---
-        settingsBtn.onclick = () => {
-            settingsModal.classList.add("visible");
+        // =============================================================
+        // 8. CYCLE DOTS & GOAL TRACKING & STATS
+        // =============================================================
+        const renderCycleDots = () => {
+            const dots = cycleDotsContainer.children;
+            for (let i = 0; i < 4; i++) dots[i].classList.toggle('completed', i < (completedCycles % 4));
         };
 
-        closeSettings.onclick = () => {
-            settingsModal.classList.remove("visible");
+        const getTodayKey = () => new Date().toISOString().split('T')[0];
+
+        const recordSessionStats = () => {
+            const today = getTodayKey();
+            statsHistory[today] = (statsHistory[today] || 0) + 1;
+            totalPomosCount++;
+            totalFocusMinutes += defaultPomo;
+
+            // Record Timeline Item
+            const now = new Date();
+            const timeStr = `${getFormattedNumber(now.getHours())}:${getFormattedNumber(now.getMinutes())}`;
+            const activeTask = (activeTaskIndex >= 0 && todos[activeTaskIndex]) ? todos[activeTaskIndex].text : 'General Focus';
+            timelineSessions.unshift({ time: timeStr, task: activeTask, duration: defaultPomo });
+            if (timelineSessions.length > 20) timelineSessions.pop();
+
+            localStorage.setItem('statsHistory', JSON.stringify(statsHistory));
+            localStorage.setItem('timelineSessions', JSON.stringify(timelineSessions));
+            localStorage.setItem('totalPomosCount', totalPomosCount);
+            localStorage.setItem('totalFocusMinutes', totalFocusMinutes);
+            renderStatsAndGoal();
         };
 
-        window.onclick = (event) => {
-            if (event.target === settingsModal) {
-                settingsModal.classList.remove("visible");
-            }
-            if (event.target === overlay) {
-                closeSidebarFunc();
-            }
-        };
+        const renderStatsAndGoal = () => {
+            const today = getTodayKey();
+            const count = statsHistory[today] || 0;
+            goalFraction.textContent = `${count}/${dailyTarget}`;
+            const pct = Math.min(100, Math.round((count / dailyTarget) * 100));
+            goalPercent.textContent = `${pct}%`;
+            dailyGoalFill.style.width = `${pct}%`;
 
-        saveSettingsBtn.onclick = () => {
-            const newPomo = parseInt(pomodoroInput.value);
-            const newShort = parseInt(shortBreakInput.value);
+            sideSessionCount.textContent = `${count} Done`;
+            document.getElementById('statTotalPomos').textContent = totalPomosCount;
+            document.getElementById('statTotalMinutes').textContent = `${totalFocusMinutes} min`;
 
-            if (newPomo > 0 && newShort > 0) {
-                defaultPomo = newPomo;
-                defaultShort = newShort;
-
-                localStorage.setItem('pomoTime', defaultPomo);
-                localStorage.setItem('shortTime', defaultShort);
-
-                settingsModal.classList.remove("visible");
-                reset();
+            // Render Timeline
+            sessionTimeline.innerHTML = '';
+            if (timelineSessions.length === 0) {
+                sessionTimeline.innerHTML = '<div style="color:var(--text-muted);font-size:0.76rem;text-align:center;padding:12px 0;">No sessions completed today yet.</div>';
             } else {
-                timerNotification.textContent = '⚠️ Please enter valid positive numbers';
-                showTimerNotification();
+                timelineSessions.forEach(s => {
+                    const row = document.createElement('div');
+                    row.className = 'timeline-item';
+                    row.innerHTML = `<span><strong>${s.time}</strong> ${s.task}</span><span>+${s.duration}m</span>`;
+                    sessionTimeline.appendChild(row);
+                });
+            }
+
+            // Render Heatmap
+            const grid = document.getElementById('heatmapGrid');
+            grid.innerHTML = '';
+            for (let i = 6; i >= 0; i--) {
+                const d = new Date(); d.setDate(d.getDate() - i);
+                const k = d.toISOString().split('T')[0];
+                const dayName = d.toLocaleDateString('en-US', { weekday: 'narrow' });
+                const sessions = statsHistory[k] || 0;
+                const cell = document.createElement('div');
+                cell.className = 'heatmap-cell';
+                if (sessions >= 6) cell.classList.add('active-3');
+                else if (sessions >= 3) cell.classList.add('active-2');
+                else if (sessions >= 1) cell.classList.add('active-1');
+                cell.innerHTML = `<span>${dayName}</span><strong>${sessions}</strong>`;
+                grid.appendChild(cell);
             }
         };
 
-        // --- Sidebar Todo Logic ---
-        const openSidebarFunc = () => {
-            sidebar.classList.add("open");
-            overlay.classList.add("active");
+        // Export Markdown Daily Summary for Notion / Obsidian
+        exportMdBtn.onclick = () => {
+            const today = getTodayKey();
+            const count = statsHistory[today] || 0;
+            const completedTasks = todos.filter(t => t.completed).map(t => `- [x] ${t.text}`).join('\n') || '- (No tasks marked completed today)';
+            
+            const summary = `### 🍅 Pomodoro Daily Summary (${today})\n- **Sessions Completed:** ${count}/${dailyTarget} (${Math.round((count * defaultPomo) / 60 * 10) / 10} hours)\n- **Completed Tasks:**\n${completedTasks}\n\n*Generated by Pomodoro Studio*`;
+            navigator.clipboard.writeText(summary).then(() => {
+                triggerNotification("Daily Summary copied to clipboard (Markdown)!");
+            }).catch(() => {});
         };
 
-        const closeSidebarFunc = () => {
-            sidebar.classList.remove("open");
-            overlay.classList.remove("active");
-        };
-
-        menuBtn.onclick = openSidebarFunc;
-        closeSidebar.onclick = closeSidebarFunc;
-
-        // Todo Data Management (persisted in localStorage)
+        // =============================================================
+        // 9. TO-DO & ACTIVE TASK LOGIC
+        // =============================================================
         let todos = JSON.parse(localStorage.getItem('todos')) || [];
+        let activeTaskIndex = parseInt(localStorage.getItem('activeTaskIndex'));
+        if (isNaN(activeTaskIndex)) activeTaskIndex = -1;
+
+        const todoList = document.getElementById('todoList');
+        const drawerTodoList = document.getElementById('drawerTodoList');
+        const todoInput = document.getElementById('todoInput');
+        const todoPomoEst = document.getElementById('todoPomoEst');
+        const addTodoBtn = document.getElementById('addTodoBtn');
+        const dockClearDoneBtn = document.getElementById('dockClearDoneBtn');
+
+        const updateActiveTaskDisplay = () => {
+            if (activeTaskIndex >= 0 && todos[activeTaskIndex]) {
+                activeTaskBadge.classList.add('show');
+                activeTaskText.textContent = todos[activeTaskIndex].text;
+            } else {
+                activeTaskBadge.classList.remove('show');
+                activeTaskText.textContent = '';
+                activeTaskIndex = -1;
+            }
+            localStorage.setItem('activeTaskIndex', activeTaskIndex);
+        };
+
+        const incrementActiveTaskPomo = () => {
+            if (activeTaskIndex >= 0 && todos[activeTaskIndex]) {
+                todos[activeTaskIndex].pomosDone = (todos[activeTaskIndex].pomosDone || 0) + 1;
+                saveTodos();
+            }
+        };
+
+        const incrementActiveTaskTime = () => {
+            if (activeTaskIndex >= 0 && todos[activeTaskIndex]) {
+                todos[activeTaskIndex].secondsSpent = (todos[activeTaskIndex].secondsSpent || 0) + 1;
+            }
+        };
 
         const renderTodos = () => {
-            todoList.textContent = '';
-            const frag = document.createDocumentFragment();
-            todos.forEach((todo, index) => {
-                const li = document.createElement('li');
-                if (todo.completed) li.classList.add('completed');
+            [todoList, drawerTodoList].forEach(targetList => {
+                if (!targetList) return;
+                targetList.textContent = '';
+                const frag = document.createDocumentFragment();
 
-                const span = document.createElement('span');
-                span.textContent = todo.text;
-                span.dataset.action = 'toggle';
-                span.dataset.index = index;
-                span.style.cssText = 'cursor:pointer;flex-grow:1';
+                todos.forEach((todo, index) => {
+                    const li = document.createElement('li');
+                    if (todo.completed) li.classList.add('completed');
+                    if (index === activeTaskIndex) li.classList.add('active-focus-task');
 
-                const btn = document.createElement('button');
-                btn.className = 'delete-task-btn';
-                btn.textContent = '×';
-                btn.dataset.action = 'delete';
-                btn.dataset.index = index;
+                    // Extract #tag
+                    const tagMatch = todo.text.match(/#(\w+)/);
+                    const tagHtml = tagMatch ? `<span class="task-tag">#${tagMatch[1]}</span>` : '';
+                    const cleanText = todo.text.replace(/#\w+/, '').trim();
 
-                li.append(span, btn);
-                frag.appendChild(li);
+                    const span = document.createElement('span');
+                    span.className = 'task-text';
+                    span.innerHTML = `${tagHtml}${cleanText}`;
+                    span.style.cssText = 'cursor:pointer;flex-grow:1;';
+                    span.dataset.action = 'toggle';
+                    span.dataset.index = index;
+
+                    span.ondblclick = () => {
+                        const newText = prompt("Edit task:", todo.text);
+                        if (newText && newText.trim()) { todo.text = newText.trim(); saveTodos(); }
+                    };
+
+                    const pomos = document.createElement('span');
+                    pomos.className = 'task-pomos';
+                    const mins = Math.floor((todo.secondsSpent || 0) / 60);
+                    pomos.textContent = `🍅 ${todo.pomosDone || 0}/${todo.pomosEst || 1} (${mins}m)`;
+
+                    const actions = document.createElement('div');
+                    actions.className = 'task-actions';
+
+                    const focusBtn = document.createElement('button');
+                    focusBtn.className = 'task-btn';
+                    focusBtn.textContent = '🎯';
+                    focusBtn.dataset.action = 'focus';
+                    focusBtn.dataset.index = index;
+
+                    const delBtn = document.createElement('button');
+                    delBtn.className = 'task-btn';
+                    delBtn.textContent = '×';
+                    delBtn.dataset.action = 'delete';
+                    delBtn.dataset.index = index;
+
+                    actions.append(focusBtn, delBtn);
+                    li.append(span, pomos, actions);
+                    frag.appendChild(li);
+                });
+                targetList.appendChild(frag);
             });
-            todoList.appendChild(frag);
+            updateActiveTaskDisplay();
         };
 
         const saveTodos = () => {
@@ -984,41 +2514,85 @@
             renderTodos();
         };
 
-        const addTodo = () => {
-            const text = todoInput.value.trim();
+        const handleAddTodo = (inputEl, estEl) => {
+            const text = inputEl.value.trim();
+            const pomosEst = parseInt(estEl.value) || 1;
             if (text) {
-                todos.push({ text, completed: false });
-                todoInput.value = '';
+                todos.push({ text, pomosEst, pomosDone: 0, secondsSpent: 0, completed: false });
+                inputEl.value = '';
                 saveTodos();
             }
         };
 
-        todoList.addEventListener('click', (e) => {
-            const target = e.target;
+        addTodoBtn.onclick = () => handleAddTodo(todoInput, todoPomoEst);
+        todoInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleAddTodo(todoInput, todoPomoEst); });
+
+        const handleListClicks = (e) => {
+            const target = e.target.closest('[data-action]');
+            if (!target) return;
             const index = parseInt(target.dataset.index);
             if (isNaN(index)) return;
 
             if (target.dataset.action === 'toggle') {
                 todos[index].completed = !todos[index].completed;
                 saveTodos();
+            } else if (target.dataset.action === 'focus') {
+                activeTaskIndex = (activeTaskIndex === index) ? -1 : index;
+                saveTodos();
             } else if (target.dataset.action === 'delete') {
+                if (activeTaskIndex === index) activeTaskIndex = -1;
+                else if (activeTaskIndex > index) activeTaskIndex--;
                 todos.splice(index, 1);
                 saveTodos();
             }
-        });
+        };
 
-        addTodoBtn.onclick = addTodo;
-        todoInput.addEventListener("keypress", (e) => {
-            if (e.key === "Enter") addTodo();
-        });
+        todoList.addEventListener('click', handleListClicks);
+        drawerTodoList.addEventListener('click', handleListClicks);
 
-        // Initial Render
-        renderTodos();
+        dockClearDoneBtn.onclick = () => {
+            todos = todos.filter(t => !t.completed);
+            activeTaskIndex = -1;
+            saveTodos();
+        };
+        document.getElementById('clearCompletedBtn').onclick = dockClearDoneBtn.onclick;
+
+        // Drawer
+        const sidebar = document.getElementById("sidebar");
+        const menuBtn = document.getElementById("menuBtn");
+        const closeSidebar = document.getElementById("closeSidebar");
+        const overlay = document.getElementById("overlay");
+        menuBtn.onclick = () => { sidebar.classList.add("open"); overlay.classList.add("active"); };
+        closeSidebar.onclick = () => { sidebar.classList.remove("open"); overlay.classList.remove("active"); };
 
         // =============================================================
-        // Audio Player — Bottom Bar
+        // 10. GLOBAL HOTKEYS
         // =============================================================
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && document.body.classList.contains('zen-active')) {
+                document.body.classList.remove('zen-active');
+                return;
+            }
+            if (['input', 'textarea', 'select'].includes(document.activeElement.tagName.toLowerCase())) return;
+            if (e.code === 'Space') { e.preventDefault(); startStop(); }
+            else if (e.key === 'r' || e.key === 'R') { reset(); }
+            else if (e.key === 'f' || e.key === 'F') { toggleFullscreen(); }
+            else if (e.key === 'm' || e.key === 'M') { document.getElementById('audioMuteBtn').click(); }
+            else if (e.key === 't' || e.key === 'T') {
+                sidebar.classList.contains('open') ? closeSidebar.click() : menuBtn.click();
+            }
+        });
 
+        // Fullscreen
+        const toggleFullscreen = () => {
+            if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(() => {});
+            else document.exitFullscreen().catch(() => {});
+        };
+        document.getElementById('fullscreenBtn').onclick = toggleFullscreen;
+
+        // =============================================================
+        // 11. AUDIO PLAYER & DRAG-DROP MEDIA
+        // =============================================================
         const audioBar = document.getElementById('audioBar');
         const syncBodyPadding = () => document.body.classList.toggle('audio-active', !audioBar.hidden);
         const audioFileInput = document.getElementById('audioFileInput');
@@ -1043,379 +2617,421 @@
         const audio = new Audio();
         let playlist = [];
         let currentTrack = -1;
-        let audioSaveTimer = null;
         let isSeeking = false;
 
-        // --- Format time helper ---
         const fmtTime = (s) => {
             if (isNaN(s) || !isFinite(s)) return '0:00';
-            const m = Math.floor(s / 60);
-            const sec = Math.floor(s % 60);
+            const m = Math.floor(s / 60); const sec = Math.floor(s % 60);
             return `${m}:${sec < 10 ? '0' : ''}${sec}`;
         };
 
-        // --- Progress persistence (keyed by filename) ---
-        const PROGRESS_KEY = 'audioProgress';
-
-        const getSavedProgress = () => {
-            try { return JSON.parse(localStorage.getItem(PROGRESS_KEY)) || {}; }
-            catch { return {}; }
-        };
-
-        const saveProgress = () => {
-            if (currentTrack < 0 || !playlist[currentTrack]) return;
-            const data = getSavedProgress();
-            data[playlist[currentTrack].name] = audio.currentTime;
-            localStorage.setItem(PROGRESS_KEY, JSON.stringify(data));
-        };
-
-        const restoreProgress = (fileName) => {
-            const data = getSavedProgress();
-            if (data[fileName] && data[fileName] > 0) {
-                audio.currentTime = data[fileName];
-            }
-        };
-
-        // --- Load and play a track ---
         const loadTrack = (index) => {
             if (index < 0 || index >= playlist.length) return;
-            if (currentTrack >= 0) saveProgress();
             currentTrack = index;
             const track = playlist[index];
             audio.src = track.url;
             audioTrackName.textContent = track.name;
             audioPlaylistInfo.textContent = `${index + 1}/${playlist.length}`;
-            audio.addEventListener('loadedmetadata', function onMeta() {
-                restoreProgress(track.name);
-                audio.removeEventListener('loadedmetadata', onMeta);
-            });
-            audio.play().then(() => {
-                audioPlayBtn.textContent = '⏸';
-            }).catch(() => { });
+            audio.play().then(() => { audioPlayBtn.textContent = '⏸'; }).catch(() => {});
             audioBar.hidden = false;
             syncBodyPadding();
             audioToggleBtn.hidden = false;
-            audioToggleBtn.classList.add('ab-playing');
         };
 
-        // --- File input handling ---
         const handleFiles = (files) => {
             if (!files || files.length === 0) return;
-
             const isVideo = files[0].type.startsWith('video/');
-            if (isVideo) {
-                playVideo(files[0]);
-                return;
-            }
-
+            if (isVideo) { playVideo(files[0]); return; }
             const audioFiles = Array.from(files).filter(f => f.type.startsWith('audio/'));
-            if (audioFiles.length === 0) return;
-
-            for (const file of audioFiles) {
-                playlist.push({
-                    name: file.name,
-                    url: URL.createObjectURL(file)
-                });
-            }
-            if (currentTrack < 0) {
-                loadTrack(0);
-            } else {
-                audioPlaylistInfo.textContent = `${currentTrack + 1}/${playlist.length}`;
-            }
+            if (!audioFiles.length) return;
+            for (const file of audioFiles) playlist.push({ name: file.name, url: URL.createObjectURL(file) });
+            if (currentTrack < 0) loadTrack(0);
+            else audioPlaylistInfo.textContent = `${currentTrack + 1}/${playlist.length}`;
         };
 
-        const videoOpenBtn = document.getElementById('videoOpenBtn');
-        videoOpenBtn.onclick = () => audioFileInput.click();
         audioOpenBtn.onclick = () => audioFileInput.click();
         audioAddMore.onclick = () => audioFileInput.click();
         audioFileInput.onchange = (e) => handleFiles(e.target.files);
 
-        // =============================================================
-        // Video Player Logic
-        // =============================================================
+        audioPlayBtn.onclick = () => {
+            if (!audio.src || !playlist.length) return;
+            if (audio.paused) { audio.play(); audioPlayBtn.textContent = '⏸'; }
+            else { audio.pause(); audioPlayBtn.textContent = '▶'; }
+        };
+        audioRewBtn.onclick = () => { audio.currentTime = Math.max(0, audio.currentTime - 10); };
+        audioFwdBtn.onclick = () => { audio.currentTime = Math.min(audio.duration || 0, audio.currentTime + 10); };
+        audioPrevBtn.onclick = () => { if (playlist.length) loadTrack((currentTrack - 1 + playlist.length) % playlist.length); };
+        audioNextBtn.onclick = () => { if (playlist.length) loadTrack((currentTrack + 1) % playlist.length); };
+
+        audioSeek.oninput = () => { isSeeking = true; };
+        audioSeek.onchange = () => { if (audio.duration) audio.currentTime = (audioSeek.value / 100) * audio.duration; isSeeking = false; };
+        audio.addEventListener('timeupdate', () => {
+            if (!isSeeking && audio.duration) audioSeek.value = (audio.currentTime / audio.duration) * 100;
+            audioTimeDisplay.textContent = `${fmtTime(audio.currentTime)} / ${fmtTime(audio.duration)}`;
+        });
+        audio.addEventListener('ended', () => {
+            if (playlist.length > 1) loadTrack((currentTrack + 1) % playlist.length);
+            else audioPlayBtn.textContent = '▶';
+        });
+
+        audioVolume.oninput = () => { audio.volume = audioVolume.value / 100; savedVolume = audio.volume; };
+        const audioSpeedEl = document.getElementById('audioSpeed');
+        const audioSpeedVal = document.getElementById('audioSpeedVal');
+        if (audioSpeedEl && audioSpeedVal) {
+            audioSpeedEl.oninput = () => {
+                const spd = parseFloat(audioSpeedEl.value) || 1;
+                audio.playbackRate = spd;
+                audioSpeedVal.textContent = spd.toFixed(1) + 'x';
+            };
+        }
+        audioMuteBtn.onclick = () => {
+            if (audio.volume > 0) { savedVolume = audio.volume; audio.volume = 0; audioVolume.value = 0; }
+            else { audio.volume = savedVolume || 1; audioVolume.value = audio.volume * 100; }
+        };
+        audioMinBtn.onclick = () => { audioBar.hidden = true; syncBodyPadding(); };
+        audioToggleBtn.onclick = () => {
+            if (!playlist.length) { audioFileInput.click(); return; }
+            audioBar.hidden = !audioBar.hidden;
+            syncBodyPadding();
+        };
+        audioCloseBtn.onclick = () => {
+            audio.pause(); audio.src = ''; audioBar.hidden = true; syncBodyPadding();
+            audioToggleBtn.hidden = true; audioPlayBtn.textContent = '▶';
+            // Release the object URLs we created for these tracks so the
+            // browser can free the underlying file memory.
+            playlist.forEach(track => { try { URL.revokeObjectURL(track.url); } catch(e) {} });
+            playlist = []; currentTrack = -1;
+        };
+
+        // Video Player
         const videoPlayer = document.getElementById('videoPlayer');
         const exitVideoBtn = document.getElementById('exitVideoBtn');
         let topBarTimeout = null;
-        let currentVideoName = '';
-        let lastVideoSaveTime = 0;
-        const VIDEO_PROGRESS_KEY = 'videoProgress';
 
-        const getSavedVideoProgress = () => {
-            try { return JSON.parse(localStorage.getItem(VIDEO_PROGRESS_KEY)) || {}; }
-            catch { return {}; }
+        const playVideo = (file) => {
+            if (!audio.paused) { audio.pause(); audioPlayBtn.textContent = '▶'; }
+            // Release the previous video's object URL (if any) before
+            // creating a new one, to avoid leaking memory when switching
+            // between several study videos in one session.
+            if (videoPlayer.src) { try { URL.revokeObjectURL(videoPlayer.src); } catch(e) {} }
+            videoPlayer.src = URL.createObjectURL(file);
+            videoPlayer.classList.add('active');
+            document.body.classList.add('video-mode');
+            videoPlayer.hidden = false;
+            exitVideoBtn.hidden = false;
+            videoPlayer.play().catch(() => {});
+            document.addEventListener('mousemove', showTopBar);
+            showTopBar();
         };
-
-        const saveVideoProgress = () => {
-            if (!currentVideoName) return;
-            const data = getSavedVideoProgress();
-            data[currentVideoName] = videoPlayer.currentTime;
-            localStorage.setItem(VIDEO_PROGRESS_KEY, JSON.stringify(data));
-        };
-
-        const restoreVideoProgress = () => {
-            if (!currentVideoName) return;
-            const data = getSavedVideoProgress();
-            if (data[currentVideoName] && data[currentVideoName] > 0) {
-                videoPlayer.currentTime = data[currentVideoName];
-            }
-        };
-
-        videoPlayer.addEventListener('timeupdate', () => {
-            const now = Date.now();
-            if (now - lastVideoSaveTime > 5000) {
-                lastVideoSaveTime = now;
-                saveVideoProgress();
-            }
-        });
-
-        videoPlayer.addEventListener('loadedmetadata', restoreVideoProgress);
+        document.getElementById('videoOpenBtn').onclick = () => audioFileInput.click();
 
         const showTopBar = () => {
             if (!document.body.classList.contains('video-mode')) return;
             container.classList.add('show-bar');
             clearTimeout(topBarTimeout);
             topBarTimeout = setTimeout(() => {
-                const isHovering = container.matches(':hover');
-                if (!isHovering && !videoPlayer.paused) {
-                    container.classList.remove('show-bar');
-                }
+                if (!container.matches(':hover') && !videoPlayer.paused) container.classList.remove('show-bar');
             }, 3000);
         };
-
-        const playVideo = (file) => {
-            if (!audio.paused) {
-                audio.pause();
-                audioPlayBtn.textContent = '▶';
-            }
-            if (currentVideoName) saveVideoProgress();
-            currentVideoName = file.name;
-            videoPlayer.src = URL.createObjectURL(file);
-            videoPlayer.classList.add('active');
-            document.body.classList.add('video-mode');
-            videoPlayer.hidden = false;
-            exitVideoBtn.hidden = false;
-            videoPlayer.play().catch(() => { });
-
-            document.addEventListener('mousemove', showTopBar);
-            showTopBar();
-        };
-
         exitVideoBtn.onclick = () => {
-            if (currentVideoName) saveVideoProgress();
             videoPlayer.pause();
-            videoPlayer.src = '';
-            currentVideoName = '';
-            videoPlayer.hidden = true;
-            videoPlayer.classList.remove('active');
-            document.body.classList.remove('video-mode');
-            container.classList.remove('show-bar');
-            exitVideoBtn.hidden = true;
+            if (videoPlayer.src) { try { URL.revokeObjectURL(videoPlayer.src); } catch(e) {} }
+            videoPlayer.src = ''; videoPlayer.hidden = true;
+            videoPlayer.classList.remove('active'); document.body.classList.remove('video-mode');
+            container.classList.remove('show-bar'); exitVideoBtn.hidden = true;
             document.removeEventListener('mousemove', showTopBar);
         };
 
-        videoPlayer.addEventListener('pause', showTopBar);
-        window.addEventListener('beforeunload', () => {
-            if (currentVideoName) saveVideoProgress();
-        });
-
-        // =============================================================
-        // Drag & Drop Support for Audio Files
-        // =============================================================
+        // Drag & Drop
         const dropOverlay = document.getElementById('dropOverlay');
         let dragCounter = 0;
-
         window.addEventListener('dragenter', (e) => {
-            e.preventDefault();
-            dragCounter++;
-            if (e.dataTransfer && e.dataTransfer.types.includes('Files')) {
-                dropOverlay.classList.add('active');
-            }
+            e.preventDefault(); dragCounter++;
+            if (e.dataTransfer && e.dataTransfer.types.includes('Files')) dropOverlay.classList.add('active');
         });
-
-        window.addEventListener('dragover', (e) => {
-            e.preventDefault();
-        });
-
+        window.addEventListener('dragover', (e) => e.preventDefault());
         window.addEventListener('dragleave', (e) => {
-            e.preventDefault();
-            dragCounter--;
-            if (dragCounter <= 0) {
-                dragCounter = 0;
-                dropOverlay.classList.remove('active');
-            }
+            e.preventDefault(); dragCounter--;
+            if (dragCounter <= 0) { dragCounter = 0; dropOverlay.classList.remove('active'); }
         });
-
         window.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dragCounter = 0;
-            dropOverlay.classList.remove('active');
-
-            if (!e.dataTransfer || !e.dataTransfer.files.length) return;
-
-            const mediaFiles = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('audio/') || f.type.startsWith('video/'));
-            if (mediaFiles.length > 0) {
-                handleFiles(mediaFiles);
-            }
+            e.preventDefault(); dragCounter = 0; dropOverlay.classList.remove('active');
+            if (e.dataTransfer && e.dataTransfer.files.length) handleFiles(e.dataTransfer.files);
         });
 
-        // --- Play / Pause ---
-        audioPlayBtn.onclick = () => {
-            if (!audio.src || playlist.length === 0) return;
-            if (audio.paused) {
-                audio.play();
-                audioPlayBtn.textContent = '⏸';
-            } else {
-                audio.pause();
-                audioPlayBtn.textContent = '▶';
-            }
+        // Picture in Picture
+        const pipBtn = document.getElementById('pipBtn');
+        const pipCanvas = document.getElementById('pipCanvas');
+        const pipVideo = document.createElement('video');
+        pipVideo.muted = true;
+        pipVideo.setAttribute('playsinline', '');
+        // Some browsers are unreliable about starting Picture-in-Picture on a
+        // video element that was never attached to the document. Keep it
+        // present but invisible instead of fully detached.
+        pipVideo.style.cssText = 'position:fixed;width:1px;height:1px;opacity:0;pointer-events:none;';
+        document.body.appendChild(pipVideo);
+        pipBtn.onclick = async () => {
+            try {
+                if (document.pictureInPictureElement) { await document.exitPictureInPicture(); return; }
+                const pctx = pipCanvas.getContext("2d");
+                const updatePip = () => {
+                    pctx.fillStyle = "#16213e"; pctx.fillRect(0, 0, 300, 300);
+                    pctx.fillStyle = "#ffffff"; pctx.font = "bold 64px system-ui";
+                    pctx.textAlign = "center"; pctx.textBaseline = "middle";
+                    pctx.fillText(counterElement.textContent, 150, 150);
+                    pctx.font = "20px system-ui"; pctx.fillStyle = "#94a3b8";
+                    pctx.fillText(currentMode.toUpperCase(), 150, 220);
+                };
+                updatePip();
+                pipVideo.srcObject = pipCanvas.captureStream(10);
+                await pipVideo.play();
+                await pipVideo.requestPictureInPicture();
+                const pipInt = setInterval(() => {
+                    if (!document.pictureInPictureElement) { clearInterval(pipInt); return; }
+                    updatePip();
+                }, 500);
+            } catch(e) {}
         };
-
-        // --- Seek ±10s ---
-        audioRewBtn.onclick = () => { audio.currentTime = Math.max(0, audio.currentTime - 10); };
-        audioFwdBtn.onclick = () => { audio.currentTime = Math.min(audio.duration || 0, audio.currentTime + 10); };
-
-        // --- Prev / Next ---
-        audioPrevBtn.onclick = () => {
-            if (playlist.length === 0) return;
-            const idx = (currentTrack - 1 + playlist.length) % playlist.length;
-            loadTrack(idx);
-        };
-        audioNextBtn.onclick = () => {
-            if (playlist.length === 0) return;
-            const idx = (currentTrack + 1) % playlist.length;
-            loadTrack(idx);
-        };
-
-        // --- Seek slider ---
-        audioSeek.oninput = () => { isSeeking = true; };
-        audioSeek.onchange = () => {
-            if (audio.duration) {
-                audio.currentTime = (audioSeek.value / 100) * audio.duration;
-            }
-            isSeeking = false;
-        };
-
-        // --- Time update ---
-        let lastSaveTime = 0;
-        audio.addEventListener('timeupdate', () => {
-            if (!isSeeking && audio.duration) {
-                audioSeek.value = (audio.currentTime / audio.duration) * 100;
-            }
-            audioTimeDisplay.textContent = `${fmtTime(audio.currentTime)} / ${fmtTime(audio.duration)}`;
-            const now = Date.now();
-            if (now - lastSaveTime > 5000) {
-                lastSaveTime = now;
-                saveProgress();
-            }
-        });
-
-        // --- Auto-advance to next track ---
-        audio.addEventListener('ended', () => {
-            saveProgress();
-            if (playlist.length > 1) {
-                const idx = (currentTrack + 1) % playlist.length;
-                loadTrack(idx);
-            } else {
-                audioPlayBtn.textContent = '▶';
-            }
-        });
-
-        // --- Speed control ---
-        const audioSpeed = document.getElementById('audioSpeed');
-        const audioSpeedVal = document.getElementById('audioSpeedVal');
-        audioSpeed.oninput = () => {
-            const rate = parseFloat(audioSpeed.value);
-            audio.playbackRate = rate;
-            audioSpeedVal.textContent = rate.toFixed(1) + 'x';
-        };
-
-        // --- Volume control ---
-        audioVolume.oninput = () => {
-            audio.volume = audioVolume.value / 100;
-            savedVolume = audio.volume;
-            audioMuteBtn.textContent = audio.volume === 0 ? '🔇' : '🔊';
-        };
-
-        audioMuteBtn.onclick = () => {
-            if (audio.volume > 0) {
-                savedVolume = audio.volume;
-                audio.volume = 0;
-                audioVolume.value = 0;
-                audioMuteBtn.textContent = '🔇';
-            } else {
-                audio.volume = savedVolume || 1;
-                audioVolume.value = audio.volume * 100;
-                audioMuteBtn.textContent = '🔊';
-            }
-        };
-
-        // --- Minimize / Show-Hide toggle ---
-        audioMinBtn.onclick = () => {
-            audioBar.hidden = true;
-            syncBodyPadding();
-            audioToggleBtn.classList.add('ab-playing');
-        };
-
-        audioToggleBtn.onclick = () => {
-            if (playlist.length === 0) {
-                audioFileInput.click();
-                return;
-            }
-            audioBar.hidden = !audioBar.hidden;
-            syncBodyPadding();
-        };
-
-        // --- Close audio bar (full stop) ---
-        audioCloseBtn.onclick = () => {
-            saveProgress();
-            audio.pause();
-            audio.src = '';
-            audioBar.hidden = true;
-            syncBodyPadding();
-            audioToggleBtn.hidden = true;
-            audioToggleBtn.classList.remove('ab-playing');
-            audioPlayBtn.textContent = '▶';
-            audioSeek.value = 0;
-            audioVolume.value = 100;
-            audioTimeDisplay.textContent = '0:00 / 0:00';
-            audioTrackName.textContent = '—';
-            playlist.forEach(t => URL.revokeObjectURL(t.url));
-            playlist = [];
-            currentTrack = -1;
-        };
-
-        // Cleanup on page unload
-        window.addEventListener('beforeunload', () => {
-            if (currentTrack >= 0) saveProgress();
-        });
 
         // =============================================================
-        // Prayer & Fullscreen (inline script merged)
+        // 12. PRAYER TIMES ENGINE
         // =============================================================
-        (function () {
-            const pBtn = document.getElementById('prayerBtn');
-            const pModal = document.getElementById('prayerModal');
-            const pClose = document.getElementById('closePrayer');
-            pBtn.onclick = () => pModal.classList.add('visible');
-            pClose.onclick = () => pModal.classList.remove('visible');
-            pModal.onclick = e => { if (e.target === pModal) pModal.classList.remove('visible'); };
+        const prayerBtn = document.getElementById('prayerBtn');
+        const prayerModal = document.getElementById('prayerModal');
+        const closePrayer = document.getElementById('closePrayer');
+        const offlinePrayerTab = document.getElementById('offlinePrayerTab');
+        const onlinePrayerTab = document.getElementById('onlinePrayerTab');
+        const offlinePrayerView = document.getElementById('offlinePrayerView');
+        const onlinePrayerView = document.getElementById('onlinePrayerView');
+        const prayerListContainer = document.getElementById('prayerListContainer');
 
-            const fsBtn = document.getElementById('fullscreenBtn');
-            fsBtn.onclick = () => {
-                if (!document.fullscreenElement) {
-                    document.documentElement.requestFullscreen();
-                } else {
-                    document.exitFullscreen();
-                }
-            };
-            document.addEventListener('fullscreenchange', () => {
-                fsBtn.textContent = document.fullscreenElement ? '⛶' : '⛶';
-                fsBtn.title = document.fullscreenElement ? 'الخروج من ملء الشاشة' : 'ملء الشاشة';
+        prayerBtn.onclick = () => { computePrayerTimes(); prayerModal.classList.add('visible'); };
+        closePrayer.onclick = () => prayerModal.classList.remove('visible');
+        offlinePrayerTab.onclick = () => {
+            offlinePrayerTab.classList.add('active-mode'); onlinePrayerTab.classList.remove('active-mode');
+            offlinePrayerView.style.display = 'block'; onlinePrayerView.style.display = 'none';
+        };
+        onlinePrayerTab.onclick = () => {
+            onlinePrayerTab.classList.add('active-mode'); offlinePrayerTab.classList.remove('active-mode');
+            offlinePrayerView.style.display = 'none'; onlinePrayerView.style.display = 'flex';
+        };
+
+        const computePrayerTimes = () => {
+            const now = new Date();
+            const dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
+            const b = 2 * Math.PI * (dayOfYear - 81) / 365;
+            const eot = 9.87 * Math.sin(2 * b) - 7.53 * Math.cos(b) - 1.5 * Math.sin(b);
+            const noonMinutes = 12 * 60 - eot - ((31.2357 - 30) * 4);
+
+            const prayers = [
+                { name: "الفجر (Fajr)", mins: noonMinutes - 410 },
+                { name: "الشروق (Sunrise)", mins: noonMinutes - 330 },
+                { name: "الظهر (Dhuhr)", mins: noonMinutes + 4 },
+                { name: "العصر (Asr)", mins: noonMinutes + 205 },
+                { name: "المغرب (Maghrib)", mins: noonMinutes + 335 },
+                { name: "العشاء (Isha)", mins: noonMinutes + 425 }
+            ];
+
+            const currentMinutes = now.getHours() * 60 + now.getMinutes();
+            prayerListContainer.innerHTML = '';
+            let nextFound = false;
+
+            prayers.forEach(p => {
+                const h = Math.floor(p.mins / 60) % 24;
+                const m = Math.floor(p.mins % 60);
+                const isNext = (!nextFound && p.mins > currentMinutes);
+                if (isNext) nextFound = true;
+                const row = document.createElement('div');
+                row.className = `prayer-item ${isNext ? 'next-prayer' : ''}`;
+                row.innerHTML = `<span>${p.name}</span><strong>${getFormattedNumber(h)}:${getFormattedNumber(m)}</strong>`;
+                prayerListContainer.appendChild(row);
             });
-        })();
+        };
 
-        reset(); // Set initial state
+        // =============================================================
+        // 13. SETTINGS & PERSISTENCE
+        // =============================================================
+        const settingsBtn = document.getElementById("settingsBtn");
+        const settingsModal = document.getElementById("settingsModal");
+        const closeSettings = document.getElementById("closeSettings");
+        const saveSettingsBtn = document.getElementById("saveSettings");
+        const statsBtn = document.getElementById("statsBtn");
+        const statsModal = document.getElementById("statsModal");
+        const closeStats = document.getElementById("closeStats");
+
+        settingsBtn.onclick = () => settingsModal.classList.add("visible");
+        closeSettings.onclick = () => settingsModal.classList.remove("visible");
+        statsBtn.onclick = () => { renderStatsAndGoal(); statsModal.classList.add("visible"); };
+        closeStats.onclick = () => statsModal.classList.remove("visible");
+
+        window.onclick = (e) => {
+            if (e.target === settingsModal) settingsModal.classList.remove('visible');
+            if (e.target === statsModal) statsModal.classList.remove('visible');
+            if (e.target === prayerModal) prayerModal.classList.remove('visible');
+            if (e.target === overlay) closeSidebar.click();
+        };
+
+        // Inputs
+        const pomodoroInput = document.getElementById("pomodoroTime");
+        const shortBreakInput = document.getElementById("shortBreakTime");
+        const longBreakInput = document.getElementById("longBreakTime");
+        const dailyTargetInput = document.getElementById("dailyTargetInput");
+        const themeSelect = document.getElementById("themeSelect");
+        const alarmSoundSelect = document.getElementById("alarmSoundSelect");
+        const autoStartBreaksCheck = document.getElementById("autoStartBreaksCheck");
+        const autoAudioSyncCheck = document.getElementById("autoAudioSyncCheck");
+        const boxBreathingCheck = document.getElementById("boxBreathingCheck");
+        const eyeCareReminderCheck = document.getElementById("eyeCareReminderCheck");
+        const tickingSoundCheck = document.getElementById("tickingSoundCheck");
+        const wakeLockCheck = document.getElementById("wakeLockCheck");
+        const strictSilentCheck = document.getElementById("strictSilentCheck");
+        const meshGradientCheck = document.getElementById("meshGradientCheck");
+        const desktopNotifCheck = document.getElementById("desktopNotifCheck");
+
+        pomodoroInput.value = defaultPomo;
+        shortBreakInput.value = defaultShort;
+        longBreakInput.value = defaultLong;
+        dailyTargetInput.value = dailyTarget;
+        themeSelect.value = currentTheme;
+        alarmSoundSelect.value = alarmSound;
+        autoStartBreaksCheck.checked = autoStartNext;
+        autoAudioSyncCheck.checked = autoAudioSync;
+        boxBreathingCheck.checked = boxBreathing;
+        eyeCareReminderCheck.checked = eyeCareReminder;
+        tickingSoundCheck.checked = tickingSound;
+        wakeLockCheck.checked = keepWakeLock;
+        strictSilentCheck.checked = strictSilent;
+        meshGradientCheck.checked = meshGradient;
+        desktopNotifCheck.checked = desktopNotif;
+
+        desktopNotifCheck.onchange = () => {
+            if (desktopNotifCheck.checked && "Notification" in window) Notification.requestPermission();
+        };
+
+        saveSettingsBtn.onclick = () => {
+            defaultPomo = parseInt(pomodoroInput.value) || 25;
+            defaultShort = parseInt(shortBreakInput.value) || 5;
+            defaultLong = parseInt(longBreakInput.value) || 15;
+            dailyTarget = parseInt(dailyTargetInput.value) || 8;
+            currentTheme = themeSelect.value;
+            alarmSound = alarmSoundSelect.value;
+            autoStartNext = autoStartBreaksCheck.checked;
+            autoAudioSync = autoAudioSyncCheck.checked;
+            boxBreathing = boxBreathingCheck.checked;
+            eyeCareReminder = eyeCareReminderCheck.checked;
+            tickingSound = tickingSoundCheck.checked;
+            keepWakeLock = wakeLockCheck.checked;
+            strictSilent = strictSilentCheck.checked;
+            meshGradient = meshGradientCheck.checked;
+            desktopNotif = desktopNotifCheck.checked;
+
+            localStorage.setItem('pomoTime', defaultPomo);
+            localStorage.setItem('shortTime', defaultShort);
+            localStorage.setItem('longTime', defaultLong);
+            localStorage.setItem('dailyTarget', dailyTarget);
+            localStorage.setItem('pomoTheme', currentTheme);
+            localStorage.setItem('alarmSound', alarmSound);
+            localStorage.setItem('autoStartNext', autoStartNext);
+            localStorage.setItem('autoAudioSync', autoAudioSync);
+            localStorage.setItem('boxBreathing', boxBreathing);
+            localStorage.setItem('eyeCareReminder', eyeCareReminder);
+            localStorage.setItem('tickingSound', tickingSound);
+            localStorage.setItem('wakeLock', keepWakeLock);
+            localStorage.setItem('strictSilent', strictSilent);
+            localStorage.setItem('meshGradient', meshGradient);
+            localStorage.setItem('desktopNotif', desktopNotif);
+
+            document.documentElement.dataset.theme = currentTheme;
+            document.body.classList.toggle('mesh-gradient-active', meshGradient);
+            updateAccentColor();
+            renderStatsAndGoal();
+            settingsModal.classList.remove("visible");
+            reset();
+        };
+
+        const saveTimerState = () => {
+            const state = {
+                currentMode, status, minutes, seconds, hours,
+                timerTotalSeconds, timerBaseSeconds, timerStartTime,
+                isOvertime, timestamp: Date.now()
+            };
+            localStorage.setItem('pomoRunningState', JSON.stringify(state));
+        };
+
+        let didRestoreTimer = false;
+        const restoreTimerState = () => {
+            try {
+                const saved = JSON.parse(localStorage.getItem('pomoRunningState'));
+                if (!saved) return;
+                if (saved.status === Status_Types.STARTED && saved.timerStartTime) {
+                    const gapSec = Math.floor((Date.now() - saved.timestamp) / 1000);
+                    currentMode = saved.currentMode || 'pomodoro';
+
+                    // Reflect the restored mode in the UI (buttons, accent color, container)
+                    // WITHOUT calling switchMode(), since switchMode() resets
+                    // timerTotalSeconds/timerBaseSeconds to defaults and would
+                    // discard the progress we're restoring below.
+                    container.dataset.mode = currentMode;
+                    for (const key in modeButtons) {
+                        modeButtons[key].classList.toggle('active-mode', key === currentMode);
+                    }
+                    document.body.classList.remove('breathing-active');
+                    if ((currentMode === 'short' || currentMode === 'long') && boxBreathing) {
+                        document.body.classList.add('breathing-active');
+                    }
+                    updateAccentColor();
+
+                    timerTotalSeconds = saved.timerTotalSeconds;
+                    timerBaseSeconds = (saved.timerBaseSeconds || 0) + gapSec;
+                    isOvertime = !!saved.isOvertime;
+                    if (isOvertime) overtimeBadge.style.display = 'block';
+
+                    startStop();
+                    didRestoreTimer = true;
+                }
+            } catch(e) {}
+        };
+
+        // Export/Import JSON
+        document.getElementById('exportDataBtn').onclick = () => {
+            const data = { todos, statsHistory, timelineSessions, totalPomosCount, totalFocusMinutes, scratchpad: scratchpadNotes.value };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const blobUrl = URL.createObjectURL(blob);
+            const a = document.createElement('a'); a.href = blobUrl;
+            a.download = `pomodoro-studio-backup-${getTodayKey()}.json`; a.click();
+            setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+        };
+        document.getElementById('importDataBtn').onclick = () => document.getElementById('importFileInput').click();
+        document.getElementById('importFileInput').onchange = (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const r = new FileReader();
+            r.onload = (ev) => {
+                try {
+                    const p = JSON.parse(ev.target.result);
+                    if (p.todos) todos = p.todos;
+                    if (p.statsHistory) statsHistory = p.statsHistory;
+                    if (p.timelineSessions) timelineSessions = p.timelineSessions;
+                    if (p.totalPomosCount) totalPomosCount = p.totalPomosCount;
+                    if (p.totalFocusMinutes) totalFocusMinutes = p.totalFocusMinutes;
+                    if (p.scratchpad) scratchpadNotes.value = p.scratchpad;
+                    saveTodos(); renderStatsAndGoal(); statsModal.classList.remove('visible');
+                    triggerNotification("Backup restored successfully!");
+                } catch(err) { alert("Invalid file"); }
+            };
+            r.readAsText(file);
+        };
+
+        // Run Init
+        renderCycleDots();
+        renderTodos();
+        renderStatsAndGoal();
+        restoreTimerState();
+        // Only reset to a fresh default timer if we did NOT just resume a
+        // running session above — otherwise this would immediately wipe
+        // out the restored progress (e.g. after a page reload while
+        // a pomodoro/break/infinity session was running).
+        if (!didRestoreTimer) reset();
     </script>
 </body>
-
 </html>
