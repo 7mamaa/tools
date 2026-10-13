@@ -1,63 +1,114 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="midnight" data-layout="studio">
+<html lang="en" data-theme="morning" data-layout="studio">
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
     <title>Pomodoro Focus Studio</title>
     <link rel="icon" id="pageFavicon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2246%22 fill=%22%23e94560%22/></svg>">
     <style>
-        :root {
-            --bg-main: #1a1a2e;
-            --bg-card: #16213e;
-            --bg-subtle: #0f172a;
+        /* =========================================================
+           1. THEME VARIABLES (INCLUDING MORNING / DAYLIGHT THEME)
+           ========================================================= */
+        :root,
+        [data-theme="midnight"] {
+            --bg-main: #141625;
+            --bg-card: #1c2237;
+            --bg-subtle: #0f1320;
+            --bg-header: rgba(20, 22, 37, 0.88);
+            --bg-floating: rgba(24, 28, 46, 0.94);
+            --surface-hover: rgba(255, 255, 255, 0.08);
+            --surface-soft: rgba(255, 255, 255, 0.05);
+            --ring-track: rgba(255, 255, 255, 0.07);
             --accent-pomo: #e94560;
-            --accent-short: #1abc9c;
-            --accent-long: #3498db;
-            --accent-infinity: #9b59b6;
+            --accent-short: #10b981;
+            --accent-long: #3b82f6;
+            --accent-infinity: #8b5cf6;
             --accent-current: var(--accent-pomo);
             --text-main: #f1f5f9;
             --text-muted: #94a3b8;
             --border-color: rgba(255, 255, 255, 0.1);
-            --shadow-card: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+            --shadow-card: 0 18px 40px -15px rgba(0, 0, 0, 0.5);
             --transition-smooth: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            --font-stack: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-stack: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans Arabic", sans-serif;
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+        }
+
+        /* Morning / Daylight Theme */
+        [data-theme="morning"] {
+            --bg-main: #f4f7fb;
+            --bg-card: #ffffff;
+            --bg-subtle: #e9eff6;
+            --bg-header: rgba(255, 255, 255, 0.88);
+            --bg-floating: rgba(255, 255, 255, 0.95);
+            --surface-hover: rgba(15, 23, 42, 0.06);
+            --surface-soft: rgba(15, 23, 42, 0.04);
+            --ring-track: rgba(15, 23, 42, 0.08);
+            --accent-pomo: #e11d48;
+            --accent-short: #059669;
+            --accent-long: #2563eb;
+            --accent-infinity: #7c3aed;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: rgba(15, 23, 42, 0.1);
+            --shadow-card: 0 14px 32px -12px rgba(15, 23, 42, 0.08), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
         }
 
         [data-theme="forest"] {
-            --bg-main: #132219;
-            --bg-card: #1b3325;
-            --bg-subtle: #0b1610;
+            --bg-main: #111e16;
+            --bg-card: #192d21;
+            --bg-subtle: #0b140f;
+            --bg-header: rgba(17, 30, 22, 0.88);
+            --bg-floating: rgba(25, 45, 33, 0.94);
+            --surface-hover: rgba(46, 204, 113, 0.1);
+            --surface-soft: rgba(46, 204, 113, 0.06);
+            --ring-track: rgba(255, 255, 255, 0.07);
             --accent-pomo: #2ecc71;
             --accent-short: #1abc9c;
-            --accent-long: #27ae60;
+            --accent-long: #3498db;
             --accent-infinity: #16a085;
+            --text-main: #ecfdf5;
+            --text-muted: #86efac;
             --border-color: rgba(46, 204, 113, 0.2);
         }
 
         [data-theme="charcoal"] {
             --bg-main: #121214;
-            --bg-card: #1e1e24;
+            --bg-card: #1c1c21;
             --bg-subtle: #0a0a0c;
+            --bg-header: rgba(18, 18, 20, 0.88);
+            --bg-floating: rgba(28, 28, 33, 0.94);
+            --surface-hover: rgba(255, 255, 255, 0.08);
+            --surface-soft: rgba(255, 255, 255, 0.04);
+            --ring-track: rgba(255, 255, 255, 0.07);
             --accent-pomo: #ff5e57;
             --accent-short: #0be881;
             --accent-long: #4bcffa;
-            --accent-infinity: #d2dae2;
-            --border-color: rgba(255, 255, 255, 0.08);
+            --accent-infinity: #a5b1c2;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border-color: rgba(255, 255, 255, 0.09);
         }
 
         [data-theme="oled"] {
             --bg-main: #000000;
-            --bg-card: #0a0a0a;
+            --bg-card: #0b0b0d;
             --bg-subtle: #050505;
-            --accent-pomo: #ff3366;
-            --accent-short: #00ffcc;
-            --accent-long: #3399ff;
-            --accent-infinity: #cc66ff;
+            --bg-header: rgba(0, 0, 0, 0.9);
+            --bg-floating: rgba(12, 12, 14, 0.96);
+            --surface-hover: rgba(255, 255, 255, 0.1);
+            --surface-soft: rgba(255, 255, 255, 0.05);
+            --ring-track: rgba(255, 255, 255, 0.09);
+            --accent-pomo: #ff2e63;
+            --accent-short: #08d9d6;
+            --accent-long: #3b82f6;
+            --accent-infinity: #a855f7;
+            --text-main: #ffffff;
+            --text-muted: #8e8e93;
             --border-color: rgba(255, 255, 255, 0.15);
         }
 
-        /* Ambient Motion Gradient Background (Optional) */
+        /* Ambient Motion Gradient Background */
         body.mesh-gradient-active {
             background: linear-gradient(135deg, var(--bg-main) 0%, var(--bg-subtle) 50%, var(--bg-card) 100%);
             background-size: 400% 400%;
@@ -70,11 +121,25 @@
             100% { background-position: 0% 50%; }
         }
 
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.65; }
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        input, textarea, select {
+            user-select: text;
+            -webkit-user-select: text;
+        }
+
+        html {
+            overflow-x: hidden;
         }
 
         body {
@@ -88,10 +153,11 @@
             transition: background 0.3s ease, color 0.3s ease;
             overflow-x: hidden;
             position: relative;
+            user-select: none;
         }
 
         body.audio-active {
-            padding-bottom: 125px;
+            padding-bottom: calc(135px + var(--safe-bottom));
         }
 
         /* Top Slim Progress Bar */
@@ -107,113 +173,127 @@
             box-shadow: 0 0 10px var(--accent-current);
         }
 
-        html {
-            overflow-x: hidden;
-        }
-
-
+        /* =========================================================
+           2. HEADER & NAVIGATION
+           ========================================================= */
         .desktop-header {
             width: 100%;
-            padding: 8px 20px;
+            padding: 10px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             z-index: 100;
             position: sticky;
             top: 0;
-            background: rgba(26, 26, 46, 0.88);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            background: var(--bg-header);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
             border-bottom: 1px solid var(--border-color);
+            gap: 10px;
         }
 
         .brand-title {
-            font-size: 1.15rem;
-            font-weight: 700;
-            letter-spacing: -0.5px;
+            font-size: 1.1rem;
+            font-weight: 800;
+            letter-spacing: -0.4px;
             display: flex;
             align-items: center;
             gap: 8px;
+            white-space: nowrap;
         }
 
         .header-actions {
             display: flex;
             align-items: center;
             gap: 8px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
         }
 
-        /* Layout Switcher Pill */
         .layout-pill-btn {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             color: var(--text-muted);
-            padding: 6px 12px;
-            border-radius: 8px;
+            padding: 7px 12px;
+            border-radius: 10px;
             font-size: 0.78rem;
+            font-weight: 600;
             cursor: pointer;
-            display: flex;
+            display: inline-flex;
             align-items: center;
             gap: 6px;
             transition: var(--transition-smooth);
+            white-space: nowrap;
         }
 
         .layout-pill-btn:hover {
             color: var(--text-main);
-            background: rgba(255, 255, 255, 0.08);
+            background: var(--surface-hover);
+            border-color: var(--accent-current);
         }
 
-        /* Workspace Grid for Desktop (Studio Mode) */
+        /* =========================================================
+           3. WORKSPACE GRID & RESPONSIVE LAYOUTS
+           ========================================================= */
         .workspace-wrapper {
             flex: 1;
             width: 100%;
             max-width: 1420px;
             margin: 0 auto;
-            padding: 8px 24px 20px;
+            padding: 16px 24px 28px;
             display: grid;
-            grid-template-columns: minmax(310px, 350px) minmax(400px, 520px) minmax(310px, 350px);
+            grid-template-columns: minmax(300px, 350px) minmax(380px, 520px) minmax(300px, 350px);
             gap: 20px;
             align-items: start;
             justify-content: center;
             transition: var(--transition-smooth);
         }
 
-        /* In Compact Layout */
+        /* Compact Mode on Desktop */
         html[data-layout="compact"] .workspace-wrapper {
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            max-width: 580px;
+            max-width: 560px;
         }
 
         html[data-layout="compact"] .desktop-side-col {
             display: none;
+            width: 100%;
         }
 
-        html[data-layout="compact"] .container {
-            width: 480px;
-            max-width: 95vw;
+        html[data-layout="compact"] .desktop-side-col.mobile-tab-active {
+            display: flex;
+        }
+
+        html[data-layout="compact"] .center-col.mobile-tab-hidden {
+            display: none;
+        }
+
+        html[data-layout="compact"] .mobile-workspace-tabs {
+            display: flex;
         }
 
         /* Side Columns */
         .desktop-side-col {
             display: flex;
             flex-direction: column;
-            gap: 14px;
+            gap: 16px;
             min-width: 0;
         }
 
         .side-card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
-            border-radius: 18px;
-            padding: 16px;
+            border-radius: 20px;
+            padding: 18px;
             box-shadow: var(--shadow-card);
             transition: var(--transition-smooth);
             overflow: hidden;
         }
 
         .side-card-title {
-            font-size: 0.88rem;
+            font-size: 0.9rem;
             font-weight: 700;
             color: var(--text-main);
             margin-bottom: 12px;
@@ -234,9 +314,9 @@
 
         .container {
             width: 100%;
-            max-width: min(520px, 96vw);
-            padding: 16px 22px 14px;
-            border-radius: 22px;
+            max-width: 520px;
+            padding: 20px 22px 18px;
+            border-radius: 24px;
             background: var(--bg-card);
             text-align: center;
             position: relative;
@@ -244,10 +324,48 @@
             border: 1px solid var(--border-color);
             transition: var(--transition-smooth);
             z-index: 50;
-            overflow: visible;
         }
 
-        /* Zen Mode (Double click anywhere on background) */
+        /* Mobile / Compact View Switcher Tabs */
+        .mobile-workspace-tabs {
+            display: none;
+            width: 100%;
+            max-width: 520px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 5px;
+            margin: 0 auto 14px;
+            gap: 4px;
+            box-shadow: var(--shadow-card);
+        }
+
+        .mobile-tab-btn {
+            flex: 1;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            padding: 9px 6px;
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 0.78rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            white-space: nowrap;
+        }
+
+        .mobile-tab-btn.active {
+            background: var(--accent-current);
+            color: #ffffff;
+            box-shadow: 0 4px 12px -2px var(--accent-current);
+        }
+
+        /* Zen Mode */
         body.zen-active .container {
             background: transparent;
             border: none;
@@ -256,6 +374,7 @@
 
         body.zen-active .desktop-header,
         body.zen-active .desktop-side-col,
+        body.zen-active .mobile-workspace-tabs,
         body.zen-active .hide-in-zen {
             opacity: 0;
             pointer-events: none;
@@ -273,7 +392,7 @@
             font-size: 0.65rem;
             padding: 1px 5px;
             border-radius: 4px;
-            background: rgba(255, 255, 255, 0.12);
+            background: var(--surface-hover);
             color: var(--text-muted);
             margin-left: 5px;
             font-family: monospace;
@@ -281,13 +400,15 @@
             vertical-align: middle;
         }
 
-        /* Modes Buttons */
+        /* =========================================================
+           4. TIMER & CONTROLS STYLING
+           ========================================================= */
         .butto--container {
             display: flex;
             justify-content: center;
             align-items: center;
             gap: 6px;
-            margin-bottom: 6px;
+            margin-bottom: 10px;
             flex-wrap: wrap;
         }
 
@@ -295,25 +416,27 @@
             background: var(--bg-main);
             border: 1px solid var(--border-color);
             color: var(--text-muted);
-            width: 36px;
-            height: 36px;
-            border-radius: 9px;
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
             cursor: pointer;
-            display: flex;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
             transition: var(--transition-smooth);
             position: relative;
+            flex-shrink: 0;
         }
 
         .icon-btn:hover {
             color: var(--text-main);
-            background: rgba(255, 255, 255, 0.08);
+            background: var(--surface-hover);
+            border-color: var(--accent-current);
         }
 
         .icon-btn svg {
-            width: 17px;
-            height: 17px;
+            width: 18px;
+            height: 18px;
             fill: none;
             stroke: currentColor;
             stroke-width: 2;
@@ -323,9 +446,9 @@
 
         .butto {
             border: none;
-            border-radius: 10px;
+            border-radius: 11px;
             font-family: inherit;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
             transition: var(--transition-smooth);
             display: inline-flex;
@@ -335,30 +458,34 @@
         }
 
         .butto--comand {
-            padding: 6px 12px;
-            font-size: .82rem;
+            padding: 7px 13px;
+            font-size: 0.82rem;
             background: var(--bg-main);
             color: var(--text-muted);
             border: 1px solid var(--border-color);
         }
 
+        .butto--comand:hover {
+            color: var(--text-main);
+            background: var(--surface-hover);
+        }
+
         .butto--comand.active-mode {
             background: var(--accent-current);
-            color: #fff;
+            color: #ffffff;
             border-color: transparent;
             box-shadow: 0 4px 14px -3px var(--accent-current);
         }
 
-        /* Large Desktop Circular Clock Wrapper */
+        /* Circular Clock Wrapper */
         .clock-wrapper {
             position: relative;
-            width: clamp(170px, 28vh, 230px);
-            height: clamp(170px, 28vh, 230px);
-            margin: 4px auto 6px;
+            width: clamp(190px, 30vh, 245px);
+            height: clamp(190px, 30vh, 245px);
+            margin: 6px auto 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: visible;
         }
 
         .progress-ring {
@@ -371,31 +498,31 @@
         }
 
         .progress-ring__circle-bg {
-            stroke: rgba(255, 255, 255, 0.06);
-            stroke-width: 9;
+            stroke: var(--ring-track);
+            stroke-width: 10;
             fill: transparent;
         }
 
         .progress-ring__circle {
             stroke: var(--accent-current);
-            stroke-width: 9;
+            stroke-width: 10;
             stroke-linecap: round;
             fill: transparent;
-            stroke-dasharray: 942.48; /* 2 * PI * 150 */
+            stroke-dasharray: 942.48;
             stroke-dashoffset: 0;
             transition: stroke-dashoffset 0.3s ease, stroke 0.3s ease;
         }
 
-        /* Box Breathing Visualization on Break Mode */
         body.breathing-active .progress-ring__circle {
             animation: boxBreathingAnim 16s infinite ease-in-out;
+            transform-origin: center;
         }
 
         @keyframes boxBreathingAnim {
-            0%, 100% { transform: scale(1); opacity: 0.8; }
-            25% { transform: scale(1.04); opacity: 1; } /* Inhale 4s */
-            50% { transform: scale(1.04); opacity: 1; } /* Hold 4s */
-            75% { transform: scale(0.96); opacity: 0.7; } /* Exhale 4s */
+            0%, 100% { transform: scale(1); opacity: 0.85; }
+            25% { transform: scale(1.03); opacity: 1; }
+            50% { transform: scale(1.03); opacity: 1; }
+            75% { transform: scale(0.97); opacity: 0.7; }
         }
 
         .clock-center-content {
@@ -408,7 +535,7 @@
         }
 
         .clock {
-            font-size: clamp(2.6rem, 5.5vh, 3.8rem);
+            font-size: clamp(2.5rem, 5.5vh, 3.7rem);
             font-weight: 800;
             color: var(--text-main);
             letter-spacing: -1.5px;
@@ -416,23 +543,28 @@
             font-variant-numeric: tabular-nums;
         }
 
+        .clock.infinity-font {
+            font-size: clamp(2rem, 4.2vh, 2.85rem);
+        }
+
         .estimated-finish-pill {
-            font-size: 0.72rem;
+            font-size: 0.73rem;
             color: var(--text-muted);
-            margin-top: 5px;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 2px 8px;
+            margin-top: 6px;
+            background: var(--surface-soft);
+            padding: 3px 10px;
             border-radius: 16px;
             border: 1px solid var(--border-color);
         }
 
         .overtime-badge {
             font-size: 0.72rem;
+            font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 1px;
             background: #ef4444;
-            color: #fff;
-            padding: 2px 8px;
+            color: #ffffff;
+            padding: 2px 9px;
             border-radius: 10px;
             margin-top: 4px;
             display: none;
@@ -444,19 +576,21 @@
             display: flex;
             gap: 8px;
             justify-content: center;
-            margin: 6px 0 10px;
+            margin: 8px 0 12px;
         }
 
         .cycle-dot {
-            width: 9px;
-            height: 9px;
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.15);
+            background: var(--ring-track);
+            border: 1px solid var(--border-color);
             transition: var(--transition-smooth);
         }
 
         .cycle-dot.completed {
             background: var(--accent-current);
+            border-color: var(--accent-current);
             box-shadow: 0 0 10px var(--accent-current);
         }
 
@@ -466,17 +600,22 @@
             justify-content: center;
             align-items: center;
             gap: 8px;
-            margin-bottom: 8px;
-            flex-wrap: nowrap;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
         }
 
         .butto--timer {
-            padding: 9px 20px;
-            font-size: .88rem;
-            color: #fff;
+            padding: 10px 22px;
+            font-size: 0.9rem;
+            color: #ffffff;
             background: var(--accent-current);
             box-shadow: 0 4px 14px -3px var(--accent-current);
             white-space: nowrap;
+        }
+
+        .butto--timer:hover {
+            filter: brightness(1.06);
+            transform: translateY(-1px);
         }
 
         .butto--timer.secondary {
@@ -488,42 +627,43 @@
 
         .butto--timer.secondary:hover {
             color: var(--text-main);
-            background: rgba(255, 255, 255, 0.08);
+            background: var(--surface-hover);
         }
 
         .quick-time-btn {
-            font-size: 0.76rem;
-            padding: 7px 11px;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.05);
+            font-size: 0.78rem;
+            font-weight: 600;
+            padding: 8px 12px;
+            border-radius: 9px;
+            background: var(--surface-soft);
             color: var(--text-muted);
             border: 1px solid var(--border-color);
             cursor: pointer;
             transition: var(--transition-smooth);
             white-space: nowrap;
-            flex-shrink: 0;
         }
 
         .quick-time-btn:hover {
-            color: #fff;
-            background: rgba(255, 255, 255, 0.12);
+            color: var(--text-main);
+            background: var(--surface-hover);
+            border-color: var(--accent-current);
         }
 
         /* Daily Target Goal Progress */
         .daily-goal-box {
             background: var(--bg-main);
             border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 8px 12px;
-            margin-top: 8px;
+            border-radius: 12px;
+            padding: 10px 14px;
+            margin-top: 10px;
             text-align: left;
         }
 
         .daily-goal-bar-bg {
-            height: 6px;
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 3px;
-            margin-top: 6px;
+            height: 7px;
+            background: var(--ring-track);
+            border-radius: 4px;
+            margin-top: 7px;
             overflow: hidden;
         }
 
@@ -535,143 +675,15 @@
             transition: width 0.4s ease;
         }
 
-        /* Scratchpad / Brain Dump Quick Notes */
-        .scratchpad-textarea {
-            width: 100%;
-            height: 120px;
-            background: var(--bg-main);
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 10px 12px;
-            color: var(--text-main);
-            font-family: inherit;
-            font-size: 0.84rem;
-            resize: vertical;
-            outline: none;
-            line-height: 1.5;
-        }
-
-        .scratchpad-textarea:focus {
-            border-color: var(--accent-current);
-        }
-
-        /* 4-Channel Ambient Sound Atmosphere Mixer */
-        .ambient-mixer-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .mixer-channel {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-            font-size: 0.82rem;
-            color: var(--text-muted);
-        }
-
-        .mixer-channel span {
-            width: 80px;
-            white-space: nowrap;
-        }
-
-        .mixer-channel input[type="range"] {
-            flex: 1;
-            height: 4px;
-            cursor: pointer;
-            accent-color: var(--accent-current);
-        }
-
-        /* Timeline Session Log */
-        .session-timeline {
-            max-height: 180px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            font-size: 0.8rem;
-        }
-
-        .timeline-item {
-            padding: 8px 10px;
-            background: var(--bg-main);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            color: var(--text-muted);
-        }
-
-        .timeline-item strong {
-            color: var(--text-main);
-        }
-
-        /* Eye Care Break Toast */
-        .eyecare-toast {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            background: #0284c7;
-            color: #fff;
-            padding: 14px 20px;
-            border-radius: 14px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
-            z-index: 9999;
-            font-size: 0.88rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            transform: translateY(100px);
-            opacity: 0;
-            transition: all 0.3s ease;
-            pointer-events: none;
-        }
-
-        .eyecare-toast.show {
-            transform: translateY(0);
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        /* Todo Tags */
-        .task-tag {
-            font-size: 0.7rem;
-            padding: 1px 6px;
-            border-radius: 4px;
-            background: rgba(255, 255, 255, 0.08);
-            color: #38bdf8;
-            margin-right: 6px;
-        }
-
-        /* Mobile Adaptations */
-        @media (max-width: 820px) {
-            .workspace-wrapper {
-                grid-template-columns: 1fr;
-                max-width: 480px;
-                padding: 10px 16px;
-            }
-            .desktop-side-col {
-                display: none;
-            }
-            .desktop-header {
-                padding: 10px 16px;
-            }
-            .clock-wrapper {
-                width: 220px;
-                height: 220px;
-            }
-        }
-
-        /* ═══ Restored missing classes ═══ */
+        /* Active Task Badge */
         .active-task-badge {
-            margin: 0 auto 14px;
-            padding: 6px 14px;
-            background: rgba(255, 255, 255, 0.05);
+            margin: 0 auto 10px;
+            padding: 5px 14px;
+            background: var(--surface-soft);
             border-radius: 20px;
             font-size: 0.8rem;
             color: var(--text-muted);
-            max-width: 90%;
+            max-width: 92%;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -683,102 +695,83 @@
             display: inline-block;
         }
 
-        .mini-stats-strip {
-            margin-top: 14px;
-            font-size: 0.78rem;
-            color: var(--text-muted);
-            display: flex;
-            justify-content: center;
-            gap: 16px;
-            border-top: 1px solid var(--border-color);
-            padding-top: 12px;
-        }
-
-        .mini-stats-strip span strong {
+        /* =========================================================
+           5. SIDE CARDS: TO-DO, SCRATCHPAD, MIXER, TIMELINE
+           ========================================================= */
+        .scratchpad-textarea {
+            width: 100%;
+            min-height: 125px;
+            background: var(--bg-main);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 10px 12px;
             color: var(--text-main);
+            font-family: inherit;
+            font-size: 0.85rem;
+            resize: vertical;
+            outline: none;
+            line-height: 1.5;
         }
 
-        .timer-notification {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%) translateY(-20px);
-            background: #10b981;
-            color: #fff;
-            padding: 12px 24px;
-            border-radius: 14px;
-            font-weight: 600;
-            font-size: .92rem;
-            z-index: 10000;
-            opacity: 0;
-            pointer-events: none;
-            transition: transform 0.3s ease, opacity 0.3s ease;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
-            display: flex;
-            align-items: center;
-            gap: 8px;
+        .scratchpad-textarea:focus {
+            border-color: var(--accent-current);
         }
 
-        .timer-notification.show {
-            opacity: 1;
-            pointer-events: auto;
-            transform: translateX(-50%) translateY(0);
-        }
-
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: -380px;
-            width: 360px;
-            max-width: 88vw;
-            height: 100vh;
-            background: var(--bg-subtle);
-            border-right: 1px solid var(--border-color);
-            z-index: 1000;
+        .ambient-mixer-grid {
             display: flex;
             flex-direction: column;
-            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
+            gap: 14px;
         }
 
-        .sidebar.open {
-            left: 0;
+        .mixer-channel {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            font-size: 0.84rem;
+            color: var(--text-muted);
         }
 
-        .sidebar-header {
+        .mixer-channel span {
+            width: 95px;
+            white-space: nowrap;
+            color: var(--text-main);
+            font-weight: 500;
+        }
+
+        .mixer-channel input[type="range"] {
+            flex: 1;
+            height: 6px;
+            cursor: pointer;
+            accent-color: var(--accent-current);
+        }
+
+        .session-timeline {
+            max-height: 190px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+            font-size: 0.8rem;
+        }
+
+        .timeline-item {
+            padding: 9px 11px;
+            background: var(--bg-main);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px;
-            border-bottom: 1px solid var(--border-color);
+            color: var(--text-muted);
+            gap: 8px;
         }
 
-        .sidebar-header h2 {
-            font-size: 1.15rem;
-            font-weight: 700;
+        .timeline-item strong {
             color: var(--text-main);
         }
 
-        .close-btn {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            color: var(--text-muted);
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.1rem;
-            transition: var(--transition-smooth);
-        }
-
-        .close-btn:hover {
-            color: #fff;
-            background: rgba(255, 255, 255, 0.1);
-        }
-
+        /* To-Do List & Inputs */
         .todo-input-container {
             display: flex;
             gap: 6px;
@@ -787,20 +780,19 @@
         }
 
         .side-card .todo-input-container {
-            padding: 0 0 10px !important;
-            gap: 6px;
+            padding: 0 0 12px !important;
         }
 
         .todo-input-container input {
             flex: 1;
             min-width: 0;
-            padding: 8px 10px;
-            border-radius: 9px;
+            padding: 9px 11px;
+            border-radius: 10px;
             border: 1px solid var(--border-color);
             background: var(--bg-main);
-            color: #fff;
+            color: var(--text-main);
             font-family: inherit;
-            font-size: .84rem;
+            font-size: 0.85rem;
             outline: none;
         }
 
@@ -809,19 +801,10 @@
         }
 
         .todo-input-container input[type="number"] {
-            width: 46px;
-            flex: 0 0 46px;
-            padding: 8px 4px;
+            width: 50px;
+            flex: 0 0 50px;
+            padding: 9px 4px;
             text-align: center;
-        }
-
-        .todo-input-container .icon-btn {
-            flex: 0 0 34px;
-            width: 34px;
-            height: 34px;
-            border-radius: 9px;
-            font-size: 1.1rem;
-            line-height: 1;
         }
 
         .todo-toolbar {
@@ -851,7 +834,7 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 7px;
         }
 
         .todo-list li {
@@ -859,33 +842,45 @@
             align-items: center;
             justify-content: space-between;
             padding: 10px 12px;
-            border-radius: 10px;
-            background: var(--bg-card);
+            border-radius: 11px;
+            background: var(--bg-main);
             color: var(--text-main);
-            font-size: .86rem;
+            font-size: 0.85rem;
             border: 1px solid var(--border-color);
             gap: 8px;
             transition: var(--transition-smooth);
         }
 
         .todo-list li.active-focus-task {
-            border-color: var(--accent-pomo);
-            background: rgba(233, 69, 96, 0.1);
+            border-color: var(--accent-current);
+            background: var(--surface-hover);
         }
 
         .todo-list li.completed span.task-text {
             text-decoration: line-through;
             color: var(--text-muted);
-            opacity: 0.6;
+            opacity: 0.65;
+        }
+
+        .task-tag {
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 5px;
+            background: var(--surface-hover);
+            color: var(--accent-current);
+            margin-right: 6px;
+            display: inline-block;
         }
 
         .task-pomos {
             font-size: 0.74rem;
             color: var(--text-muted);
-            background: rgba(255, 255, 255, 0.06);
-            padding: 2px 6px;
+            background: var(--surface-soft);
+            padding: 3px 7px;
             border-radius: 6px;
             white-space: nowrap;
+            border: 1px solid var(--border-color);
         }
 
         .task-actions {
@@ -899,24 +894,140 @@
             border: none;
             color: var(--text-muted);
             cursor: pointer;
-            padding: 4px;
-            border-radius: 4px;
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 0.95rem;
         }
 
         .task-btn:hover {
-            color: #fff;
-            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-main);
+            background: var(--surface-hover);
+        }
+
+        /* =========================================================
+           6. DRAWER, MODALS & NOTIFICATIONS
+           ========================================================= */
+        .timer-notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-20px);
+            background: #10b981;
+            color: #ffffff;
+            padding: 12px 22px;
+            border-radius: 14px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            z-index: 10000;
+            opacity: 0;
+            pointer-events: none;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.35);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            max-width: 92vw;
+            text-align: center;
+        }
+
+        .timer-notification.show {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .eyecare-toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #0284c7;
+            color: #ffffff;
+            padding: 14px 20px;
+            border-radius: 14px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+            z-index: 9999;
+            font-size: 0.88rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            pointer-events: none;
+            max-width: calc(100vw - 32px);
+        }
+
+        .eyecare-toast.show {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -400px;
+            width: 360px;
+            max-width: 88vw;
+            height: 100vh;
+            height: 100dvh;
+            background: var(--bg-card);
+            border-right: 1px solid var(--border-color);
+            z-index: 1500;
+            display: flex;
+            flex-direction: column;
+            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 10px 0 30px rgba(0, 0, 0, 0.35);
+        }
+
+        .sidebar.open {
+            left: 0;
+        }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .close-btn {
+            background: var(--bg-main);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            width: 34px;
+            height: 34px;
+            border-radius: 9px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: var(--transition-smooth);
+        }
+
+        .close-btn:hover {
+            color: var(--text-main);
+            background: var(--surface-hover);
         }
 
         .overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, .6);
-            backdrop-filter: blur(2px);
-            z-index: 999;
+            background: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(3px);
+            z-index: 1400;
             display: none;
         }
 
@@ -931,8 +1042,9 @@
             justify-content: center;
             align-items: center;
             z-index: 2000;
-            background: rgba(0, 0, 0, .7);
+            background: rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(4px);
+            padding: 16px;
         }
 
         .modal.visible {
@@ -940,16 +1052,17 @@
         }
 
         .modal-content {
-            width: 420px;
-            max-width: 90vw;
-            max-height: 88vh;
+            width: 440px;
+            max-width: 100%;
+            max-height: 90vh;
+            max-height: 90dvh;
             overflow-y: auto;
             background: var(--bg-card);
             border: 1px solid var(--border-color);
-            border-radius: 20px;
-            padding: 26px;
+            border-radius: 22px;
+            padding: 24px;
             position: relative;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45);
         }
 
         .modal-content h2 {
@@ -967,15 +1080,26 @@
             right: 18px;
             background: var(--bg-main);
             border: 1px solid var(--border-color);
-            border-radius: 8px;
-            width: 32px;
-            height: 32px;
+            border-radius: 9px;
+            width: 34px;
+            height: 34px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: var(--text-muted);
             cursor: pointer;
             font-size: 1.2rem;
+        }
+
+        .modal-content .close:hover {
+            color: var(--text-main);
+            background: var(--surface-hover);
+        }
+
+        .setting-grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
         }
 
         .setting-group {
@@ -985,26 +1109,33 @@
         .setting-group label {
             display: block;
             color: var(--text-muted);
-            font-size: .82rem;
+            font-size: 0.8rem;
+            font-weight: 600;
             margin-bottom: 6px;
         }
 
-        .setting-group select {
+        .setting-group select,
+        .setting-group input[type="number"] {
             width: 100%;
             padding: 9px 12px;
-            border-radius: 8px;
+            border-radius: 10px;
             border: 1px solid var(--border-color);
             background: var(--bg-main);
-            color: #fff;
+            color: var(--text-main);
             font-family: inherit;
-            font-size: .9rem;
+            font-size: 0.88rem;
             outline: none;
+        }
+
+        .setting-group select:focus,
+        .setting-group input[type="number"]:focus {
+            border-color: var(--accent-current);
         }
 
         .setting-checkbox {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             margin-bottom: 10px;
             font-size: 0.84rem;
             color: var(--text-main);
@@ -1012,30 +1143,33 @@
         }
 
         .setting-checkbox input {
-            accent-color: var(--accent-pomo);
-            width: 16px;
-            height: 16px;
+            accent-color: var(--accent-current);
+            width: 17px;
+            height: 17px;
+            flex-shrink: 0;
         }
 
-        /* Premium Floating Audio Bar */
+        /* =========================================================
+           7. FLOATING AUDIO BAR & VIDEO MODE
+           ========================================================= */
         #audioBar {
             position: fixed;
-            bottom: 16px;
+            bottom: calc(14px + var(--safe-bottom));
             left: 50%;
             transform: translateX(-50%);
-            width: calc(100% - 32px);
+            width: calc(100% - 24px);
             max-width: 680px;
-            background: rgba(18, 18, 36, 0.92);
+            background: var(--bg-floating);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 10px 16px;
-            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.55), 0 0 1px rgba(255, 255, 255, 0.15) inset;
+            border-radius: 18px;
+            padding: 12px 16px;
+            box-shadow: var(--shadow-card);
             z-index: 1000;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 8px;
             transition: var(--transition-smooth);
         }
 
@@ -1048,12 +1182,14 @@
             align-items: center;
             gap: 8px;
             width: 100%;
+            flex-wrap: wrap;
         }
 
         #audioTrackName {
             flex: 1;
+            min-width: 120px;
             font-size: 0.82rem;
-            font-weight: 600;
+            font-weight: 700;
             color: var(--text-main);
             overflow: hidden;
             white-space: nowrap;
@@ -1068,11 +1204,11 @@
         }
 
         #audioBar button {
-            background: rgba(255, 255, 255, 0.06);
+            background: var(--surface-soft);
             border: 1px solid var(--border-color);
             color: var(--text-main);
-            width: 30px;
-            height: 30px;
+            width: 32px;
+            height: 32px;
             border-radius: 8px;
             display: inline-flex;
             align-items: center;
@@ -1081,68 +1217,48 @@
             font-size: 0.8rem;
             transition: var(--transition-smooth);
             flex-shrink: 0;
-            padding: 0;
         }
 
         #audioBar button:hover {
-            background: rgba(255, 255, 255, 0.14);
-            border-color: rgba(255, 255, 255, 0.25);
-            transform: scale(1.05);
+            background: var(--surface-hover);
+            border-color: var(--accent-current);
         }
 
         #audioPlayBtn {
-            background: var(--accent-pomo) !important;
+            background: var(--accent-current) !important;
             border-color: transparent !important;
-            color: #fff !important;
-            width: 34px !important;
-            height: 34px !important;
+            color: #ffffff !important;
+            width: 36px !important;
+            height: 36px !important;
             border-radius: 10px !important;
             font-size: 0.95rem !important;
-            box-shadow: 0 4px 12px -2px var(--accent-pomo);
-        }
-
-        #audioPlayBtn:hover {
-            transform: scale(1.08) !important;
-            filter: brightness(1.1);
         }
 
         #audioCloseBtn:hover {
-            background: #e94560 !important;
-            color: #fff !important;
+            background: #ef4444 !important;
+            color: #ffffff !important;
             border-color: transparent !important;
         }
 
         #audioSeek {
             flex: 1;
+            min-width: 100px;
             height: 5px;
             cursor: pointer;
-            accent-color: var(--accent-pomo);
-            border-radius: 3px;
+            accent-color: var(--accent-current);
         }
 
         #audioVolume, #audioSpeed {
-            height: 4px;
+            height: 5px;
             cursor: pointer;
             accent-color: var(--accent-short);
-            border-radius: 2px;
         }
 
         #audioAddMore {
             width: auto !important;
             padding: 2px 10px !important;
-            font-size: 0.72rem !important;
-            height: 24px !important;
-            border-radius: 6px !important;
-        }
-
-        .ambient-controls {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            background: rgba(255, 255, 255, 0.04);
-            padding: 4px 8px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
+            font-size: 0.74rem !important;
+            height: 26px !important;
         }
 
         #dropOverlay {
@@ -1154,6 +1270,7 @@
             backdrop-filter: blur(6px);
             align-items: center;
             justify-content: center;
+            padding: 20px;
         }
 
         #dropOverlay.active {
@@ -1163,11 +1280,12 @@
         #dropOverlay .drop-border {
             border: 2px dashed var(--accent-pomo);
             border-radius: 24px;
-            padding: 48px 64px;
+            padding: 40px 48px;
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 10px;
+            text-align: center;
         }
 
         .video-player {
@@ -1193,6 +1311,7 @@
 
         body.video-mode .desktop-header,
         body.video-mode .desktop-side-col,
+        body.video-mode .mobile-workspace-tabs,
         body.video-mode #topProgressBar {
             display: none !important;
         }
@@ -1211,23 +1330,25 @@
 
         body.video-mode .container {
             position: fixed;
-            top: 16px;
+            top: 14px;
             left: 50%;
-            transform: translate(-50%, -120%);
-            width: calc(100% - 32px);
-            max-width: 820px;
+            transform: translate(-50%, -130%);
+            width: calc(100% - 24px);
+            max-width: 860px;
             border-radius: 16px;
             display: flex;
             flex-direction: row;
+            flex-wrap: wrap;
             align-items: center;
             justify-content: space-between;
-            padding: 10px 20px;
+            gap: 8px;
+            padding: 10px 16px;
             z-index: 100;
-            background: rgba(15, 15, 30, 0.88);
+            background: var(--bg-floating);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5);
             transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
             opacity: 0;
             pointer-events: none;
@@ -1239,36 +1360,24 @@
             pointer-events: auto;
         }
 
-        /* Hide elements that clutter the video top bar */
         body.video-mode .progress-ring,
         body.video-mode .cycle-dots,
         body.video-mode .daily-goal-box,
-        body.video-mode .mini-stats-strip,
         body.video-mode #menuBtn,
         body.video-mode #activeTaskBadge,
         body.video-mode .hotkey-badge {
             display: none !important;
         }
 
-        /* Sleek inline mode switchers in video mode */
         body.video-mode .butto--container {
             margin: 0 !important;
             gap: 4px !important;
-            flex-wrap: nowrap;
         }
 
-        body.video-mode .butto--comand {
-            padding: 5px 10px !important;
-            font-size: 0.76rem !important;
-            border-radius: 8px !important;
-        }
-
-        /* Center clock in video mode */
         body.video-mode .clock-wrapper {
             width: auto !important;
             height: auto !important;
-            margin: 0 14px !important;
-            position: static;
+            margin: 0 8px !important;
         }
 
         body.video-mode .clock-center-content {
@@ -1278,46 +1387,12 @@
         }
 
         body.video-mode .clock {
-            font-size: 1.85rem !important;
-            font-weight: 800;
-            letter-spacing: -0.5px;
+            font-size: 1.65rem !important;
         }
 
         body.video-mode .estimated-finish-pill {
             margin-top: 0 !important;
-            font-size: 0.7rem !important;
-            padding: 1px 6px !important;
-        }
-
-        body.video-mode .timer-controls-row {
-            margin: 0 !important;
-            gap: 6px !important;
-        }
-
-        body.video-mode .butto--timer {
-            padding: 6px 14px !important;
-            font-size: 0.8rem !important;
-            border-radius: 8px !important;
-        }
-
-        body.video-mode .quick-time-btn {
-            padding: 5px 8px !important;
-            font-size: 0.72rem !important;
-            border-radius: 6px !important;
-        }
-
-        body.video-mode .icon-btn {
-            width: 32px !important;
-            height: 32px !important;
-            border-radius: 8px !important;
-        }
-
-        body.video-mode #exitVideoBtn {
-            background: #e94560 !important;
-            color: #fff !important;
-            border-color: transparent !important;
-            box-shadow: 0 0 12px rgba(233, 69, 96, 0.4);
-            margin-left: 6px;
+            font-size: 0.68rem !important;
         }
 
         .heatmap-grid {
@@ -1329,22 +1404,20 @@
 
         .heatmap-cell {
             aspect-ratio: 1;
-            border-radius: 6px;
-            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            background: var(--surface-soft);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-size: 0.68rem;
+            font-size: 0.7rem;
             color: var(--text-muted);
             border: 1px solid var(--border-color);
         }
 
-        .heatmap-cell.active-1 { background: rgba(233, 69, 96, 0.3); color: #fff; }
-
-        .heatmap-cell.active-2 { background: rgba(233, 69, 96, 0.6); color: #fff; }
-
-        .heatmap-cell.active-3 { background: rgba(233, 69, 96, 0.9); color: #fff; }
+        .heatmap-cell.active-1 { background: rgba(233, 69, 96, 0.25); color: var(--text-main); }
+        .heatmap-cell.active-2 { background: rgba(233, 69, 96, 0.55); color: #ffffff; }
+        .heatmap-cell.active-3 { background: rgba(233, 69, 96, 0.9); color: #ffffff; }
 
         .prayer-list {
             display: flex;
@@ -1365,7 +1438,89 @@
 
         .prayer-item.next-prayer {
             border-color: #10b981;
-            background: rgba(16, 185, 129, 0.1);
+            background: rgba(16, 185, 129, 0.12);
+        }
+
+        /* =========================================================
+           8. TABLET & MOBILE BREAKPOINTS
+           ========================================================= */
+        /* Tablet View (768px - 1120px): Main timer centered on top, 2 side columns below */
+        @media (max-width: 1120px) and (min-width: 768px) {
+            .workspace-wrapper {
+                grid-template-columns: 1fr 1fr;
+                max-width: 820px;
+                padding: 16px;
+            }
+            .center-col {
+                grid-column: 1 / -1;
+                order: -1;
+            }
+            .container {
+                max-width: 560px;
+            }
+        }
+
+        /* Mobile View (< 768px): Tabbed Workspace so ALL features remain accessible */
+        @media (max-width: 767px) {
+            .desktop-header {
+                padding: 10px 12px;
+            }
+            .brand-title span {
+                font-size: 0.98rem;
+            }
+            #layoutToggleBtn {
+                display: none;
+            }
+            .layout-pill-btn {
+                padding: 6px 9px;
+                font-size: 0.74rem;
+            }
+            .workspace-wrapper {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                padding: 10px 12px 24px;
+                gap: 12px;
+            }
+            .mobile-workspace-tabs {
+                display: flex;
+            }
+            .desktop-side-col {
+                display: none;
+                width: 100%;
+                max-width: 520px;
+            }
+            .desktop-side-col.mobile-tab-active {
+                display: flex;
+            }
+            .center-col.mobile-tab-hidden {
+                display: none;
+            }
+            .container {
+                padding: 16px 14px;
+                border-radius: 20px;
+            }
+            .clock-wrapper {
+                width: 205px;
+                height: 205px;
+            }
+            .hotkey-badge {
+                display: none !important;
+            }
+            .icon-btn {
+                width: 42px;
+                height: 42px;
+            }
+            .butto--comand {
+                padding: 8px 11px;
+                font-size: 0.78rem;
+            }
+            .butto--timer {
+                padding: 11px 20px;
+            }
+            .setting-grid-2 {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -1378,8 +1533,8 @@
     <div id="dropOverlay">
         <div class="drop-border">
             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent-pomo)"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-            <span style="color:#eee;font-weight:600;font-size:1.1rem">Drop media files here</span>
-            <span style="color:#888;font-size:0.85rem">Audio & Video supported</span>
+            <span style="color:#fff;font-weight:700;font-size:1.1rem">Drop media files here</span>
+            <span style="color:#cbd5e1;font-size:0.85rem">Audio & Video supported</span>
         </div>
     </div>
 
@@ -1394,43 +1549,54 @@
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/></svg>
         <div>
             <strong>Eye Care: Look 20ft away!</strong>
-            <div style="font-size:0.75rem;opacity:0.85">Relax your eyes for 20 seconds.</div>
+            <div style="font-size:0.75rem;opacity:0.9">Relax your eyes for 20 seconds.</div>
         </div>
     </div>
 
-    <!-- Top Desktop Studio Header -->
+    <!-- Top Studio Header -->
     <header class="desktop-header">
         <div class="brand-title">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="color:var(--accent-pomo)"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" style="color:var(--accent-current)"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
             <span>Pomodoro Studio</span>
         </div>
         <div class="header-actions">
+            <button id="themeQuickToggleBtn" class="layout-pill-btn" title="Switch Morning / Night Theme">
+                <span id="themeQuickIcon">☀️</span>
+                <span id="themeQuickText">Morning</span>
+            </button>
             <button id="layoutToggleBtn" class="layout-pill-btn" title="Toggle Studio / Compact Card view">
                 <span id="layoutBtnText">Compact Mode</span>
             </button>
             <button id="zenBtn" class="layout-pill-btn" title="Zen Focus Mode (Dbl-click background)">
-                <span>Zen Mode</span>
+                <span>Zen</span>
             </button>
             <button id="exportMdBtn" class="layout-pill-btn" title="Copy Daily Summary to Clipboard (Markdown)">
-                <span>Copy Summary</span>
+                <span>Summary</span>
             </button>
         </div>
     </header>
 
-    <!-- Studio 3-Column Workspace -->
+    <!-- Studio Workspace -->
     <main class="workspace-wrapper">
+        <!-- Mobile & Compact Tab Switcher -->
+        <nav class="mobile-workspace-tabs hide-in-zen" aria-label="Workspace Sections">
+            <button type="button" class="mobile-tab-btn active" data-tab="timer">⏱️ Timer</button>
+            <button type="button" class="mobile-tab-btn" data-tab="tasks">📋 Tasks & Notes</button>
+            <button type="button" class="mobile-tab-btn" data-tab="ambient">🎧 Mixer & Log</button>
+        </nav>
+
         <!-- LEFT COLUMN: Tasks & Scratchpad -->
-        <aside class="desktop-side-col">
+        <aside id="leftSideCol" class="desktop-side-col">
             <!-- Active & To-Do Card -->
             <div class="side-card">
                 <div class="side-card-title">
                     <span>Tasks & Priorities</span>
-                    <button id="dockClearDoneBtn" style="background:none;border:none;color:var(--text-muted);font-size:0.75rem;cursor:pointer">Clear Done</button>
+                    <button id="dockClearDoneBtn" style="background:none;border:none;color:var(--text-muted);font-size:0.76rem;cursor:pointer;font-weight:600">Clear Done</button>
                 </div>
                 <div class="todo-input-container">
                     <input type="text" id="todoInput" placeholder="Add task with #tag...">
-                    <input type="number" id="todoPomoEst" value="1" min="1" max="10" title="Estimated Pomodoros">
-                    <button id="addTodoBtn" class="icon-btn" style="background:var(--accent-pomo);color:#fff">+</button>
+                    <input type="number" id="todoPomoEst" value="1" min="1" max="20" title="Estimated Pomodoros">
+                    <button id="addTodoBtn" class="icon-btn" style="background:var(--accent-current);color:#fff;border:none" aria-label="Add Task">+</button>
                 </div>
                 <ul id="todoList" class="todo-list" style="max-height:260px;padding:0;"></ul>
             </div>
@@ -1439,14 +1605,14 @@
             <div class="side-card">
                 <div class="side-card-title">
                     <span>Brain Dump / Scratchpad</span>
-                    <span style="font-size:0.7rem;color:var(--text-muted)">Auto-saved</span>
+                    <span style="font-size:0.72rem;color:var(--text-muted)">Auto-saved</span>
                 </div>
-                <textarea id="scratchpadNotes" class="scratchpad-textarea" placeholder="Jot down distracting thoughts or quick ideas here to keep your mind clear..."></textarea>
+                <textarea id="scratchpadNotes" class="scratchpad-textarea" placeholder="Jot down distracting thoughts or quick study notes here to keep your mind clear..."></textarea>
             </div>
         </aside>
 
         <!-- CENTER COLUMN: Focus Clock & Hero Controls -->
-        <div class="center-col">
+        <div id="centerTimerCol" class="center-col">
             <div id="Container" class="container" data-mode="pomodoro">
                 <!-- Modes Switcher -->
                 <div class="butto--container hide-in-zen">
@@ -1499,10 +1665,10 @@
                     <button id="quickPlus" class="quick-time-btn hide-in-zen" title="+5 Minutes">+5m</button>
                 </div>
 
-                <!-- Utility Action Row with Clean SVG Icons -->
+                <!-- Utility Action Row -->
                 <div class="butto--container hide-in-zen" style="margin-top: 10px;">
                     <button id="settingsBtn" class="icon-btn" title="Settings">
-                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
                     </button>
                     <button id="statsBtn" class="icon-btn" title="Stats & History">
                         <svg viewBox="0 0 24 24"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
@@ -1521,12 +1687,11 @@
                     </button>
                     <button id="fullscreenBtn" class="icon-btn" title="Fullscreen (F)">
                         <svg viewBox="0 0 24 24"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
-                        <span class="hotkey-badge" style="position:absolute;bottom:2px;right:2px;font-size:0.55rem">F</span>
                     </button>
                     <button id="audioToggleBtn" class="icon-btn" title="Show/Hide Bottom Audio" hidden>
                         <svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
                     </button>
-                    <button id="exitVideoBtn" class="icon-btn" title="Close Video" hidden style="background:#e94560;color:#fff;">
+                    <button id="exitVideoBtn" class="icon-btn" title="Close Video" hidden style="background:#ef4444;color:#fff;border:none">
                         <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                     </button>
                 </div>
@@ -1547,12 +1712,12 @@
         </div>
 
         <!-- RIGHT COLUMN: Atmosphere Mixer & Session Timeline -->
-        <aside class="desktop-side-col">
+        <aside id="rightSideCol" class="desktop-side-col">
             <!-- 4-Channel Ambient Atmosphere Mixer -->
             <div class="side-card">
                 <div class="side-card-title">
                     <span>Atmosphere Sound Mixer</span>
-                    <button id="masterAmbientMute" style="background:none;border:none;color:var(--accent-current);font-size:0.75rem;cursor:pointer">Mute All</button>
+                    <button id="masterAmbientMute" style="background:none;border:none;color:var(--accent-current);font-size:0.76rem;font-weight:700;cursor:pointer">Mute All</button>
                 </div>
                 <div class="ambient-mixer-grid">
                     <div class="mixer-channel">
@@ -1581,22 +1746,22 @@
                     <span id="sideSessionCount" style="font-size:0.75rem;color:var(--text-muted)">0 Done</span>
                 </div>
                 <div id="sessionTimeline" class="session-timeline">
-                    <div style="color:var(--text-muted);font-size:0.76rem;text-align:center;padding:12px 0;">No sessions completed today yet.</div>
+                    <div style="color:var(--text-muted);font-size:0.78rem;text-align:center;padding:12px 0;">No sessions completed today yet.</div>
                 </div>
             </div>
         </aside>
     </main>
 
-    <!-- Sidebar To-Do Drawer (For Mobile & Compact view) -->
+    <!-- Sidebar To-Do Drawer -->
     <div id="sidebar" class="sidebar">
         <div class="sidebar-header">
             <h2>Tasks & Focus</h2>
-            <button id="closeSidebar" class="close-btn">&times;</button>
+            <button id="closeSidebar" class="close-btn" aria-label="Close drawer">&times;</button>
         </div>
         <div class="todo-input-container">
-            <input type="text" id="drawerTodoInput" placeholder="Add task...">
-            <input type="number" id="drawerTodoPomoEst" value="1" min="1" max="10" title="Estimated Pomodoros" style="width:60px">
-            <button id="drawerAddTodoBtn" class="icon-btn" style="background:var(--accent-pomo);color:#fff">+</button>
+            <input type="text" id="drawerTodoInput" placeholder="Add task with #tag...">
+            <input type="number" id="drawerTodoPomoEst" value="1" min="1" max="20" title="Estimated Pomodoros">
+            <button id="drawerAddTodoBtn" class="icon-btn" style="background:var(--accent-current);color:#fff;border:none" aria-label="Add Task">+</button>
         </div>
         <div class="todo-toolbar">
             <span>Click to toggle | 🎯 Focus</span>
@@ -1609,49 +1774,52 @@
     <div id="overlay" class="overlay"></div>
 
     <!-- Ambient Video Player -->
-    <video id="videoPlayer" class="video-player" controls hidden></video>
+    <video id="videoPlayer" class="video-player" controls playsinline hidden></video>
     <canvas id="pipCanvas" width="300" height="300" style="display:none"></canvas>
 
     <!-- Settings Modal -->
     <div id="settingsModal" class="modal">
         <div class="modal-content">
-            <span id="closeSettings" class="close">&times;</span>
-            <h2>Settings</h2>
+            <button id="closeSettings" class="close" aria-label="Close settings">&times;</button>
+            <h2>⚙️ Studio Settings</h2>
             
             <div class="setting-group">
-                <label>Theme</label>
+                <label for="themeSelect">Color Theme</label>
                 <select id="themeSelect">
-                    <option value="midnight">Deep Midnight</option>
-                    <option value="forest">Forest Green</option>
-                    <option value="charcoal">Minimal Charcoal</option>
-                    <option value="oled">OLED Ultra-Black</option>
+                    <option value="morning">☀️ Morning Daylight (صباحي مشرق)</option>
+                    <option value="midnight">🌙 Deep Midnight (ليلي هادئ)</option>
+                    <option value="forest">🌲 Forest Green (أخضر غابات)</option>
+                    <option value="charcoal">🪨 Minimal Charcoal (رمادي داكن)</option>
+                    <option value="oled">🖤 OLED Ultra-Black (أسود عميق)</option>
                 </select>
             </div>
 
-            <div class="setting-group">
-                <label>Pomodoro Duration (min)</label>
-                <input type="number" id="pomodoroTime" value="25" min="1">
-            </div>
-            <div class="setting-group">
-                <label>Short Break Duration (min)</label>
-                <input type="number" id="shortBreakTime" value="5" min="1">
-            </div>
-            <div class="setting-group">
-                <label>Long Break Duration (min)</label>
-                <input type="number" id="longBreakTime" value="15" min="1">
-            </div>
-            <div class="setting-group">
-                <label>Daily Pomodoros Target</label>
-                <input type="number" id="dailyTargetInput" value="8" min="1" max="30">
+            <div class="setting-grid-2">
+                <div class="setting-group">
+                    <label for="pomodoroTime">Pomodoro (min)</label>
+                    <input type="number" id="pomodoroTime" value="25" min="1" max="180">
+                </div>
+                <div class="setting-group">
+                    <label for="shortBreakTime">Short Break (min)</label>
+                    <input type="number" id="shortBreakTime" value="5" min="1" max="60">
+                </div>
+                <div class="setting-group">
+                    <label for="longBreakTime">Long Break (min)</label>
+                    <input type="number" id="longBreakTime" value="15" min="1" max="90">
+                </div>
+                <div class="setting-group">
+                    <label for="dailyTargetInput">Daily Goal (Sessions)</label>
+                    <input type="number" id="dailyTargetInput" value="8" min="1" max="30">
+                </div>
             </div>
 
             <div class="setting-group">
-                <label>Alarm Sound</label>
+                <label for="alarmSoundSelect">Alarm Sound</label>
                 <select id="alarmSoundSelect">
                     <option value="beep">Digital Beep (Double)</option>
                     <option value="bell">Zen Singing Bowl</option>
                     <option value="chime">Gentle Marimba</option>
-                    <option value="radar">Soft Pulse</option>
+                    <option value="radar">Soft Pulse Radar</option>
                 </select>
             </div>
 
@@ -1661,7 +1829,7 @@
             </label>
             <label class="setting-checkbox">
                 <input type="checkbox" id="autoAudioSyncCheck" checked>
-                Auto-sync audio with session mode
+                Auto-sync audio player with session start/pause
             </label>
             <label class="setting-checkbox">
                 <input type="checkbox" id="boxBreathingCheck" checked>
@@ -1689,25 +1857,25 @@
             </label>
             <label class="setting-checkbox">
                 <input type="checkbox" id="desktopNotifCheck">
-                Desktop notifications
+                Browser notifications
             </label>
 
-            <button id="saveSettings" class="butto butto--timer" style="width:100%;margin-top:16px">Save Settings</button>
+            <button id="saveSettings" class="butto butto--timer" style="width:100%;margin-top:14px">Save Settings</button>
         </div>
     </div>
 
     <!-- Stats & History Modal -->
     <div id="statsModal" class="modal">
         <div class="modal-content">
-            <span id="closeStats" class="close">&times;</span>
-            <h2>Stats & Continuity</h2>
-            <div style="font-size:0.9rem;line-height:1.6;color:var(--text-muted)">
+            <button id="closeStats" class="close" aria-label="Close stats">&times;</button>
+            <h2>📊 Stats & Continuity</h2>
+            <div style="font-size:0.9rem;line-height:1.7;color:var(--text-muted)">
                 <p>Total Completed Sessions: <strong id="statTotalPomos" style="color:var(--text-main)">0</strong></p>
                 <p>Total Focus Time: <strong id="statTotalMinutes" style="color:var(--text-main)">0 min</strong></p>
             </div>
 
             <div style="margin-top:16px;">
-                <label style="font-size:0.8rem;color:var(--text-muted)">Last 7 Days Activity</label>
+                <label style="font-size:0.8rem;font-weight:600;color:var(--text-muted)">Last 7 Days Activity</label>
                 <div id="heatmapGrid" class="heatmap-grid"></div>
             </div>
 
@@ -1722,16 +1890,16 @@
     <!-- Prayer Times Modal -->
     <div id="prayerModal" class="modal">
         <div class="modal-content" style="width:400px;">
-            <span id="closePrayer" class="close">&times;</span>
+            <button id="closePrayer" class="close" aria-label="Close prayer times">&times;</button>
             <h2>🕌 Prayer Times</h2>
             <div style="display:flex;gap:6px;margin-bottom:12px;">
-                <button id="offlinePrayerTab" class="butto butto--comand active-mode" style="flex:1">Offline Times</button>
-                <button id="onlinePrayerTab" class="butto butto--comand" style="flex:1">Widget</button>
+                <button id="offlinePrayerTab" class="butto butto--comand active-mode" style="flex:1">Local Times</button>
+                <button id="onlinePrayerTab" class="butto butto--comand" style="flex:1">Online Widget</button>
             </div>
 
             <div id="offlinePrayerView">
                 <div class="prayer-list" id="prayerListContainer"></div>
-                <p style="font-size:0.75rem;color:var(--text-muted);margin-top:10px;text-align:center;">Calculated locally for current day (Cairo angle)</p>
+                <p style="font-size:0.75rem;color:var(--text-muted);margin-top:10px;text-align:center;">Calculated locally for current day (Egypt / Cairo coordinates)</p>
             </div>
 
             <div id="onlinePrayerView" style="display:none;justify-content:center">
@@ -1748,8 +1916,8 @@
     <div id="audioBar" hidden>
         <div class="ab-row">
             <span id="audioTrackName">—</span>
-            <span id="audioTimeDisplay" style="color:var(--text-muted);font-size:.76rem">0:00 / 0:00</span>
-            <button id="audioMuteBtn" title="Mute">
+            <span id="audioTimeDisplay">0:00 / 0:00</span>
+            <button id="audioMuteBtn" title="Mute (M)">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
             </button>
             <input type="range" id="audioVolume" min="0" max="100" value="100" step="1" style="width:65px">
@@ -1765,12 +1933,12 @@
             <input type="range" id="audioSeek" min="0" max="100" value="0" step="0.1">
         </div>
         <div class="ab-row">
-            <span style="color:var(--text-muted);font-size:.72rem">Speed:</span>
-            <input type="range" id="audioSpeed" min="1" max="3" value="1" step="0.1" style="width:75px">
-            <span id="audioSpeedVal" style="color:var(--text-muted);font-size:.72rem;min-width:28px">1x</span>
+            <span style="color:var(--text-muted);font-size:.74rem">Speed:</span>
+            <input type="range" id="audioSpeed" min="0.5" max="2.5" value="1" step="0.1" style="width:75px">
+            <span id="audioSpeedVal" style="color:var(--text-muted);font-size:.74rem;min-width:30px">1.0x</span>
             <span style="flex:1"></span>
             <button id="audioAddMore" title="Add files">+ Files</button>
-            <span id="audioPlaylistInfo" style="color:var(--text-muted);font-size:.72rem"></span>
+            <span id="audioPlaylistInfo" style="color:var(--text-muted);font-size:.74rem"></span>
         </div>
     </div>
 
@@ -1779,15 +1947,15 @@
         // =============================================================
         // 1. STATE & LOCALSTORAGE INIT
         // =============================================================
-        const Button_Labels = { Start: "Start", Stop: "Stop", Reset: "Reset" };
+        const Button_Labels = { Start: "Start", Stop: "Pause", Reset: "Reset" };
         const Status_Types = { STOPPED: 0, STARTED: 1 };
 
         let defaultPomo = parseInt(localStorage.getItem('pomoTime')) || 25;
         let defaultShort = parseInt(localStorage.getItem('shortTime')) || 5;
         let defaultLong = parseInt(localStorage.getItem('longTime')) || 15;
         let dailyTarget = parseInt(localStorage.getItem('dailyTarget')) || 8;
-        let currentTheme = localStorage.getItem('pomoTheme') || 'midnight';
-        let currentLayout = localStorage.getItem('pomoLayout') || 'studio'; // 'studio' or 'compact'
+        let currentTheme = localStorage.getItem('pomoTheme') || 'morning';
+        let currentLayout = localStorage.getItem('pomoLayout') || 'studio';
         let alarmSound = localStorage.getItem('alarmSound') || 'beep';
         let autoStartNext = localStorage.getItem('autoStartNext') === 'true';
         let autoAudioSync = localStorage.getItem('autoAudioSync') !== 'false';
@@ -1798,11 +1966,6 @@
         let strictSilent = localStorage.getItem('strictSilent') === 'true';
         let meshGradient = localStorage.getItem('meshGradient') === 'true';
         let desktopNotif = localStorage.getItem('desktopNotif') === 'true';
-
-        // Apply attributes to DOM
-        document.documentElement.dataset.theme = currentTheme;
-        document.documentElement.dataset.layout = currentLayout;
-        if (meshGradient) document.body.classList.add('mesh-gradient-active');
 
         // Timer Runtime
         let minutes = defaultPomo;
@@ -1823,7 +1986,7 @@
         let totalPomosCount = parseInt(localStorage.getItem('totalPomosCount')) || 0;
         let totalFocusMinutes = parseInt(localStorage.getItem('totalFocusMinutes')) || 0;
 
-        // Elements
+        // DOM Elements
         const container = document.getElementById("Container");
         const starTimerBtn = document.getElementById("startStop");
         const resetTimerBtn = document.getElementById("reset");
@@ -1849,14 +2012,15 @@
         const scratchpadNotes = document.getElementById("scratchpadNotes");
         const layoutToggleBtn = document.getElementById("layoutToggleBtn");
         const layoutBtnText = document.getElementById("layoutBtnText");
+        const themeQuickToggleBtn = document.getElementById("themeQuickToggleBtn");
+        const themeQuickIcon = document.getElementById("themeQuickIcon");
+        const themeQuickText = document.getElementById("themeQuickText");
         const zenBtn = document.getElementById("zenBtn");
         const exportMdBtn = document.getElementById("exportMdBtn");
 
-        // Radius = 150 -> Circumference = 2 * PI * 150 = 942.48
         const CIRCUMFERENCE = 942.48;
         progressCircle.style.strokeDasharray = CIRCUMFERENCE;
 
-        // Modes map
         const modeButtons = {
             pomodoro: document.getElementById("pomodoro"),
             short: document.getElementById("break"),
@@ -1871,24 +2035,73 @@
         };
 
         // =============================================================
-        // 2. THEMES & COLOR HANDLING
+        // 2. THEMES, FAVICON & COLOR HANDLING
         // =============================================================
-        const updateAccentColor = () => {
-            let color = 'var(--accent-pomo)';
-            if (currentMode === 'short') color = 'var(--accent-short)';
-            else if (currentMode === 'long') color = 'var(--accent-long)';
-            else if (currentMode === 'infinity') color = 'var(--accent-infinity)';
-            document.documentElement.style.setProperty('--accent-current', color);
-            topProgressBar.style.background = color;
+        const updateThemeUI = () => {
+            document.documentElement.dataset.theme = currentTheme;
+            localStorage.setItem('pomoTheme', currentTheme);
+            const themeSelectEl = document.getElementById("themeSelect");
+            if (themeSelectEl) themeSelectEl.value = currentTheme;
+
+            if (currentTheme === 'morning') {
+                themeQuickIcon.textContent = '🌙';
+                themeQuickText.textContent = 'Night';
+            } else {
+                themeQuickIcon.textContent = '☀️';
+                themeQuickText.textContent = 'Morning';
+            }
+            updateAccentColor();
         };
 
+        const updateAccentColor = () => {
+            let colorVar = 'var(--accent-pomo)';
+            let hexFallback = '#e94560';
+            if (currentMode === 'short') { colorVar = 'var(--accent-short)'; hexFallback = '#10b981'; }
+            else if (currentMode === 'long') { colorVar = 'var(--accent-long)'; hexFallback = '#3b82f6'; }
+            else if (currentMode === 'infinity') { colorVar = 'var(--accent-infinity)'; hexFallback = '#8b5cf6'; }
+
+            document.documentElement.style.setProperty('--accent-current', colorVar);
+            topProgressBar.style.background = colorVar;
+
+            if (pageFavicon) {
+                pageFavicon.href = `data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2246%22 fill=%22${encodeURIComponent(hexFallback)}%22/></svg>`;
+            }
+        };
+
+        themeQuickToggleBtn.onclick = () => {
+            currentTheme = (currentTheme === 'morning') ? 'midnight' : 'morning';
+            updateThemeUI();
+        };
+
+        if (meshGradient) document.body.classList.add('mesh-gradient-active');
+        updateThemeUI();
+
         // =============================================================
-        // 3. LAYOUT & ZEN TOGGLE
+        // 3. LAYOUT, MOBILE TABS & ZEN TOGGLE
         // =============================================================
+        const leftSideCol = document.getElementById('leftSideCol');
+        const rightSideCol = document.getElementById('rightSideCol');
+        const centerTimerCol = document.getElementById('centerTimerCol');
+        const mobileTabBtns = document.querySelectorAll('.mobile-tab-btn');
+
+        const setMobileWorkspaceTab = (tabName) => {
+            mobileTabBtns.forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tabName));
+            centerTimerCol.classList.toggle('mobile-tab-hidden', tabName !== 'timer');
+            leftSideCol.classList.toggle('mobile-tab-active', tabName === 'tasks');
+            rightSideCol.classList.toggle('mobile-tab-active', tabName === 'ambient');
+        };
+
+        mobileTabBtns.forEach(btn => {
+            btn.onclick = () => setMobileWorkspaceTab(btn.dataset.tab);
+        });
+
         const updateLayoutDisplay = () => {
             document.documentElement.dataset.layout = currentLayout;
             layoutBtnText.textContent = (currentLayout === 'studio') ? 'Compact Mode' : 'Studio Mode';
             localStorage.setItem('pomoLayout', currentLayout);
+            if (currentLayout === 'studio' && window.innerWidth > 767) {
+                setMobileWorkspaceTab('timer');
+            }
         };
         updateLayoutDisplay();
 
@@ -1902,15 +2115,11 @@
         };
 
         document.body.ondblclick = (e) => {
-            // Once inside Zen mode, exit on a double-click anywhere at all —
-            // the header/button that normally toggles it is intentionally
-            // hidden while zen-active, so this must not be limited to a
-            // specific background element or the user gets stuck.
             if (document.body.classList.contains('zen-active')) {
                 document.body.classList.remove('zen-active');
                 return;
             }
-            if (e.target === document.body || e.target === container || e.target.classList.contains('workspace-wrapper')) {
+            if (e.target === document.body || e.target.classList.contains('workspace-wrapper')) {
                 document.body.classList.add('zen-active');
             }
         };
@@ -1920,7 +2129,7 @@
         // =============================================================
         let wakeLockSentinel = null;
         const requestWakeLock = async () => {
-            if (!keepWakeLock || currentMode !== 'pomodoro') return;
+            if (!keepWakeLock || status !== Status_Types.STARTED) return;
             try {
                 if ('wakeLock' in navigator) wakeLockSentinel = await navigator.wakeLock.request('screen');
             } catch (err) {}
@@ -1928,6 +2137,12 @@
         const releaseWakeLock = () => {
             if (wakeLockSentinel) { wakeLockSentinel.release().catch(() => {}); wakeLockSentinel = null; }
         };
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible' && status === Status_Types.STARTED) {
+                requestWakeLock();
+            }
+        });
 
         // =============================================================
         // 5. WEB AUDIO & 4-CHANNEL AMBIENT ATMOSPHERE MIXER
@@ -1939,15 +2154,14 @@
             return audioCtx;
         };
 
-        // Channel Nodes
         let noiseNodes = { rain: null, ocean: null, wind: null, brown: null };
         let gainNodes = { rain: null, ocean: null, wind: null, brown: null };
 
         const setupMixerChannels = () => {
             const ctx = getAudioContext();
-            
-            // Brown Noise
             const bufferSize = 2 * ctx.sampleRate;
+
+            // Brown Noise Buffer
             const brownBuf = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
             const bOut = brownBuf.getChannelData(0);
             let lastOut = 0.0;
@@ -1966,12 +2180,14 @@
             gainNodes.brown.connect(ctx.destination);
             noiseNodes.brown.start();
 
-            // Rain (White noise filtered with Bandpass)
-            const rainBuf = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-            const rOut = rainBuf.getChannelData(0);
+            // White Noise Buffer for Rain & Wind
+            const whiteBuf = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+            const rOut = whiteBuf.getChannelData(0);
             for (let i = 0; i < bufferSize; i++) rOut[i] = Math.random() * 2 - 1;
+
+            // Rain
             noiseNodes.rain = ctx.createBufferSource();
-            noiseNodes.rain.buffer = rainBuf;
+            noiseNodes.rain.buffer = whiteBuf;
             noiseNodes.rain.loop = true;
             const rainFilter = ctx.createBiquadFilter();
             rainFilter.type = 'lowpass';
@@ -1983,9 +2199,9 @@
             gainNodes.rain.connect(ctx.destination);
             noiseNodes.rain.start();
 
-            // Wind (Low frequency oscillation)
+            // Wind
             noiseNodes.wind = ctx.createBufferSource();
-            noiseNodes.wind.buffer = rainBuf;
+            noiseNodes.wind.buffer = whiteBuf;
             noiseNodes.wind.loop = true;
             const windFilter = ctx.createBiquadFilter();
             windFilter.type = 'bandpass';
@@ -1997,7 +2213,7 @@
             gainNodes.wind.connect(ctx.destination);
             noiseNodes.wind.start();
 
-            // Ocean (Sine modulation wave)
+            // Ocean
             noiseNodes.ocean = ctx.createBufferSource();
             noiseNodes.ocean.buffer = brownBuf;
             noiseNodes.ocean.loop = true;
@@ -2018,7 +2234,7 @@
             const gain = gainNodes[channel];
             if (!gain) return;
             const val = (percent / 100) * 0.08;
-            gain.gain.setTargetAtTime(val, audioCtx.currentTime, 0.2); // Smooth fade
+            gain.gain.setTargetAtTime(val, audioCtx.currentTime, 0.2);
         };
 
         document.getElementById('volRain').oninput = (e) => setChannelVolume('rain', e.target.value);
@@ -2051,10 +2267,10 @@
                 gain.connect(ctx.destination);
                 osc.start();
                 osc.stop(ctx.currentTime + 0.03);
-            } catch(e) {}
+            } catch (e) {}
         };
 
-        // Alarms
+        // Alarms (Fixed distinct sounds for all 4 options: beep, bell, chime, radar)
         const playAlarmChime = () => {
             if (strictSilent) return;
             const ctx = getAudioContext();
@@ -2073,29 +2289,48 @@
                     osc.start(time);
                     osc.stop(time + 0.12);
                 };
-                playBeep(now, 880); playBeep(now + 0.15, 880); playBeep(now + 0.45, 880);
+                playBeep(now, 880);
+                playBeep(now + 0.16, 880);
+                playBeep(now + 0.45, 1046.5);
             } else if (alarmSound === 'bell') {
                 [440, 880, 1320].forEach(f => {
                     const osc = ctx.createOscillator();
                     const gain = ctx.createGain();
                     osc.frequency.setValueAtTime(f, now);
-                    gain.gain.setValueAtTime(0.15, now);
-                    gain.gain.exponentialRampToValueAtTime(0.0001, now + 2.5);
+                    gain.gain.setValueAtTime(0.14, now);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, now + 2.4);
                     osc.connect(gain);
                     gain.connect(ctx.destination);
-                    osc.start(now); osc.stop(now + 2.5);
+                    osc.start(now);
+                    osc.stop(now + 2.4);
+                });
+            } else if (alarmSound === 'radar') {
+                [0, 0.35, 0.7].forEach(offset => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(587.33, now + offset);
+                    osc.frequency.exponentialRampToValueAtTime(880, now + offset + 0.22);
+                    gain.gain.setValueAtTime(0.16, now + offset);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + offset + 0.25);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(now + offset);
+                    osc.stop(now + offset + 0.25);
                 });
             } else {
+                // Gentle Marimba Chime
                 [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => {
                     const osc = ctx.createOscillator();
                     const gain = ctx.createGain();
                     osc.type = 'triangle';
-                    osc.frequency.setValueAtTime(f, now + i * 0.1);
-                    gain.gain.setValueAtTime(0.2, now + i * 0.1);
-                    gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.1 + 0.6);
+                    osc.frequency.setValueAtTime(f, now + i * 0.11);
+                    gain.gain.setValueAtTime(0.2, now + i * 0.11);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.11 + 0.6);
                     osc.connect(gain);
                     gain.connect(ctx.destination);
-                    osc.start(now + i * 0.1); osc.stop(now + i * 0.1 + 0.6);
+                    osc.start(now + i * 0.11);
+                    osc.stop(now + i * 0.11 + 0.6);
                 });
             }
         };
@@ -2104,22 +2339,30 @@
         // 6. NOTIFICATIONS & 20-20-20 EYE CARE REMINDER
         // =============================================================
         let notifTimer = null;
-        const triggerNotification = (msg) => {
+
+        // UI Toast without triggering alarm chime or stopping music
+        const showToast = (msg) => {
             notifMessage.textContent = msg;
             timerNotification.classList.add('show');
+            if (notifTimer) clearTimeout(notifTimer);
+            notifTimer = setTimeout(() => { timerNotification.classList.remove('show'); }, 3500);
+        };
+
+        // Timer Completion Notification
+        const triggerAlarmNotification = (msg) => {
+            showToast(msg);
             playAlarmChime();
 
             if (desktopNotif && "Notification" in window && Notification.permission === "granted") {
                 new Notification("Pomodoro Studio", { body: msg });
             }
 
-            if (!audio.paused) { audio.pause(); audioPlayBtn.textContent = '▶'; }
-
-            if (notifTimer) clearTimeout(notifTimer);
-            notifTimer = setTimeout(() => { timerNotification.classList.remove('show'); }, 4000);
+            if (autoAudioSync && !audio.paused) {
+                audio.pause();
+                audioPlayBtn.textContent = '▶';
+            }
         };
 
-        // Eye Care Timer (Every 20 minutes)
         setInterval(() => {
             if (eyeCareReminder && status === Status_Types.STARTED) {
                 eyeCareToast.classList.add('show');
@@ -2130,14 +2373,18 @@
         // =============================================================
         // 7. CORE TIMER ENGINE
         // =============================================================
-        const getFormattedNumber = (n) => (n > 9 ? n : `0${n}`);
+        const getFormattedNumber = (n) => (n > 9 ? `${n}` : `0${n}`);
 
         const updateEstimatedFinishTime = () => {
-            if (currentMode === 'infinity' || status === Status_Types.STOPPED) {
+            if (currentMode === 'infinity') {
+                estimatedFinishPill.textContent = 'Stopwatch Mode';
+                return;
+            }
+            if (status === Status_Types.STOPPED) {
                 estimatedFinishPill.textContent = 'Ends at —:—';
                 return;
             }
-            const remainingSec = minutes * 60 + seconds;
+            const remainingSec = isOvertime ? 0 : (minutes * 60 + seconds);
             const end = new Date(Date.now() + remainingSec * 1000);
             estimatedFinishPill.textContent = `Ends at ${getFormattedNumber(end.getHours())}:${getFormattedNumber(end.getMinutes())}`;
         };
@@ -2145,20 +2392,22 @@
         const updateDisplay = () => {
             let str = '';
             if (currentMode === 'infinity') {
+                counterElement.classList.add('infinity-font');
                 str = `${getFormattedNumber(hours)}:${getFormattedNumber(minutes)}:${getFormattedNumber(seconds)}`;
             } else {
+                counterElement.classList.remove('infinity-font');
                 str = `${getFormattedNumber(minutes)}:${getFormattedNumber(seconds)}`;
             }
             counterElement.textContent = str;
             document.title = `(${str}) Pomodoro Studio`;
 
             if (currentMode !== 'infinity') {
-                const total = timerTotalSeconds || 1;
+                const total = Math.max(1, timerTotalSeconds);
                 const remaining = minutes * 60 + seconds;
                 const frac = isOvertime ? 0 : Math.max(0, Math.min(1, remaining / total));
                 const offset = CIRCUMFERENCE - (frac * CIRCUMFERENCE);
                 progressCircle.style.strokeDashoffset = offset;
-                topProgressBar.style.width = `${((total - remaining) / total) * 100}%`;
+                topProgressBar.style.width = isOvertime ? '100%' : `${((total - remaining) / total) * 100}%`;
             } else {
                 progressCircle.style.strokeDashoffset = 0;
                 topProgressBar.style.width = '100%';
@@ -2200,6 +2449,10 @@
         const tickStopwatchUp = () => {
             const elapsedMs = Date.now() - timerStartTime;
             const totalSec = Math.floor(elapsedMs / 1000) + timerBaseSeconds;
+            if (totalSec !== lastTickSec) {
+                lastTickSec = totalSec;
+                incrementActiveTaskTime();
+            }
             hours = Math.floor(totalSec / 3600);
             minutes = Math.floor((totalSec % 3600) / 60);
             seconds = totalSec % 60;
@@ -2208,7 +2461,11 @@
         };
 
         const onTimerCompleted = () => {
-            triggerNotification(currentMode === 'pomodoro' ? "🎉 Session finished! Enjoy your break." : "⚡ Break is over! Let's get to work.");
+            triggerAlarmNotification(
+                currentMode === 'pomodoro'
+                    ? "🎉 Session finished! Enjoy your break."
+                    : "⚡ Break is over! Let's get back to focus."
+            );
 
             if (currentMode === 'pomodoro') {
                 completedCycles++;
@@ -2230,25 +2487,41 @@
             getAudioContext();
             if (status === Status_Types.STOPPED) {
                 timerStartTime = Date.now();
+                lastTickSec = -1;
                 if (currentMode === 'infinity') {
                     interval = setInterval(tickStopwatchUp, 250);
                 } else {
-                    if (!isOvertime) timerTotalSeconds = (timerTotalSeconds > 0) ? timerTotalSeconds : (minutes * 60 + seconds);
+                    if (!isOvertime && timerTotalSeconds <= 0) {
+                        timerTotalSeconds = minutes * 60 + seconds;
+                    }
                     interval = setInterval(tickCountdown, 250);
                 }
                 starTimerBtn.querySelector('span:first-child').textContent = Button_Labels.Stop;
                 status = Status_Types.STARTED;
                 requestWakeLock();
+
+                if (autoAudioSync && currentMode === 'pomodoro' && playlist.length > 0 && audio.paused) {
+                    audio.play().then(() => { audioPlayBtn.textContent = '⏸'; }).catch(() => {});
+                }
             } else {
                 clearInterval(interval);
                 interval = null;
-                const elapsedMs = Date.now() - timerStartTime;
-                timerBaseSeconds += Math.floor(elapsedMs / 1000);
+                if (timerStartTime) {
+                    const elapsedMs = Date.now() - timerStartTime;
+                    timerBaseSeconds += Math.floor(elapsedMs / 1000);
+                }
                 timerStartTime = null;
                 starTimerBtn.querySelector('span:first-child').textContent = Button_Labels.Start;
                 status = Status_Types.STOPPED;
                 releaseWakeLock();
+                localStorage.setItem('todos', JSON.stringify(todos));
+
+                if (autoAudioSync && !audio.paused) {
+                    audio.pause();
+                    audioPlayBtn.textContent = '▶';
+                }
             }
+            updateDisplay();
             saveTimerState();
         };
 
@@ -2257,9 +2530,12 @@
             interval = null;
             status = Status_Types.STOPPED;
             starTimerBtn.querySelector('span:first-child').textContent = Button_Labels.Start;
-            seconds = 0; hours = 0; isOvertime = false;
+            seconds = 0;
+            hours = 0;
+            isOvertime = false;
             overtimeBadge.style.display = 'none';
-            timerStartTime = null; timerBaseSeconds = 0;
+            timerStartTime = null;
+            timerBaseSeconds = 0;
             releaseWakeLock();
 
             if (currentMode === 'pomodoro') minutes = defaultPomo;
@@ -2278,9 +2554,12 @@
             currentMode = mode;
             status = Status_Types.STOPPED;
             starTimerBtn.querySelector('span:first-child').textContent = Button_Labels.Start;
-            seconds = 0; hours = 0; isOvertime = false;
+            seconds = 0;
+            hours = 0;
+            isOvertime = false;
             overtimeBadge.style.display = 'none';
-            timerStartTime = null; timerBaseSeconds = 0;
+            timerStartTime = null;
+            timerBaseSeconds = 0;
             releaseWakeLock();
 
             if (mode === 'pomodoro') {
@@ -2288,10 +2567,10 @@
                 document.body.classList.remove('breathing-active');
             } else if (mode === 'short') {
                 minutes = defaultShort;
-                if (boxBreathing) document.body.classList.add('breathing-active');
+                document.body.classList.toggle('breathing-active', boxBreathing);
             } else if (mode === 'long') {
                 minutes = defaultLong;
-                if (boxBreathing) document.body.classList.add('breathing-active');
+                document.body.classList.toggle('breathing-active', boxBreathing);
             } else if (mode === 'infinity') {
                 minutes = 0;
                 document.body.classList.remove('breathing-active');
@@ -2311,14 +2590,30 @@
             if (autoStart) startStop();
         };
 
-        // Quick adjust ±5 min
+        // Quick adjust ±5 min (safe while stopped, paused, or running)
         quickMinusBtn.onclick = () => {
-            if (currentMode === 'infinity') return;
-            if (minutes > 5) { minutes -= 5; timerTotalSeconds = Math.max(60, timerTotalSeconds - 300); updateDisplay(); }
+            if (currentMode === 'infinity' || isOvertime) return;
+            const currentElapsed = timerBaseSeconds + (timerStartTime ? Math.floor((Date.now() - timerStartTime) / 1000) : 0);
+            const currentRemaining = timerTotalSeconds - currentElapsed;
+            if (currentRemaining > 300) {
+                timerTotalSeconds -= 300;
+                const newRem = timerTotalSeconds - currentElapsed;
+                minutes = Math.floor(newRem / 60);
+                seconds = newRem % 60;
+                updateDisplay();
+                saveTimerState();
+            }
         };
+
         quickPlusBtn.onclick = () => {
-            if (currentMode === 'infinity') return;
-            minutes += 5; timerTotalSeconds += 300; updateDisplay();
+            if (currentMode === 'infinity' || isOvertime) return;
+            const currentElapsed = timerBaseSeconds + (timerStartTime ? Math.floor((Date.now() - timerStartTime) / 1000) : 0);
+            timerTotalSeconds += 300;
+            const newRem = timerTotalSeconds - currentElapsed;
+            minutes = Math.floor(newRem / 60);
+            seconds = newRem % 60;
+            updateDisplay();
+            saveTimerState();
         };
 
         modeButtons.pomodoro.onclick = () => switchMode('pomodoro');
@@ -2329,14 +2624,25 @@
         resetTimerBtn.onclick = reset;
 
         // =============================================================
-        // 8. CYCLE DOTS & GOAL TRACKING & STATS
+        // 8. CYCLE DOTS, GOAL TRACKING & STATS
         // =============================================================
         const renderCycleDots = () => {
             const dots = cycleDotsContainer.children;
-            for (let i = 0; i < 4; i++) dots[i].classList.toggle('completed', i < (completedCycles % 4));
+            for (let i = 0; i < 4; i++) {
+                dots[i].classList.toggle('completed', i < (completedCycles % 4));
+            }
         };
 
         const getTodayKey = () => new Date().toISOString().split('T')[0];
+
+        const escapeHtml = (unsafe) => {
+            return String(unsafe)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        };
 
         const recordSessionStats = () => {
             const today = getTodayKey();
@@ -2344,12 +2650,11 @@
             totalPomosCount++;
             totalFocusMinutes += defaultPomo;
 
-            // Record Timeline Item
             const now = new Date();
             const timeStr = `${getFormattedNumber(now.getHours())}:${getFormattedNumber(now.getMinutes())}`;
             const activeTask = (activeTaskIndex >= 0 && todos[activeTaskIndex]) ? todos[activeTaskIndex].text : 'General Focus';
             timelineSessions.unshift({ time: timeStr, task: activeTask, duration: defaultPomo });
-            if (timelineSessions.length > 20) timelineSessions.pop();
+            if (timelineSessions.length > 25) timelineSessions.pop();
 
             localStorage.setItem('statsHistory', JSON.stringify(statsHistory));
             localStorage.setItem('timelineSessions', JSON.stringify(timelineSessions));
@@ -2362,7 +2667,7 @@
             const today = getTodayKey();
             const count = statsHistory[today] || 0;
             goalFraction.textContent = `${count}/${dailyTarget}`;
-            const pct = Math.min(100, Math.round((count / dailyTarget) * 100));
+            const pct = Math.min(100, Math.round((count / Math.max(1, dailyTarget)) * 100));
             goalPercent.textContent = `${pct}%`;
             dailyGoalFill.style.width = `${pct}%`;
 
@@ -2370,26 +2675,25 @@
             document.getElementById('statTotalPomos').textContent = totalPomosCount;
             document.getElementById('statTotalMinutes').textContent = `${totalFocusMinutes} min`;
 
-            // Render Timeline
             sessionTimeline.innerHTML = '';
             if (timelineSessions.length === 0) {
-                sessionTimeline.innerHTML = '<div style="color:var(--text-muted);font-size:0.76rem;text-align:center;padding:12px 0;">No sessions completed today yet.</div>';
+                sessionTimeline.innerHTML = '<div style="color:var(--text-muted);font-size:0.78rem;text-align:center;padding:12px 0;">No sessions completed today yet.</div>';
             } else {
                 timelineSessions.forEach(s => {
                     const row = document.createElement('div');
                     row.className = 'timeline-item';
-                    row.innerHTML = `<span><strong>${s.time}</strong> ${s.task}</span><span>+${s.duration}m</span>`;
+                    row.innerHTML = `<span><strong>${escapeHtml(s.time)}</strong> ${escapeHtml(s.task)}</span><span>+${Number(s.duration) || 25}m</span>`;
                     sessionTimeline.appendChild(row);
                 });
             }
 
-            // Render Heatmap
             const grid = document.getElementById('heatmapGrid');
             grid.innerHTML = '';
             for (let i = 6; i >= 0; i--) {
-                const d = new Date(); d.setDate(d.getDate() - i);
+                const d = new Date();
+                d.setDate(d.getDate() - i);
                 const k = d.toISOString().split('T')[0];
-                const dayName = d.toLocaleDateString('en-US', { weekday: 'narrow' });
+                const dayName = d.toLocaleDateString('en-US', { weekday: 'short' });
                 const sessions = statsHistory[k] || 0;
                 const cell = document.createElement('div');
                 cell.className = 'heatmap-cell';
@@ -2401,20 +2705,18 @@
             }
         };
 
-        // Export Markdown Daily Summary for Notion / Obsidian
         exportMdBtn.onclick = () => {
             const today = getTodayKey();
             const count = statsHistory[today] || 0;
             const completedTasks = todos.filter(t => t.completed).map(t => `- [x] ${t.text}`).join('\n') || '- (No tasks marked completed today)';
-            
             const summary = `### 🍅 Pomodoro Daily Summary (${today})\n- **Sessions Completed:** ${count}/${dailyTarget} (${Math.round((count * defaultPomo) / 60 * 10) / 10} hours)\n- **Completed Tasks:**\n${completedTasks}\n\n*Generated by Pomodoro Studio*`;
             navigator.clipboard.writeText(summary).then(() => {
-                triggerNotification("Daily Summary copied to clipboard (Markdown)!");
+                showToast("📋 Daily Summary copied to clipboard!");
             }).catch(() => {});
         };
 
         // =============================================================
-        // 9. TO-DO & ACTIVE TASK LOGIC
+        // 9. TO-DO & ACTIVE TASK LOGIC (WITH DRAWER SUPPORT FIXED)
         // =============================================================
         let todos = JSON.parse(localStorage.getItem('todos')) || [];
         let activeTaskIndex = parseInt(localStorage.getItem('activeTaskIndex'));
@@ -2425,6 +2727,9 @@
         const todoInput = document.getElementById('todoInput');
         const todoPomoEst = document.getElementById('todoPomoEst');
         const addTodoBtn = document.getElementById('addTodoBtn');
+        const drawerTodoInput = document.getElementById('drawerTodoInput');
+        const drawerTodoPomoEst = document.getElementById('drawerTodoPomoEst');
+        const drawerAddTodoBtn = document.getElementById('drawerAddTodoBtn');
         const dockClearDoneBtn = document.getElementById('dockClearDoneBtn');
 
         const updateActiveTaskDisplay = () => {
@@ -2449,6 +2754,9 @@
         const incrementActiveTaskTime = () => {
             if (activeTaskIndex >= 0 && todos[activeTaskIndex]) {
                 todos[activeTaskIndex].secondsSpent = (todos[activeTaskIndex].secondsSpent || 0) + 1;
+                if (todos[activeTaskIndex].secondsSpent % 30 === 0) {
+                    saveTodos();
+                }
             }
         };
 
@@ -2463,21 +2771,24 @@
                     if (todo.completed) li.classList.add('completed');
                     if (index === activeTaskIndex) li.classList.add('active-focus-task');
 
-                    // Extract #tag
-                    const tagMatch = todo.text.match(/#(\w+)/);
-                    const tagHtml = tagMatch ? `<span class="task-tag">#${tagMatch[1]}</span>` : '';
-                    const cleanText = todo.text.replace(/#\w+/, '').trim();
+                    // Supports both Arabic and English hashtags
+                    const tagMatch = todo.text.match(/#([\p{L}\p{N}_-]+)/u);
+                    const tagHtml = tagMatch ? `<span class="task-tag">#${escapeHtml(tagMatch[1])}</span>` : '';
+                    const cleanText = escapeHtml(todo.text.replace(/#[\p{L}\p{N}_-]+/u, '').trim() || todo.text);
 
                     const span = document.createElement('span');
                     span.className = 'task-text';
                     span.innerHTML = `${tagHtml}${cleanText}`;
-                    span.style.cssText = 'cursor:pointer;flex-grow:1;';
+                    span.style.cssText = 'cursor:pointer;flex-grow:1;word-break:break-word;';
                     span.dataset.action = 'toggle';
                     span.dataset.index = index;
 
                     span.ondblclick = () => {
                         const newText = prompt("Edit task:", todo.text);
-                        if (newText && newText.trim()) { todo.text = newText.trim(); saveTodos(); }
+                        if (newText && newText.trim()) {
+                            todo.text = newText.trim();
+                            saveTodos();
+                        }
                     };
 
                     const pomos = document.createElement('span');
@@ -2490,12 +2801,14 @@
 
                     const focusBtn = document.createElement('button');
                     focusBtn.className = 'task-btn';
+                    focusBtn.title = 'Focus on this task';
                     focusBtn.textContent = '🎯';
                     focusBtn.dataset.action = 'focus';
                     focusBtn.dataset.index = index;
 
                     const delBtn = document.createElement('button');
                     delBtn.className = 'task-btn';
+                    delBtn.title = 'Delete task';
                     delBtn.textContent = '×';
                     delBtn.dataset.action = 'delete';
                     delBtn.dataset.index = index;
@@ -2516,22 +2829,28 @@
 
         const handleAddTodo = (inputEl, estEl) => {
             const text = inputEl.value.trim();
-            const pomosEst = parseInt(estEl.value) || 1;
+            const pomosEst = Math.max(1, parseInt(estEl.value) || 1);
             if (text) {
                 todos.push({ text, pomosEst, pomosDone: 0, secondsSpent: 0, completed: false });
                 inputEl.value = '';
+                if (activeTaskIndex === -1 && todos.length === 1) activeTaskIndex = 0;
                 saveTodos();
             }
         };
 
+        // Main card To-Do input events
         addTodoBtn.onclick = () => handleAddTodo(todoInput, todoPomoEst);
-        todoInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleAddTodo(todoInput, todoPomoEst); });
+        todoInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleAddTodo(todoInput, todoPomoEst); });
+
+        // Drawer To-Do input events (Fixed!)
+        drawerAddTodoBtn.onclick = () => handleAddTodo(drawerTodoInput, drawerTodoPomoEst);
+        drawerTodoInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleAddTodo(drawerTodoInput, drawerTodoPomoEst); });
 
         const handleListClicks = (e) => {
             const target = e.target.closest('[data-action]');
             if (!target) return;
             const index = parseInt(target.dataset.index);
-            if (isNaN(index)) return;
+            if (isNaN(index) || !todos[index]) return;
 
             if (target.dataset.action === 'toggle') {
                 todos[index].completed = !todos[index].completed;
@@ -2551,13 +2870,14 @@
         drawerTodoList.addEventListener('click', handleListClicks);
 
         dockClearDoneBtn.onclick = () => {
+            const activeTaskObj = activeTaskIndex >= 0 ? todos[activeTaskIndex] : null;
             todos = todos.filter(t => !t.completed);
-            activeTaskIndex = -1;
+            activeTaskIndex = activeTaskObj ? todos.indexOf(activeTaskObj) : -1;
             saveTodos();
         };
         document.getElementById('clearCompletedBtn').onclick = dockClearDoneBtn.onclick;
 
-        // Drawer
+        // Sidebar Drawer
         const sidebar = document.getElementById("sidebar");
         const menuBtn = document.getElementById("menuBtn");
         const closeSidebar = document.getElementById("closeSidebar");
@@ -2569,8 +2889,12 @@
         // 10. GLOBAL HOTKEYS
         // =============================================================
         window.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && document.body.classList.contains('zen-active')) {
-                document.body.classList.remove('zen-active');
+            if (e.key === 'Escape') {
+                if (document.body.classList.contains('zen-active')) document.body.classList.remove('zen-active');
+                settingsModal.classList.remove('visible');
+                statsModal.classList.remove('visible');
+                prayerModal.classList.remove('visible');
+                closeSidebar.click();
                 return;
             }
             if (['input', 'textarea', 'select'].includes(document.activeElement.tagName.toLowerCase())) return;
@@ -2583,7 +2907,6 @@
             }
         });
 
-        // Fullscreen
         const toggleFullscreen = () => {
             if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(() => {});
             else document.exitFullscreen().catch(() => {});
@@ -2591,7 +2914,7 @@
         document.getElementById('fullscreenBtn').onclick = toggleFullscreen;
 
         // =============================================================
-        // 11. AUDIO PLAYER & DRAG-DROP MEDIA
+        // 11. AUDIO PLAYER, VIDEO MODE & PICTURE-IN-PICTURE
         // =============================================================
         const audioBar = document.getElementById('audioBar');
         const syncBodyPadding = () => document.body.classList.toggle('audio-active', !audioBar.hidden);
@@ -2621,7 +2944,8 @@
 
         const fmtTime = (s) => {
             if (isNaN(s) || !isFinite(s)) return '0:00';
-            const m = Math.floor(s / 60); const sec = Math.floor(s % 60);
+            const m = Math.floor(s / 60);
+            const sec = Math.floor(s % 60);
             return `${m}:${sec < 10 ? '0' : ''}${sec}`;
         };
 
@@ -2651,7 +2975,7 @@
 
         audioOpenBtn.onclick = () => audioFileInput.click();
         audioAddMore.onclick = () => audioFileInput.click();
-        audioFileInput.onchange = (e) => handleFiles(e.target.files);
+        audioFileInput.onchange = (e) => { handleFiles(e.target.files); audioFileInput.value = ''; };
 
         audioPlayBtn.onclick = () => {
             if (!audio.src || !playlist.length) return;
@@ -2664,7 +2988,10 @@
         audioNextBtn.onclick = () => { if (playlist.length) loadTrack((currentTrack + 1) % playlist.length); };
 
         audioSeek.oninput = () => { isSeeking = true; };
-        audioSeek.onchange = () => { if (audio.duration) audio.currentTime = (audioSeek.value / 100) * audio.duration; isSeeking = false; };
+        audioSeek.onchange = () => {
+            if (audio.duration) audio.currentTime = (audioSeek.value / 100) * audio.duration;
+            isSeeking = false;
+        };
         audio.addEventListener('timeupdate', () => {
             if (!isSeeking && audio.duration) audioSeek.value = (audio.currentTime / audio.duration) * 100;
             audioTimeDisplay.textContent = `${fmtTime(audio.currentTime)} / ${fmtTime(audio.duration)}`;
@@ -2695,35 +3022,21 @@
             syncBodyPadding();
         };
         audioCloseBtn.onclick = () => {
-            audio.pause(); audio.src = ''; audioBar.hidden = true; syncBodyPadding();
-            audioToggleBtn.hidden = true; audioPlayBtn.textContent = '▶';
-            // Release the object URLs we created for these tracks so the
-            // browser can free the underlying file memory.
-            playlist.forEach(track => { try { URL.revokeObjectURL(track.url); } catch(e) {} });
-            playlist = []; currentTrack = -1;
+            audio.pause();
+            audio.src = '';
+            audioBar.hidden = true;
+            syncBodyPadding();
+            audioToggleBtn.hidden = true;
+            audioPlayBtn.textContent = '▶';
+            playlist.forEach(track => { try { URL.revokeObjectURL(track.url); } catch (e) {} });
+            playlist = [];
+            currentTrack = -1;
         };
 
-        // Video Player
+        // Video Player (with mobile touch support)
         const videoPlayer = document.getElementById('videoPlayer');
         const exitVideoBtn = document.getElementById('exitVideoBtn');
         let topBarTimeout = null;
-
-        const playVideo = (file) => {
-            if (!audio.paused) { audio.pause(); audioPlayBtn.textContent = '▶'; }
-            // Release the previous video's object URL (if any) before
-            // creating a new one, to avoid leaking memory when switching
-            // between several study videos in one session.
-            if (videoPlayer.src) { try { URL.revokeObjectURL(videoPlayer.src); } catch(e) {} }
-            videoPlayer.src = URL.createObjectURL(file);
-            videoPlayer.classList.add('active');
-            document.body.classList.add('video-mode');
-            videoPlayer.hidden = false;
-            exitVideoBtn.hidden = false;
-            videoPlayer.play().catch(() => {});
-            document.addEventListener('mousemove', showTopBar);
-            showTopBar();
-        };
-        document.getElementById('videoOpenBtn').onclick = () => audioFileInput.click();
 
         const showTopBar = () => {
             if (!document.body.classList.contains('video-mode')) return;
@@ -2731,56 +3044,91 @@
             clearTimeout(topBarTimeout);
             topBarTimeout = setTimeout(() => {
                 if (!container.matches(':hover') && !videoPlayer.paused) container.classList.remove('show-bar');
-            }, 3000);
+            }, 3200);
         };
+
+        const playVideo = (file) => {
+            if (!audio.paused) { audio.pause(); audioPlayBtn.textContent = '▶'; }
+            if (videoPlayer.src) { try { URL.revokeObjectURL(videoPlayer.src); } catch (e) {} }
+            videoPlayer.src = URL.createObjectURL(file);
+            videoPlayer.classList.add('active');
+            document.body.classList.add('video-mode');
+            videoPlayer.hidden = false;
+            exitVideoBtn.hidden = false;
+            videoPlayer.play().catch(() => {});
+            document.addEventListener('mousemove', showTopBar);
+            document.addEventListener('touchstart', showTopBar, { passive: true });
+            showTopBar();
+        };
+        document.getElementById('videoOpenBtn').onclick = () => audioFileInput.click();
+
         exitVideoBtn.onclick = () => {
             videoPlayer.pause();
-            if (videoPlayer.src) { try { URL.revokeObjectURL(videoPlayer.src); } catch(e) {} }
-            videoPlayer.src = ''; videoPlayer.hidden = true;
-            videoPlayer.classList.remove('active'); document.body.classList.remove('video-mode');
-            container.classList.remove('show-bar'); exitVideoBtn.hidden = true;
+            if (videoPlayer.src) { try { URL.revokeObjectURL(videoPlayer.src); } catch (e) {} }
+            videoPlayer.src = '';
+            videoPlayer.hidden = true;
+            videoPlayer.classList.remove('active');
+            document.body.classList.remove('video-mode');
+            container.classList.remove('show-bar');
+            exitVideoBtn.hidden = true;
             document.removeEventListener('mousemove', showTopBar);
+            document.removeEventListener('touchstart', showTopBar);
         };
 
         // Drag & Drop
         const dropOverlay = document.getElementById('dropOverlay');
         let dragCounter = 0;
         window.addEventListener('dragenter', (e) => {
-            e.preventDefault(); dragCounter++;
+            e.preventDefault();
+            dragCounter++;
             if (e.dataTransfer && e.dataTransfer.types.includes('Files')) dropOverlay.classList.add('active');
         });
         window.addEventListener('dragover', (e) => e.preventDefault());
         window.addEventListener('dragleave', (e) => {
-            e.preventDefault(); dragCounter--;
+            e.preventDefault();
+            dragCounter--;
             if (dragCounter <= 0) { dragCounter = 0; dropOverlay.classList.remove('active'); }
         });
         window.addEventListener('drop', (e) => {
-            e.preventDefault(); dragCounter = 0; dropOverlay.classList.remove('active');
+            e.preventDefault();
+            dragCounter = 0;
+            dropOverlay.classList.remove('active');
             if (e.dataTransfer && e.dataTransfer.files.length) handleFiles(e.dataTransfer.files);
         });
 
-        // Picture in Picture
+        // Picture in Picture (Theme-aware)
         const pipBtn = document.getElementById('pipBtn');
         const pipCanvas = document.getElementById('pipCanvas');
         const pipVideo = document.createElement('video');
         pipVideo.muted = true;
         pipVideo.setAttribute('playsinline', '');
-        // Some browsers are unreliable about starting Picture-in-Picture on a
-        // video element that was never attached to the document. Keep it
-        // present but invisible instead of fully detached.
         pipVideo.style.cssText = 'position:fixed;width:1px;height:1px;opacity:0;pointer-events:none;';
         document.body.appendChild(pipVideo);
+
         pipBtn.onclick = async () => {
             try {
                 if (document.pictureInPictureElement) { await document.exitPictureInPicture(); return; }
                 const pctx = pipCanvas.getContext("2d");
                 const updatePip = () => {
-                    pctx.fillStyle = "#16213e"; pctx.fillRect(0, 0, 300, 300);
-                    pctx.fillStyle = "#ffffff"; pctx.font = "bold 64px system-ui";
-                    pctx.textAlign = "center"; pctx.textBaseline = "middle";
-                    pctx.fillText(counterElement.textContent, 150, 150);
-                    pctx.font = "20px system-ui"; pctx.fillStyle = "#94a3b8";
-                    pctx.fillText(currentMode.toUpperCase(), 150, 220);
+                    const isMorning = currentTheme === 'morning';
+                    pctx.fillStyle = isMorning ? "#f4f7fb" : "#16213e";
+                    pctx.fillRect(0, 0, 300, 300);
+
+                    pctx.fillStyle = isMorning ? "#0f172a" : "#ffffff";
+                    pctx.font = "bold 62px system-ui";
+                    pctx.textAlign = "center";
+                    pctx.textBaseline = "middle";
+                    pctx.fillText(counterElement.textContent, 150, 140);
+
+                    pctx.font = "bold 18px system-ui";
+                    pctx.fillStyle = "#e11d48";
+                    pctx.fillText(currentMode.toUpperCase(), 150, 205);
+
+                    if (activeTaskIndex >= 0 && todos[activeTaskIndex]) {
+                        pctx.font = "14px system-ui";
+                        pctx.fillStyle = isMorning ? "#64748b" : "#94a3b8";
+                        pctx.fillText(todos[activeTaskIndex].text.slice(0, 28), 150, 240);
+                    }
                 };
                 updatePip();
                 pipVideo.srcObject = pipCanvas.captureStream(10);
@@ -2790,7 +3138,9 @@
                     if (!document.pictureInPictureElement) { clearInterval(pipInt); return; }
                     updatePip();
                 }, 500);
-            } catch(e) {}
+            } catch (e) {
+                showToast("Picture-in-Picture is not supported on this browser.");
+            }
         };
 
         // =============================================================
@@ -2808,20 +3158,24 @@
         prayerBtn.onclick = () => { computePrayerTimes(); prayerModal.classList.add('visible'); };
         closePrayer.onclick = () => prayerModal.classList.remove('visible');
         offlinePrayerTab.onclick = () => {
-            offlinePrayerTab.classList.add('active-mode'); onlinePrayerTab.classList.remove('active-mode');
-            offlinePrayerView.style.display = 'block'; onlinePrayerView.style.display = 'none';
+            offlinePrayerTab.classList.add('active-mode');
+            onlinePrayerTab.classList.remove('active-mode');
+            offlinePrayerView.style.display = 'block';
+            onlinePrayerView.style.display = 'none';
         };
         onlinePrayerTab.onclick = () => {
-            onlinePrayerTab.classList.add('active-mode'); offlinePrayerTab.classList.remove('active-mode');
-            offlinePrayerView.style.display = 'none'; onlinePrayerView.style.display = 'flex';
+            onlinePrayerTab.classList.add('active-mode');
+            offlinePrayerTab.classList.remove('active-mode');
+            offlinePrayerView.style.display = 'none';
+            onlinePrayerView.style.display = 'flex';
         };
 
         const computePrayerTimes = () => {
             const now = new Date();
-            const dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
+            const dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 86400000);
             const b = 2 * Math.PI * (dayOfYear - 81) / 365;
             const eot = 9.87 * Math.sin(2 * b) - 7.53 * Math.cos(b) - 1.5 * Math.sin(b);
-            const noonMinutes = 12 * 60 - eot - ((31.2357 - 30) * 4);
+            const noonMinutes = 12 * 60 - eot - ((31.0 - 30) * 4);
 
             const prayers = [
                 { name: "الفجر (Fajr)", mins: noonMinutes - 410 },
@@ -2849,7 +3203,7 @@
         };
 
         // =============================================================
-        // 13. SETTINGS & PERSISTENCE
+        // 13. SETTINGS & ACCURATE STATE PERSISTENCE
         // =============================================================
         const settingsBtn = document.getElementById("settingsBtn");
         const settingsModal = document.getElementById("settingsModal");
@@ -2871,7 +3225,6 @@
             if (e.target === overlay) closeSidebar.click();
         };
 
-        // Inputs
         const pomodoroInput = document.getElementById("pomodoroTime");
         const shortBreakInput = document.getElementById("shortBreakTime");
         const longBreakInput = document.getElementById("longBreakTime");
@@ -2909,10 +3262,10 @@
         };
 
         saveSettingsBtn.onclick = () => {
-            defaultPomo = parseInt(pomodoroInput.value) || 25;
-            defaultShort = parseInt(shortBreakInput.value) || 5;
-            defaultLong = parseInt(longBreakInput.value) || 15;
-            dailyTarget = parseInt(dailyTargetInput.value) || 8;
+            defaultPomo = Math.max(1, parseInt(pomodoroInput.value) || 25);
+            defaultShort = Math.max(1, parseInt(shortBreakInput.value) || 5);
+            defaultLong = Math.max(1, parseInt(longBreakInput.value) || 15);
+            dailyTarget = Math.max(1, parseInt(dailyTargetInput.value) || 8);
             currentTheme = themeSelect.value;
             alarmSound = alarmSoundSelect.value;
             autoStartNext = autoStartBreaksCheck.checked;
@@ -2929,7 +3282,6 @@
             localStorage.setItem('shortTime', defaultShort);
             localStorage.setItem('longTime', defaultLong);
             localStorage.setItem('dailyTarget', dailyTarget);
-            localStorage.setItem('pomoTheme', currentTheme);
             localStorage.setItem('alarmSound', alarmSound);
             localStorage.setItem('autoStartNext', autoStartNext);
             localStorage.setItem('autoAudioSync', autoAudioSync);
@@ -2941,55 +3293,68 @@
             localStorage.setItem('meshGradient', meshGradient);
             localStorage.setItem('desktopNotif', desktopNotif);
 
-            document.documentElement.dataset.theme = currentTheme;
             document.body.classList.toggle('mesh-gradient-active', meshGradient);
-            updateAccentColor();
+            updateThemeUI();
             renderStatsAndGoal();
             settingsModal.classList.remove("visible");
-            reset();
+            if (status === Status_Types.STOPPED && timerBaseSeconds === 0) {
+                reset();
+            }
+            showToast("⚙️ Settings saved!");
         };
 
         const saveTimerState = () => {
             const state = {
-                currentMode, status, minutes, seconds, hours,
-                timerTotalSeconds, timerBaseSeconds, timerStartTime,
-                isOvertime, timestamp: Date.now()
+                currentMode,
+                status,
+                minutes,
+                seconds,
+                hours,
+                timerTotalSeconds,
+                timerBaseSeconds,
+                timerStartTime,
+                isOvertime
             };
             localStorage.setItem('pomoRunningState', JSON.stringify(state));
         };
 
+        // Fixed restore logic: accurately restores both RUNNING and PAUSED timers
         let didRestoreTimer = false;
         const restoreTimerState = () => {
             try {
                 const saved = JSON.parse(localStorage.getItem('pomoRunningState'));
                 if (!saved) return;
+
+                currentMode = saved.currentMode || 'pomodoro';
+                container.dataset.mode = currentMode;
+                for (const key in modeButtons) {
+                    modeButtons[key].classList.toggle('active-mode', key === currentMode);
+                }
+                document.body.classList.toggle('breathing-active', (currentMode === 'short' || currentMode === 'long') && boxBreathing);
+                updateAccentColor();
+
                 if (saved.status === Status_Types.STARTED && saved.timerStartTime) {
-                    const gapSec = Math.floor((Date.now() - saved.timestamp) / 1000);
-                    currentMode = saved.currentMode || 'pomodoro';
-
-                    // Reflect the restored mode in the UI (buttons, accent color, container)
-                    // WITHOUT calling switchMode(), since switchMode() resets
-                    // timerTotalSeconds/timerBaseSeconds to defaults and would
-                    // discard the progress we're restoring below.
-                    container.dataset.mode = currentMode;
-                    for (const key in modeButtons) {
-                        modeButtons[key].classList.toggle('active-mode', key === currentMode);
-                    }
-                    document.body.classList.remove('breathing-active');
-                    if ((currentMode === 'short' || currentMode === 'long') && boxBreathing) {
-                        document.body.classList.add('breathing-active');
-                    }
-                    updateAccentColor();
-
-                    timerTotalSeconds = saved.timerTotalSeconds;
-                    timerBaseSeconds = (saved.timerBaseSeconds || 0) + gapSec;
+                    const totalElapsedSinceStart = Math.floor((Date.now() - saved.timerStartTime) / 1000);
+                    timerTotalSeconds = saved.timerTotalSeconds || (defaultPomo * 60);
+                    timerBaseSeconds = (saved.timerBaseSeconds || 0) + Math.max(0, totalElapsedSinceStart);
                     isOvertime = !!saved.isOvertime;
                     if (isOvertime) overtimeBadge.style.display = 'block';
 
                     startStop();
                     didRestoreTimer = true;
+                } else if (saved.status === Status_Types.STOPPED && (saved.timerBaseSeconds > 0 || saved.isOvertime)) {
+                    timerTotalSeconds = saved.timerTotalSeconds || (defaultPomo * 60);
+                    timerBaseSeconds = saved.timerBaseSeconds || 0;
+                    minutes = saved.minutes ?? defaultPomo;
+                    seconds = saved.seconds ?? 0;
+                    hours = saved.hours ?? 0;
+                    isOvertime = !!saved.isOvertime;
+                    if (isOvertime) overtimeBadge.style.display = 'block';
+
+                    updateDisplay();
+                    didRestoreTimer = true;
                 }
-            } catch(e) {}
+            } catch (e) {}
         };
 
         // Export/Import JSON
@@ -2997,8 +3362,10 @@
             const data = { todos, statsHistory, timelineSessions, totalPomosCount, totalFocusMinutes, scratchpad: scratchpadNotes.value };
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
             const blobUrl = URL.createObjectURL(blob);
-            const a = document.createElement('a'); a.href = blobUrl;
-            a.download = `pomodoro-studio-backup-${getTodayKey()}.json`; a.click();
+            const a = document.createElement('a');
+            a.href = blobUrl;
+            a.download = `pomodoro-studio-backup-${getTodayKey()}.json`;
+            a.click();
             setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
         };
         document.getElementById('importDataBtn').onclick = () => document.getElementById('importFileInput').click();
@@ -3009,15 +3376,22 @@
             r.onload = (ev) => {
                 try {
                     const p = JSON.parse(ev.target.result);
-                    if (p.todos) todos = p.todos;
+                    if (Array.isArray(p.todos)) todos = p.todos;
                     if (p.statsHistory) statsHistory = p.statsHistory;
-                    if (p.timelineSessions) timelineSessions = p.timelineSessions;
-                    if (p.totalPomosCount) totalPomosCount = p.totalPomosCount;
-                    if (p.totalFocusMinutes) totalFocusMinutes = p.totalFocusMinutes;
-                    if (p.scratchpad) scratchpadNotes.value = p.scratchpad;
-                    saveTodos(); renderStatsAndGoal(); statsModal.classList.remove('visible');
-                    triggerNotification("Backup restored successfully!");
-                } catch(err) { alert("Invalid file"); }
+                    if (Array.isArray(p.timelineSessions)) timelineSessions = p.timelineSessions;
+                    if (typeof p.totalPomosCount === 'number') totalPomosCount = p.totalPomosCount;
+                    if (typeof p.totalFocusMinutes === 'number') totalFocusMinutes = p.totalFocusMinutes;
+                    if (typeof p.scratchpad === 'string') {
+                        scratchpadNotes.value = p.scratchpad;
+                        localStorage.setItem('scratchpadContent', p.scratchpad);
+                    }
+                    saveTodos();
+                    renderStatsAndGoal();
+                    statsModal.classList.remove('visible');
+                    showToast("✅ Backup restored successfully!");
+                } catch (err) {
+                    alert("Invalid JSON backup file.");
+                }
             };
             r.readAsText(file);
         };
@@ -3027,10 +3401,6 @@
         renderTodos();
         renderStatsAndGoal();
         restoreTimerState();
-        // Only reset to a fresh default timer if we did NOT just resume a
-        // running session above — otherwise this would immediately wipe
-        // out the restored progress (e.g. after a page reload while
-        // a pomodoro/break/infinity session was running).
         if (!didRestoreTimer) reset();
     </script>
 </body>
